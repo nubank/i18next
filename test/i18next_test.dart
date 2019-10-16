@@ -35,8 +35,8 @@ void main() {
           return null;
         },
       );
-      expect(i18next.localize('ns1:myKey'), 'My first value');
-      expect(i18next.localize('ns2:myKey'), 'My second value');
+      expect(i18next.t('ns1:myKey'), 'My first value');
+      expect(i18next.t('ns2:myKey'), 'My second value');
     });
   });
 
@@ -49,27 +49,27 @@ void main() {
         return {'myKey': 'My value'};
       }, count: 1),
     );
-    expect(i18next.localize('ns:myKey'), 'My value');
+    expect(i18next.t('ns:myKey'), 'My value');
   });
 
   test('given key for unregistered namespace', () {
     i18next = I18Next(locale, (namespace, loc) => null);
-    expect(() => i18next.localize('ns:myKey'), throwsAssertionError);
+    expect(() => i18next.t('ns:myKey'), throwsAssertionError);
   });
 
   test('given null key', () {
     given({});
-    expect(() => i18next.localize(null), throwsAssertionError);
+    expect(() => i18next.t(null), throwsAssertionError);
   });
 
   test('given an existing string key', () {
     given({'myKey': 'This is my key'});
-    expect(i18next.localize('myKey'), 'This is my key');
+    expect(i18next.t('myKey'), 'This is my key');
   });
 
   test('given a non-existing key', () {
     given({});
-    expect(i18next.localize('someKey'), 'someKey');
+    expect(i18next.t('someKey'), 'someKey');
   });
 
   test('given a nested string key', () {
@@ -81,8 +81,8 @@ void main() {
         }
       }
     });
-    expect(i18next.localize('my.key'), 'This is my key');
-    expect(i18next.localize('my.nested.key'), 'This is a more nested key');
+    expect(i18next.t('my.key'), 'This is my key');
+    expect(i18next.t('my.nested.key'), 'This is a more nested key');
   });
 
   test('given a partially matching nested key', () {
@@ -91,8 +91,8 @@ void main() {
         'nested': {'key': 'This is a more nested key'},
       }
     });
-    expect(i18next.localize('my'), 'my');
-    expect(i18next.localize('my.nested'), 'my.nested');
+    expect(i18next.t('my'), 'my');
+    expect(i18next.t('my.nested'), 'my.nested');
   });
 
   group('pluralizable data', () {
@@ -104,23 +104,23 @@ void main() {
     });
 
     test('without count', () {
-      expect(i18next.localize('friend'), 'A friend');
+      expect(i18next.t('friend'), 'A friend');
     });
 
     test('given count', () {
-      expect(i18next.localize('friend', count: 0), '0 friends');
-      expect(i18next.localize('friend', count: 1), 'A friend');
-      expect(i18next.localize('friend', count: -1), '-1 friends');
-      expect(i18next.localize('friend', count: 99), '99 friends');
+      expect(i18next.t('friend', count: 0), '0 friends');
+      expect(i18next.t('friend', count: 1), 'A friend');
+      expect(i18next.t('friend', count: -1), '-1 friends');
+      expect(i18next.t('friend', count: 99), '99 friends');
     });
 
     test('given count and unmmaped context', () {
       expect(
-        i18next.localize('friend', count: 1, context: 'something'),
+        i18next.t('friend', count: 1, context: 'something'),
         'A friend',
       );
       expect(
-        i18next.localize('friend', count: 99, context: 'something'),
+        i18next.t('friend', count: 99, context: 'something'),
         '99 friends',
       );
     });
@@ -138,36 +138,36 @@ void main() {
     });
 
     test('without context', () {
-      expect(i18next.localize('friend'), 'A friend');
+      expect(i18next.t('friend'), 'A friend');
     });
 
     test('given mapped context', () {
-      expect(i18next.localize('friend', context: 'male'), 'A boyfriend');
-      expect(i18next.localize('friend', context: 'female'), 'A girlfriend');
+      expect(i18next.t('friend', context: 'male'), 'A boyfriend');
+      expect(i18next.t('friend', context: 'female'), 'A girlfriend');
     });
 
     test('given unmaped context', () {
-      expect(i18next.localize('friend', context: 'other'), 'A friend');
+      expect(i18next.t('friend', context: 'other'), 'A friend');
     });
 
     test('given mapped context and count', () {
       expect(
-        i18next.localize('friend', context: 'male', count: 0),
+        i18next.t('friend', context: 'male', count: 0),
         'A boyfriend',
       );
       expect(
-        i18next.localize('friend', context: 'male', count: 1),
+        i18next.t('friend', context: 'male', count: 1),
         'A boyfriend',
       );
     });
 
     test('given unmapped context and count', () {
       expect(
-        i18next.localize('friend', context: 'other', count: 1),
+        i18next.t('friend', context: 'other', count: 1),
         'A friend',
       );
       expect(
-        i18next.localize('friend', context: 'other', count: 99),
+        i18next.t('friend', context: 'other', count: 99),
         'A friend',
       );
     });
@@ -187,30 +187,30 @@ void main() {
 
     test('given mapped context and count', () {
       expect(
-        i18next.localize('friend', context: 'male', count: 0),
+        i18next.t('friend', context: 'male', count: 0),
         '0 boyfriends',
       );
       expect(
-        i18next.localize('friend', context: 'male', count: 1),
+        i18next.t('friend', context: 'male', count: 1),
         'A boyfriend',
       );
       expect(
-        i18next.localize('friend', context: 'female', count: 0),
+        i18next.t('friend', context: 'female', count: 0),
         '0 girlfriends',
       );
       expect(
-        i18next.localize('friend', context: 'female', count: 1),
+        i18next.t('friend', context: 'female', count: 1),
         'A girlfriend',
       );
     });
 
     test('given unmmaped context and count', () {
       expect(
-        i18next.localize('friend', context: 'other', count: 0),
+        i18next.t('friend', context: 'other', count: 0),
         '0 friends',
       );
       expect(
-        i18next.localize('friend', context: 'other', count: 1),
+        i18next.t('friend', context: 'other', count: 1),
         'A friend',
       );
     });
@@ -223,25 +223,25 @@ void main() {
 
     test('given non matching arguments', () {
       expect(
-        i18next.localize('myKey', arguments: {'none': 'none'}),
+        i18next.t('myKey', arguments: {'none': 'none'}),
         '{{first}}, {{second}}, and then {{third}}!',
       );
     });
 
     test('given partially matching arguments', () {
       expect(
-        i18next.localize('myKey', arguments: {'first': 'fst'}),
+        i18next.t('myKey', arguments: {'first': 'fst'}),
         'fst, {{second}}, and then {{third}}!',
       );
       expect(
-        i18next.localize('myKey', arguments: {'first': 'fst', 'third': 'trd'}),
+        i18next.t('myKey', arguments: {'first': 'fst', 'third': 'trd'}),
         'fst, {{second}}, and then trd!',
       );
     });
 
     test('given all matching arguments', () {
       expect(
-        i18next.localize('myKey', arguments: {
+        i18next.t('myKey', arguments: {
           'first': 'fst',
           'second': 'snd',
           'third': 'trd',
@@ -252,7 +252,7 @@ void main() {
 
     test('given extra matching arguments', () {
       expect(
-        i18next.localize('myKey', arguments: {
+        i18next.t('myKey', arguments: {
           'first': 'fst',
           'second': 'snd',
           'third': 'trd',
@@ -270,7 +270,7 @@ void main() {
         formatter: expectAsync3((value, format, locale) => null, count: 0),
       );
       expect(
-        i18next.localize('myKey'),
+        i18next.t('myKey'),
         'leading no value trailing',
       );
     });
@@ -281,7 +281,7 @@ void main() {
         formatter: expectAsync3((value, format, locale) => value.toString()),
       );
       expect(
-        i18next.localize('myKey', arguments: {'value': 'eulav'}),
+        i18next.t('myKey', arguments: {'value': 'eulav'}),
         'leading eulav trailing',
       );
     });
@@ -299,7 +299,7 @@ void main() {
         ),
       );
       expect(
-        i18next.localize('myKey', arguments: {'value': 'eulav'}),
+        i18next.t('myKey', arguments: {'value': 'eulav'}),
         'leading eulav trailing',
       );
     });
@@ -322,7 +322,7 @@ void main() {
         ),
       );
       expect(
-        i18next.localize('myKey', arguments: {
+        i18next.t('myKey', arguments: {
           'value1': '1eulav',
           'value2': '2eulav',
         }),

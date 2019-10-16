@@ -87,7 +87,7 @@ class I18Next {
   ///   has been found (delimited by [prefix] and [suffix]). Before the result
   ///   is added to the final message, it first goes through [formatter].
   // TODO: add individual level property overrides (prefix, suffix, locale, ...)
-  String localize(
+  String t(
     String key, {
     String context,
     int count,
