@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'interpolation_options.dart';
 import 'utils.dart';
 
 /// It translates the i18next localized format in your localization objects
@@ -28,18 +29,9 @@ import 'utils.dart';
 /// I18Next.localization('feature:title') // -> 'My feature title'
 /// ```
 class I18Next {
-  const I18Next(
-    this.locale,
-    this.dataSource, {
-    this.prefix = '{{',
-    this.suffix = '}}',
-    this.formatSeparator = ',',
-    ArgumentFormatter formatter,
-  })  : assert(prefix != null),
-        assert(suffix != null),
-        assert(dataSource != null),
-        assert(formatSeparator != null && formatSeparator != ''),
-        formatter = formatter ?? defaultFormatter;
+  I18Next(this.locale, this.dataSource, {InterpolationOptions interpolation})
+      : assert(dataSource != null),
+        interpolation = interpolation ?? InterpolationOptions();
 
   /// The current [Locale] for this instance.
   ///
@@ -53,24 +45,8 @@ class I18Next {
   /// just fallback to the key used.
   final LocalizationDataSource dataSource;
 
-  /// [prefix] and [suffix] are the deliminators for the variable
-  /// interpolation and formatting mechanism.
-  /// By default they are '{{' and '}}' respectively and ca't be null but
-  /// can be empty.
-  ///
-  /// [formatSeparator] is used to separate the variable's name from the
-  /// format (if any). Defaults to ',' and cannot be null.
-  /// e.g. '{{title, uppercase}}' name = 'title', format = 'uppercase'
-  final String prefix, suffix, formatSeparator;
-
-  /// Formats the variables before they are joined into the final result.
-  ///
-  /// Defaults to [defaultFormatter] which simply returns the value itself.
-  final ArgumentFormatter formatter;
-
-  /// Simply returns the [value], doesn't attempt to format it in any way.
-  static String defaultFormatter(Object value, String format, Locale locale) =>
-      value.toString();
+  /// The options used to find and format matching interpolations.
+  final InterpolationOptions interpolation;
 
   /// Attempts to retrieve a translation at [key].
   ///
@@ -166,16 +142,16 @@ class I18Next {
   String _replace(String target, Map<String, Object> arguments) {
     if (arguments == null || arguments.isEmpty) return target;
 
-    final regex = RegExp('$prefix(.*?)$suffix');
+    final regex = interpolation.pattern;
     return target.splitMapJoin(
       regex,
       onMatch: (match) {
-        final split = match.group(1).split(RegExp(' *$formatSeparator *'));
+        final split = match.group(1).split(interpolation.separatorPattern);
         final name = split.first;
         if (arguments.containsKey(name)) {
           String format;
           if (split.length > 1) format = split[1];
-          return formatter(arguments[name], format, locale);
+          return interpolation.formatter(arguments[name], format, locale);
         }
         return match.group(0);
       },

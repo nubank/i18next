@@ -14,7 +14,7 @@ void main() {
     i18next = I18Next(
       locale,
       (namespace, locale) => data,
-      formatter: formatter,
+      interpolation: InterpolationOptions(formatter: formatter),
     );
   }
 
