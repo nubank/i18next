@@ -124,11 +124,13 @@ class I18Next {
 
     String message = _evaluate(alteredKey, data);
     // trying fallbacks
-    if (message == null && count != null)
-      message = _evaluate(_pluralize(key, count, locale), data);
-    if (message == null && context != null)
-      message = _evaluate(_contextualize(key, context), data);
-    if (message == null) message = _evaluate(key, data);
+    if (message == null) {
+      if (count != null)
+        message ??= _evaluate(_pluralize(key, count, locale), data);
+      if (context != null && context.isNotEmpty)
+        message ??= _evaluate(_contextualize(key, context), data);
+      message ??= _evaluate(key, data);
+    }
 
     if (message != null)
       message = _interpolate(message, arguments, locale, interpolation);
