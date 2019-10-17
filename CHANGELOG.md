@@ -2,6 +2,10 @@
 
 * Adds InterpolationOption
 * Allows locale and interpolation options override on `t`
+* Adds a little more documentation
+
+Internal:
+* Splits data fetching and translation into separate methods
 
 ## [0.0.1] - TODO: Add release date.
 
