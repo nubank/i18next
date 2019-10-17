@@ -62,7 +62,10 @@ class I18Next {
   ///   is added to the final message, it first goes through [formatter].
   /// - If [locale] is given, it overrides the current locale value.
   /// - If [interpolation] is given, it overrides the current interpolation
-  /// values.
+  ///   values.
+  ///
+  /// Keys that allow both contextualization and pluralization must be declared
+  /// in the order: `key_context_plural`
   String t(
     String key, {
     String context,
@@ -132,6 +135,7 @@ class I18Next {
     return message;
   }
 
+  /// Returns the contextualized form for the [key].
   static String _contextualize(String key, String context) {
     return '${key}_$context';
   }
@@ -195,6 +199,11 @@ class I18Next {
 class _KeyAnalyzer {
   _KeyAnalyzer(this.namespace, this.key);
 
+  /// From [key], it extracts a [namespace] and a [key]:
+  ///
+  /// - 'ns:myKey' -> namespace: 'ns', key: 'myKey'
+  /// - 'ns:my.key' -> namespace: 'ns', key: 'my.key'
+  /// - 'myKey' -> namespace: '', key: 'myKey'
   factory _KeyAnalyzer.fromKey(String key) {
     final match = RegExp(':').firstMatch(key);
     String namespace, keyPath;
