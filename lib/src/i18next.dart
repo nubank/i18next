@@ -1,8 +1,6 @@
 import 'dart:ui';
 
-typedef ArgumentFormatter = String Function(Object, String, Locale);
-
-typedef LocalizationDataSource = Map<String, Object> Function(String, Locale);
+import 'utils.dart';
 
 /// It translates the i18next localized format in your localization objects
 /// (provided by [dataSource]) to the final translation.
