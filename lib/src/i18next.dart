@@ -87,8 +87,29 @@ class I18Next {
       return key;
     }
 
+    return _translate(
+          analyzer.key,
+          data,
+          context: context,
+          count: count,
+          arguments: arguments,
+          locale: locale,
+          interpolation: interpolation,
+        ) ??
+        key;
+  }
+
+  static String _translate(
+    String key,
+    Map<String, Object> data, {
+    String context,
+    int count,
+    Map<String, Object> arguments,
+    Locale locale,
+    InterpolationOptions interpolation,
+  }) {
     arguments ??= {};
-    String alteredKey = analyzer.key;
+    String alteredKey = key;
     if (context != null && context.isNotEmpty) {
       alteredKey = _contextualize(alteredKey, context);
       arguments['context'] ??= context;
@@ -101,14 +122,14 @@ class I18Next {
     String message = _evaluate(alteredKey, data);
     // trying fallbacks
     if (message == null && count != null)
-      message = _evaluate(_pluralize(analyzer.key, count, locale), data);
+      message = _evaluate(_pluralize(key, count, locale), data);
     if (message == null && context != null)
-      message = _evaluate(_contextualize(analyzer.key, context), data);
-    if (message == null) message = _evaluate(analyzer.key, data);
+      message = _evaluate(_contextualize(key, context), data);
+    if (message == null) message = _evaluate(key, data);
 
     if (message != null)
       message = _interpolate(message, arguments, locale, interpolation);
-    return message ?? key;
+    return message;
   }
 
   static String _contextualize(String key, String context) {
