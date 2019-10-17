@@ -25,8 +25,8 @@ import 'utils.dart';
 /// // { "continue": "Continue" }
 /// // feature.json
 /// // { "title": "My feature Title" }
-/// I18Next.localization('common:continue') // -> 'Continue'
-/// I18Next.localization('feature:title') // -> 'My feature title'
+/// I18Next.t('common:continue') // -> 'Continue'
+/// I18Next.t('feature:title') // -> 'My feature title'
 /// ```
 class I18Next {
   I18Next(this.locale, this.dataSource, {InterpolationOptions interpolation})
@@ -91,8 +91,8 @@ class I18Next {
       arguments['count'] ??= count;
     }
 
-    // TODO: try all possibilities for fallbacks?
     String message = _evaluate(alteredKey, data);
+    // trying fallbacks
     if (message == null && count != null)
       message = _evaluate(_pluralize(analyzer.keyPath, count), data);
     if (message == null && context != null)
@@ -131,14 +131,15 @@ class I18Next {
     return object;
   }
 
-  /// Replaces occurrences of matches ([prefix] and [suffix]) in [target] for
-  /// the named values in [arguments], by first passing through the [formatter]
-  /// before joining the resulting string.
+  /// Replaces occurrences of matches in [target] for the named values
+  /// in [arguments] (if they exist), by first passing through the
+  /// [InterpolationOptions.formatter] before joining the resulting string.
   ///
   /// - 'Hello {{name}}' + {name: 'World'} -> 'Hello World'.
   ///   This example illustrates a simple interpolation.
   /// - 'Now is {{date, dd/MM}}' + {date: DateTime.now()} -> 'Now is 23/09'.
-  ///   In this example, [formatter] must be able to properly format the date.
+  ///   In this example, [InterpolationOptions.formatter] must be able to
+  ///   properly format the date.
   String _replace(String target, Map<String, Object> arguments) {
     if (arguments == null || arguments.isEmpty) return target;
 
