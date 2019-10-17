@@ -156,7 +156,6 @@ class I18Next {
         }
         return match.group(0);
       },
-      onNonMatch: (nonMatch) => nonMatch,
     );
   }
 }
