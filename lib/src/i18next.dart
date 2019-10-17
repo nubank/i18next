@@ -81,7 +81,7 @@ class I18Next {
     }
 
     arguments ??= {};
-    String alteredKey = analyzer.keyPath;
+    String alteredKey = analyzer.key;
     if (context != null && context.isNotEmpty) {
       alteredKey = _contextualize(alteredKey, context);
       arguments['context'] ??= context;
@@ -94,10 +94,10 @@ class I18Next {
     String message = _evaluate(alteredKey, data);
     // trying fallbacks
     if (message == null && count != null)
-      message = _evaluate(_pluralize(analyzer.keyPath, count), data);
+      message = _evaluate(_pluralize(analyzer.key, count, locale), data);
     if (message == null && context != null)
-      message = _evaluate(_contextualize(analyzer.keyPath, context), data);
-    if (message == null) message = _evaluate(analyzer.keyPath, data);
+      message = _evaluate(_contextualize(analyzer.key, context), data);
+    if (message == null) message = _evaluate(analyzer.key, data);
 
     if (message != null) message = _replace(message, arguments);
     return message ?? key;
@@ -161,7 +161,7 @@ class I18Next {
 }
 
 class _KeyAnalyzer {
-  _KeyAnalyzer(this.namespace, this.keyPath);
+  _KeyAnalyzer(this.namespace, this.key);
 
   factory _KeyAnalyzer.fromKey(String key) {
     final match = RegExp(':').firstMatch(key);
@@ -173,8 +173,8 @@ class _KeyAnalyzer {
     return _KeyAnalyzer(namespace ?? '', keyPath ?? key);
   }
 
-  final String namespace, keyPath;
+  final String namespace, key;
 
   @override
-  String toString() => '"$namespace" : "$keyPath"';
+  String toString() => '"$namespace" : "$key"';
 }
