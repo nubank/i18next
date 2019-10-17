@@ -2,16 +2,22 @@ import 'dart:ui';
 
 import 'utils.dart';
 
+/// Contains all interpolation options for [I18Next] to work properly.
 class InterpolationOptions {
-  /// [prefix] and [suffix] are the deliminators for the variable
+  /// Creates a new instance where:
+  ///
+  /// - [prefix] and [suffix] are the deliminators for the variable
   /// interpolation and formatting mechanism.
   /// By default they are '{{' and '}}' respectively and can't be null but
-  /// can be empty.
-  ///
-  /// [separatorPattern] is used to separate the variable's name from the
+  /// can be empty. They are used to build [pattern].
+  /// - [formatSeparator] is used to separate the variable's name from the
   /// format (if any). Defaults to ',' and cannot be null nor empty (otherwise
-  /// it'll match every char in the interpolation).
+  /// it'll match every char in the interpolation). It is used to build
+  /// [separatorPattern].
   /// e.g. '{{title, uppercase}}' name = 'title', format = 'uppercase'
+  /// - [formatter] is a [ArgumentFormatter] called when an interpolation has
+  /// been found and is ready for substitution. Defaults to [defaultFormatter],
+  /// which simply returns the value itself.
   InterpolationOptions({
     String prefix = '{{',
     String suffix = '}}',
