@@ -60,14 +60,21 @@ class I18Next {
   /// - If [arguments] are given, they are used as a lookup table when a match
   ///   has been found (delimited by [prefix] and [suffix]). Before the result
   ///   is added to the final message, it first goes through [formatter].
-  // TODO: add individual level property overrides (prefix, suffix, locale, ...)
+  /// - If [locale] is given, it overrides the current locale value.
+  /// - If [interpolation] is given, it overrides the current interpolation
+  /// values.
   String t(
     String key, {
     String context,
     int count,
     Map<String, Object> arguments,
+    Locale locale,
+    InterpolationOptions interpolation,
   }) {
     assert(key != null);
+    locale ??= this.locale;
+    // TODO: add a way to merge instead of overriding everything?
+    interpolation ??= this.interpolation;
 
     final analyzer = _KeyAnalyzer.fromKey(key);
     final data = dataSource(analyzer.namespace, locale);
@@ -87,7 +94,7 @@ class I18Next {
       arguments['context'] ??= context;
     }
     if (count != null) {
-      alteredKey = _pluralize(alteredKey, count);
+      alteredKey = _pluralize(alteredKey, count, locale);
       arguments['count'] ??= count;
     }
 
@@ -99,16 +106,17 @@ class I18Next {
       message = _evaluate(_contextualize(analyzer.key, context), data);
     if (message == null) message = _evaluate(analyzer.key, data);
 
-    if (message != null) message = _replace(message, arguments);
+    if (message != null)
+      message = _interpolate(message, arguments, locale, interpolation);
     return message ?? key;
   }
 
-  String _contextualize(String key, String context) {
+  static String _contextualize(String key, String context) {
     return '${key}_$context';
   }
 
   /// Returns the pluralized form for the [key] based on [locale] and [count].
-  String _pluralize(String key, int count) {
+  static String _pluralize(String key, int count, Locale locale) {
     // TODO: check locale's plural forms (zero, one, few, many, others)
     return count == 1 ? key : '${key}_plural';
   }
@@ -116,7 +124,7 @@ class I18Next {
   /// Given a key with multiple split points (`.`), this method navigates
   /// through the objects and returns the last node, expecting it to be a
   /// [String], null otherwise.
-  String _evaluate(String path, Map<String, Object> data) {
+  static String _evaluate(String path, Map<String, Object> data) {
     final keys = path.split('.');
 
     dynamic object = data;
@@ -140,9 +148,12 @@ class I18Next {
   /// - 'Now is {{date, dd/MM}}' + {date: DateTime.now()} -> 'Now is 23/09'.
   ///   In this example, [InterpolationOptions.formatter] must be able to
   ///   properly format the date.
-  String _replace(String target, Map<String, Object> arguments) {
-    if (arguments == null || arguments.isEmpty) return target;
-
+  static String _interpolate(
+    String target,
+    Map<String, Object> arguments,
+    Locale locale,
+    InterpolationOptions interpolation,
+  ) {
     final regex = interpolation.pattern;
     return target.splitMapJoin(
       regex,

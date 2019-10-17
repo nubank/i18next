@@ -10,10 +10,14 @@ void main() {
     i18next = null;
   });
 
-  void given(Map<String, Object> data, {ArgumentFormatter formatter}) {
+  void given(
+    Map<String, Object> data, {
+    LocalizationDataSource dataSource,
+    ArgumentFormatter formatter,
+  }) {
     i18next = I18Next(
       locale,
-      (namespace, locale) => data,
+      dataSource ?? (namespace, locale) => data,
       interpolation: InterpolationOptions(formatter: formatter),
     );
   }
@@ -331,5 +335,35 @@ void main() {
       expect(values, orderedEquals(<String>['1eulav', '2eulav']));
       expect(formats, orderedEquals(<String>['format1', 'format2']));
     });
+  });
+
+  test('given overriding locale', () {
+    const data = {'key': 'my value'};
+    const anotherLocale = Locale('another');
+    i18next = I18Next(locale, expectAsync2((_, loc) {
+      expect(loc, anotherLocale);
+      return data;
+    }));
+    expect(i18next.t('key', locale: anotherLocale), 'my value');
+  });
+
+  test('given overriding interpolation formatter', () {
+    given(
+      {'key': 'my {{value}}'},
+      formatter: expectAsync3(null, count: 0),
+    );
+    expect(
+      i18next.t(
+        'key',
+        arguments: {'value': 'new value'},
+        interpolation: InterpolationOptions(
+          formatter: expectAsync3((value, _, __) {
+            expect(value, 'new value');
+            return value.toString();
+          }),
+        ),
+      ),
+      'my new value',
+    );
   });
 }
