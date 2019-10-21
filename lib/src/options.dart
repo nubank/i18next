@@ -14,7 +14,8 @@ class I18NextOptions {
     String nestingSeparator = ',',
     this.pluralSuffix = '_plural',
     ArgumentFormatter formatter,
-  })  : assert(interpolationPrefix != null),
+  })  : assert(namespaceSeparator != null),
+        assert(interpolationPrefix != null),
         assert(interpolationSuffix != null),
         assert(interpolationSeparator != null &&
             interpolationSeparator.isNotEmpty),
@@ -29,7 +30,23 @@ class I18NextOptions {
         nestingSeparator = RegExp.escape(nestingSeparator),
         formatter = formatter ?? defaultFormatter;
 
+  /// The pattern used to separate namespaces in keys
+  ///
+  /// e.g. 'ns:myKey' -> namespace = 'ns', key = 'myKey'
   final String namespaceSeparator;
+
+  /// This is the suffix used for the pluralization mechanism.
+  ///
+  /// Defaults to '_plural' and is used for both simple and complex
+  /// pluralization rule cases.
+  ///
+  /// For example, in english where it only has singular or plural forms:
+  ///
+  /// ```
+  /// "friend": "A friend"
+  /// "friend_plural": "{{count}} friends"
+  /// ```
+  final String pluralSuffix;
 
   /// [interpolationPrefix] and [interpolationSuffix] are the deliminators
   /// for the variable interpolation and formatting mechanism.
@@ -67,25 +84,14 @@ class I18NextOptions {
   /// ```
   final String nestingPrefix, nestingSuffix, nestingSeparator;
 
-  /// This is the suffix used for the pluralization mechanism.
-  ///
-  /// Defaults to '_plural' and is used for both simple and complex
-  /// pluralization rule cases.
-  ///
-  /// For example, in english where it only has singular or plural forms:
-  ///
-  /// ```
-  /// "friend": "A friend"
-  /// "friend_plural": "{{count}} friends"
-  /// ```
-  final String pluralSuffix;
-
   /// [formatter] is called when an interpolation has been found and is ready
   /// for substitution.
   ///
   /// Defaults to [defaultFormatter], which simply returns the value itself in
   /// String form ([Object.toString]).
   final ArgumentFormatter formatter;
+
+  RegExp get namespacePattern => RegExp(namespaceSeparator);
 
   /// The matching pattern for interpolations.
   ///

@@ -26,7 +26,8 @@ class Translator {
     variables ??= {};
 
     String namespace = '', keyPath = key;
-    final match = RegExp(':').firstMatch(key);
+
+    final match = options.namespacePattern.firstMatch(key);
     if (match != null) {
       namespace = key.substring(0, match.start);
       keyPath = key.substring(match.end);
