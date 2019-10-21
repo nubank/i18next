@@ -51,7 +51,7 @@ class Translator {
     Map<String, Object> variables,
   }) {
     if (context != null && context.isNotEmpty) {
-      final contextKey = '${key}_$context';
+      final contextKey = '$key${options.contextSeparator}$context';
       final value = translateKey(namespace, contextKey,
           count: count, variables: variables);
       if (value != null) return value;

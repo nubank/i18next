@@ -5,6 +5,7 @@ void main() {
   test('default values', () {
     final options = I18NextOptions();
     expect(options.namespaceSeparator, ':');
+    expect(options.contextSeparator, '_');
 
     expect(options.interpolationPrefix, r'\{\{');
     expect(options.interpolationSuffix, r'\}\}');

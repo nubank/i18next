@@ -6,6 +6,7 @@ import 'utils.dart';
 class I18NextOptions {
   I18NextOptions({
     this.namespaceSeparator = ':',
+    this.contextSeparator = '_',
     String interpolationPrefix = '{{',
     String interpolationSuffix = '}}',
     String interpolationSeparator = ',',
@@ -34,6 +35,8 @@ class I18NextOptions {
   ///
   /// e.g. 'ns:myKey' -> namespace = 'ns', key = 'myKey'
   final String namespaceSeparator;
+
+  final String contextSeparator;
 
   /// This is the suffix used for the pluralization mechanism.
   ///
