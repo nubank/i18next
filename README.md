@@ -10,7 +10,7 @@ Mind that this is still a pre-1.0.0 so breaking changes may occur frequently.
 - [ ]  Support for multiple plural forms (one, few, many, plural, ...)
 - [x]  Graceful translation lookup
 - [x]  Get string or object tree
-- [ ]  Support for nesting
+- [x]  Support for nesting
 - [ ]  Sprintf support
 - [ ]  Retrieve resource files from server
 - [ ]  Resource caching
@@ -69,7 +69,7 @@ i18next.t('unspecifiedKey'); // 'unspecifiedKey'
 i18next.t('key', arguments: {'name': 'World'}); // 'Hello World!'
 ```
 
-- [Nesting](https://www.i18next.com/translation-function/nesting) (**Unsupported**):
+- [Nesting](https://www.i18next.com/translation-function/nesting):
 
 ```json
 {

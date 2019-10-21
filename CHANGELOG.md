@@ -3,7 +3,8 @@
 * Renames arguments to variables
 * Replaces InterpolationOptions for I18NextOptions
 * Updates I18Next inner workings to more contextualized methods.
-* Escapes interpolation strings in options for RegExp 
+* Escapes interpolation strings in options for RegExp
+* Adds base nesting mechanism
 
 ## [0.0.1+3]
 

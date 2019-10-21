@@ -220,9 +220,14 @@ void main() {
     });
   });
 
-  group('matching arguments', () {
+  group('interpolation', () {
     setUp(() {
       given(const {'myKey': '{{first}}, {{second}}, and then {{third}}!'});
+    });
+
+    test('given empty interpolation', () {
+      given({'key': 'This is some {{}}'});
+      expect(i18next.t('key'), 'This is some {{}}');
     });
 
     test('given non matching arguments', () {
@@ -270,16 +275,27 @@ void main() {
   group('given formatter', () {
     test('with no interpolations', () {
       given(
-        const {'myKey': 'leading no value trailing'},
+        const {'key': 'no interpolations here'},
         formatter: expectAsync3((value, format, locale) => null, count: 0),
       );
+      expect(i18next.t('key'), 'no interpolations here');
+    });
+
+    test('with no matching variables', () {
+      given(
+        const {'key': 'leading {{value, format}} trailing'},
+        formatter: expectAsync3(
+          (value, format, locale) => value.toString(),
+          count: 0,
+        ),
+      );
       expect(
-        i18next.t('myKey'),
-        'leading no value trailing',
+        i18next.t('key', variables: {'name': 'World'}),
+        'leading {{value, format}} trailing',
       );
     });
 
-    test('with no matching arguments', () {
+    test('with matching variables', () {
       given(
         const {'myKey': 'leading {{value, format}} trailing'},
         formatter: expectAsync3((value, format, locale) => value.toString()),
@@ -345,5 +361,59 @@ void main() {
       return data;
     }));
     expect(i18next.t('key', locale: anotherLocale), 'my value');
+  });
+
+  group('nesting', () {
+    test('when nested key is not found', () {
+      given({
+        'key': r'This is my $t(anotherKey)',
+      });
+      expect(i18next.t('key'), r'This is my anotherKey');
+    });
+
+    test('simple key substitutions', () {
+      given({
+        'nesting1': r'1 $t(nesting2)',
+        'nesting2': r'2 $t(nesting3)',
+        'nesting3': '3',
+      });
+      expect(i18next.t('nesting1'), '1 2 3');
+    });
+
+    test('interpolation from immediate variables', () {
+      given({
+        'key1': 'hello world',
+        'key2': 'say: {{val}}',
+      });
+      expect(
+        i18next.t('key2', variables: {'val': r'$t(key1)'}),
+        'say: hello world',
+      );
+    });
+
+    test('interpolation of nested variables', () {
+      given({
+        'key1': 'hello {{name}}',
+        'key2': r'say: $t(key1)',
+      });
+      expect(
+        i18next.t('key2', variables: {'name': 'world'}),
+        'say: hello world',
+      );
+    });
+
+    test('with pluralization and interpolation ', () {
+      given({
+        'girlsAndBoys': r'$t(girls, {"count": {{girls}} }) and {{count}} boy',
+        'girlsAndBoys_plural':
+            r'$t(girls, {"count": {{girls}} }) and {{count}} boys',
+        'girls': "{{count}} girl",
+        'girls_plural': "{{count}} girls"
+      });
+      expect(
+        i18next.t('girlsAndBoys', count: 2, variables: {'girls': 3}),
+        '3 girls and 2 boys',
+      );
+    });
   });
 }
