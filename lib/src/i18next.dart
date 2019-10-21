@@ -57,7 +57,7 @@ class I18Next {
   ///   appropriate pluralized key, before defaulting to the [key] itself.
   ///   Most languages like `en` have only `one` and `other` pluralization
   ///   forms but some like `ar` require a more complex system.
-  /// - If [arguments] are given, they are used as a lookup table when a match
+  /// - If [variables] are given, they are used as a lookup table when a match
   ///   has been found (delimited by [prefix] and [suffix]). Before the result
   ///   is added to the final message, it first goes through [formatter].
   /// - If [locale] is given, it overrides the current locale value.
@@ -70,7 +70,7 @@ class I18Next {
     String key, {
     String context,
     int count,
-    Map<String, Object> arguments,
+    Map<String, Object> variables,
     Locale locale,
     InterpolationOptions interpolation,
   }) {
@@ -95,7 +95,7 @@ class I18Next {
           data,
           context: context,
           count: count,
-          arguments: arguments,
+          variables: variables,
           locale: locale,
           interpolation: interpolation,
         ) ??
@@ -107,19 +107,19 @@ class I18Next {
     Map<String, Object> data, {
     String context,
     int count,
-    Map<String, Object> arguments,
+    Map<String, Object> variables,
     Locale locale,
     InterpolationOptions interpolation,
   }) {
-    arguments ??= {};
+    variables ??= {};
     String alteredKey = key;
     if (context != null && context.isNotEmpty) {
       alteredKey = _contextualize(alteredKey, context);
-      arguments['context'] ??= context;
+      variables['context'] ??= context;
     }
     if (count != null) {
       alteredKey = _pluralize(alteredKey, count, locale);
-      arguments['count'] ??= count;
+      variables['count'] ??= count;
     }
 
     String message = _evaluate(alteredKey, data);
@@ -133,7 +133,7 @@ class I18Next {
     }
 
     if (message != null)
-      message = _interpolate(message, arguments, locale, interpolation);
+      message = _interpolate(message, variables, locale, interpolation);
     return message;
   }
 
@@ -167,7 +167,7 @@ class I18Next {
   }
 
   /// Replaces occurrences of matches in [target] for the named values
-  /// in [arguments] (if they exist), by first passing through the
+  /// in [variables] (if they exist), by first passing through the
   /// [InterpolationOptions.formatter] before joining the resulting string.
   ///
   /// - 'Hello {{name}}' + {name: 'World'} -> 'Hello World'.
@@ -177,7 +177,7 @@ class I18Next {
   ///   properly format the date.
   static String _interpolate(
     String target,
-    Map<String, Object> arguments,
+    Map<String, Object> variables,
     Locale locale,
     InterpolationOptions interpolation,
   ) {
@@ -187,10 +187,10 @@ class I18Next {
       onMatch: (match) {
         final split = match.group(1).split(interpolation.separatorPattern);
         final name = split.first;
-        if (arguments.containsKey(name)) {
+        if (variables.containsKey(name)) {
           String format;
           if (split.length > 1) format = split[1];
-          return interpolation.formatter(arguments[name], format, locale);
+          return interpolation.formatter(variables[name], format, locale);
         }
         return match.group(0);
       },

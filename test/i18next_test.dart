@@ -227,25 +227,25 @@ void main() {
 
     test('given non matching arguments', () {
       expect(
-        i18next.t('myKey', arguments: {'none': 'none'}),
+        i18next.t('myKey', variables: {'none': 'none'}),
         '{{first}}, {{second}}, and then {{third}}!',
       );
     });
 
     test('given partially matching arguments', () {
       expect(
-        i18next.t('myKey', arguments: {'first': 'fst'}),
+        i18next.t('myKey', variables: {'first': 'fst'}),
         'fst, {{second}}, and then {{third}}!',
       );
       expect(
-        i18next.t('myKey', arguments: {'first': 'fst', 'third': 'trd'}),
+        i18next.t('myKey', variables: {'first': 'fst', 'third': 'trd'}),
         'fst, {{second}}, and then trd!',
       );
     });
 
     test('given all matching arguments', () {
       expect(
-        i18next.t('myKey', arguments: {
+        i18next.t('myKey', variables: {
           'first': 'fst',
           'second': 'snd',
           'third': 'trd',
@@ -256,7 +256,7 @@ void main() {
 
     test('given extra matching arguments', () {
       expect(
-        i18next.t('myKey', arguments: {
+        i18next.t('myKey', variables: {
           'first': 'fst',
           'second': 'snd',
           'third': 'trd',
@@ -285,7 +285,7 @@ void main() {
         formatter: expectAsync3((value, format, locale) => value.toString()),
       );
       expect(
-        i18next.t('myKey', arguments: {'value': 'eulav'}),
+        i18next.t('myKey', variables: {'value': 'eulav'}),
         'leading eulav trailing',
       );
     });
@@ -303,7 +303,7 @@ void main() {
         ),
       );
       expect(
-        i18next.t('myKey', arguments: {'value': 'eulav'}),
+        i18next.t('myKey', variables: {'value': 'eulav'}),
         'leading eulav trailing',
       );
     });
@@ -326,7 +326,7 @@ void main() {
         ),
       );
       expect(
-        i18next.t('myKey', arguments: {
+        i18next.t('myKey', variables: {
           'value1': '1eulav',
           'value2': '2eulav',
         }),
@@ -355,7 +355,7 @@ void main() {
     expect(
       i18next.t(
         'key',
-        arguments: {'value': 'new value'},
+        variables: {'value': 'new value'},
         interpolation: InterpolationOptions(
           formatter: expectAsync3((value, _, __) {
             expect(value, 'new value');
