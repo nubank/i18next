@@ -18,7 +18,7 @@ void main() {
     i18next = I18Next(
       locale,
       dataSource ?? (namespace, locale) => data,
-      interpolation: InterpolationOptions(formatter: formatter),
+      options: I18NextOptions(formatter: formatter),
     );
   }
 
@@ -345,25 +345,5 @@ void main() {
       return data;
     }));
     expect(i18next.t('key', locale: anotherLocale), 'my value');
-  });
-
-  test('given overriding interpolation formatter', () {
-    given(
-      {'key': 'my {{value}}'},
-      formatter: expectAsync3(null, count: 0),
-    );
-    expect(
-      i18next.t(
-        'key',
-        variables: {'value': 'new value'},
-        interpolation: InterpolationOptions(
-          formatter: expectAsync3((value, _, __) {
-            expect(value, 'new value');
-            return value.toString();
-          }),
-        ),
-      ),
-      'my new value',
-    );
   });
 }

@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'interpolation_options.dart';
+import 'options.dart';
 import 'utils.dart';
 
 /// It translates the i18next localized format in your localization objects
@@ -29,9 +29,9 @@ import 'utils.dart';
 /// I18Next.t('feature:title') // -> 'My feature title'
 /// ```
 class I18Next {
-  I18Next(this.locale, this.dataSource, {InterpolationOptions interpolation})
+  I18Next(this.locale, this.dataSource, {I18NextOptions options})
       : assert(dataSource != null),
-        interpolation = interpolation ?? InterpolationOptions();
+        options = options ?? I18NextOptions();
 
   /// The current [Locale] for this instance.
   ///
@@ -46,7 +46,7 @@ class I18Next {
   final LocalizationDataSource dataSource;
 
   /// The options used to find and format matching interpolations.
-  final InterpolationOptions interpolation;
+  final I18NextOptions options;
 
   /// Attempts to retrieve a translation at [key].
   ///
@@ -58,11 +58,10 @@ class I18Next {
   ///   Most languages like `en` have only `one` and `other` pluralization
   ///   forms but some like `ar` require a more complex system.
   /// - If [variables] are given, they are used as a lookup table when a match
-  ///   has been found (delimited by [prefix] and [suffix]). Before the result
-  ///   is added to the final message, it first goes through [formatter].
+  ///   has been found (delimited by [I18NextOptions.interpolationPrefix] and
+  ///   [I18NextOptions.interpolationSuffix]). Before the result is added to
+  ///   the final message, it first goes through [I18NextOptions.formatter].
   /// - If [locale] is given, it overrides the current locale value.
-  /// - If [interpolation] is given, it overrides the current interpolation
-  ///   values.
   ///
   /// Keys that allow both contextualization and pluralization must be declared
   /// in the order: `key_context_plural`
@@ -72,12 +71,9 @@ class I18Next {
     int count,
     Map<String, Object> variables,
     Locale locale,
-    InterpolationOptions interpolation,
   }) {
     assert(key != null);
     locale ??= this.locale;
-    // TODO: add a way to merge instead of overriding everything?
-    interpolation ??= this.interpolation;
 
     final analyzer = _KeyAnalyzer.fromKey(key);
     final data = dataSource(analyzer.namespace, locale);
@@ -97,7 +93,7 @@ class I18Next {
           count: count,
           variables: variables,
           locale: locale,
-          interpolation: interpolation,
+          options: options,
         ) ??
         key;
   }
@@ -109,7 +105,7 @@ class I18Next {
     int count,
     Map<String, Object> variables,
     Locale locale,
-    InterpolationOptions interpolation,
+    I18NextOptions options,
   }) {
     variables ??= {};
     String alteredKey = key;
@@ -133,7 +129,7 @@ class I18Next {
     }
 
     if (message != null)
-      message = _interpolate(message, variables, locale, interpolation);
+      message = _interpolate(message, variables, locale, options);
     return message;
   }
 
@@ -179,20 +175,21 @@ class I18Next {
     String target,
     Map<String, Object> variables,
     Locale locale,
-    InterpolationOptions interpolation,
+    I18NextOptions options,
   ) {
-    final regex = interpolation.pattern;
     return target.splitMapJoin(
-      regex,
+      options.interpolationPattern,
       onMatch: (match) {
-        final split = match.group(1).split(interpolation.separatorPattern);
-        final name = split.first;
-        if (variables.containsKey(name)) {
-          String format;
-          if (split.length > 1) format = split[1];
-          return interpolation.formatter(variables[name], format, locale);
+        RegExpMatch regExpMatch = match;
+        final variable = regExpMatch.namedGroup('variable');
+
+        String result;
+        final value = variables[variable];
+        if (value != null) {
+          final format = regExpMatch.namedGroup('format');
+          result = options.formatter(value, format, locale);
         }
-        return match.group(0);
+        return result ?? regExpMatch.group(0);
       },
     );
   }

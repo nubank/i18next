@@ -1,6 +1,7 @@
 ## [0.0.1+4]
 
 * Renames arguments to variables
+* Replaces InterpolationOptions for I18NextOptions
 
 ## [0.0.1+3]
 
