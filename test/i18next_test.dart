@@ -58,7 +58,7 @@ void main() {
 
   test('given key for unregistered namespace', () {
     i18next = I18Next(locale, (namespace, loc) => null);
-    expect(() => i18next.t('ns:myKey'), throwsAssertionError);
+    expect(i18next.t('ns:myKey'), 'ns:myKey');
   });
 
   test('given null key', () {

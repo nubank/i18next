@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
+
 import 'options.dart';
 import 'utils.dart';
 
@@ -75,79 +77,86 @@ class I18Next {
     assert(key != null);
     locale ??= this.locale;
 
-    final analyzer = _KeyAnalyzer.fromKey(key);
-    final data = dataSource(analyzer.namespace, locale);
-    if (data == null) {
-      assert(
-        false,
-        'Data source could not retrieve appropriate strings map for $locale'
-        ' at $analyzer',
-      );
-      return key;
+    String namespace = '', keyPath = key;
+    final match = RegExp(':').firstMatch(key);
+    if (match != null) {
+      namespace = key.substring(0, match.start);
+      keyPath = key.substring(match.end);
     }
 
-    return _translate(
-          analyzer.key,
-          data,
-          context: context,
-          count: count,
-          variables: variables,
-          locale: locale,
-          options: options,
-        ) ??
+    return translateKey(namespace, keyPath,
+            context: context,
+            count: count,
+            variables: variables,
+            locale: locale,
+            options: options,
+            dataSource: dataSource) ??
         key;
   }
 
-  static String _translate(
-    String key,
-    Map<String, Object> data, {
+  static String translateKey(
+    String namespace,
+    String key, {
     String context,
     int count,
     Map<String, Object> variables,
     Locale locale,
     I18NextOptions options,
+    // TODO: remove this later
+    @required LocalizationDataSource dataSource,
   }) {
-    variables ??= {};
-    String alteredKey = key;
     if (context != null && context.isNotEmpty) {
-      alteredKey = _contextualize(alteredKey, context);
-      variables['context'] ??= context;
+      final contextKey = '${key}_$context';
+      final value = translateKey(namespace, contextKey,
+          count: count,
+          variables: variables,
+          locale: locale,
+          options: options,
+          dataSource: dataSource);
+      if (value != null) return value;
     }
+
     if (count != null) {
-      alteredKey = _pluralize(alteredKey, count, locale);
-      variables['count'] ??= count;
+      final variablesWithCount = Map<String, Object>.from(variables ?? {});
+      variablesWithCount['count'] ??= count;
+
+      final pluralKey = pluralize(key, options.pluralSuffix, count, locale);
+      final value = translateKey(namespace, pluralKey,
+          variables: variablesWithCount,
+          locale: locale,
+          options: options,
+          dataSource: dataSource);
+      if (value != null) return value;
     }
 
-    String message = _evaluate(alteredKey, data);
-    // trying fallbacks
-    if (message == null) {
-      if (count != null)
-        message ??= _evaluate(_pluralize(key, count, locale), data);
-      if (context != null && context.isNotEmpty)
-        message ??= _evaluate(_contextualize(key, context), data);
-      message ??= _evaluate(key, data);
-    }
-
-    if (message != null)
-      message = _interpolate(message, variables, locale, options);
-    return message;
-  }
-
-  /// Returns the contextualized form for the [key].
-  static String _contextualize(String key, String context) {
-    return '${key}_$context';
+    return find(namespace, key,
+        variables: variables,
+        locale: locale,
+        options: options,
+        dataSource: dataSource);
   }
 
   /// Returns the pluralized form for the [key] based on [locale] and [count].
-  static String _pluralize(String key, int count, Locale locale) {
-    // TODO: check locale's plural forms (zero, one, few, many, others)
-    return count == 1 ? key : '${key}_plural';
+  static String pluralize(String key, String suffix, int count, Locale locale) {
+    if (count != 1) {
+      final number = _numberForLocale(count.abs(), locale);
+      if (number >= 0)
+        key = '$key${suffix}_$number';
+      else
+        key = '$key$suffix';
+    }
+    return key;
+  }
+
+  static int _numberForLocale(int count, Locale locale) {
+    // TODO: add locale based rules
+    return -1;
   }
 
   /// Given a key with multiple split points (`.`), this method navigates
   /// through the objects and returns the last node, expecting it to be a
   /// [String], null otherwise.
-  static String _evaluate(String path, Map<String, Object> data) {
+  static String evaluate(String path, Map<String, Object> data) {
     final keys = path.split('.');
 
     dynamic object = data;
@@ -162,6 +171,35 @@ class I18Next {
     return object;
   }
 
+  static String find(
+    String namespace,
+    String key, {
+    Map<String, Object> variables,
+    Locale locale,
+    I18NextOptions options,
+    // TODO: remove this later
+    @required LocalizationDataSource dataSource,
+  }) {
+    // TODO: find out if namespaces are loaded early
+    Map<String, Object> data = dataSource(namespace, locale);
+    final value = evaluate(key, data);
+    if (value == null) {
+      // TODO: fallback locales
+      // TODO: fallback namespaces
+      // TODO: fallback to default value
+    }
+
+    String result;
+    if (value != null) {
+      result = interpolate(value,
+          variables: variables, locale: locale, options: options);
+      result =
+          nest(result, variables: variables, locale: locale, options: options);
+    }
+
+    return result;
+  }
+
   /// Replaces occurrences of matches in [target] for the named values
   /// in [variables] (if they exist), by first passing through the
   /// [InterpolationOptions.formatter] before joining the resulting string.
@@ -171,13 +209,13 @@ class I18Next {
   /// - 'Now is {{date, dd/MM}}' + {date: DateTime.now()} -> 'Now is 23/09'.
   ///   In this example, [InterpolationOptions.formatter] must be able to
   ///   properly format the date.
-  static String _interpolate(
-    String target,
+  static String interpolate(
+    String string, {
     Map<String, Object> variables,
     Locale locale,
     I18NextOptions options,
-  ) {
-    return target.splitMapJoin(
+  }) {
+    return string.splitMapJoin(
       options.interpolationPattern,
       onMatch: (match) {
         RegExpMatch regExpMatch = match;
@@ -193,28 +231,14 @@ class I18Next {
       },
     );
   }
-}
 
-class _KeyAnalyzer {
-  _KeyAnalyzer(this.namespace, this.key);
-
-  /// From [key], it extracts a [namespace] and a [key]:
-  ///
-  /// - 'ns:myKey' -> namespace: 'ns', key: 'myKey'
-  /// - 'ns:my.key' -> namespace: 'ns', key: 'my.key'
-  /// - 'myKey' -> namespace: '', key: 'myKey'
-  factory _KeyAnalyzer.fromKey(String key) {
-    final match = RegExp(':').firstMatch(key);
-    String namespace, keyPath;
-    if (match != null) {
-      namespace = key.substring(0, match.start);
-      keyPath = key.substring(match.end);
-    }
-    return _KeyAnalyzer(namespace ?? '', keyPath ?? key);
+  static String nest(
+    String string, {
+    Map<String, Object> variables,
+    Locale locale,
+    I18NextOptions options,
+  }) {
+    // TODO: implement
+    return string;
   }
-
-  final String namespace, key;
-
-  @override
-  String toString() => '"$namespace" : "$key"';
 }

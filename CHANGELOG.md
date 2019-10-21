@@ -2,6 +2,7 @@
 
 * Renames arguments to variables
 * Replaces InterpolationOptions for I18NextOptions
+* Updates I18Next inner workings to more contextualized methods. 
 
 ## [0.0.1+3]
 
