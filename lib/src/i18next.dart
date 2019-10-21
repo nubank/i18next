@@ -32,7 +32,7 @@ import 'utils.dart';
 class I18Next {
   I18Next(this.locale, this.dataSource, {I18NextOptions options})
       : assert(dataSource != null),
-        options = options ?? I18NextOptions();
+        options = I18NextOptions.base.apply(options);
 
   /// The current [Locale] for this instance.
   ///
@@ -63,6 +63,8 @@ class I18Next {
   ///   [I18NextOptions.interpolationSuffix]). Before the result is added to
   ///   the final message, it first goes through [I18NextOptions.formatter].
   /// - If [locale] is given, it overrides the current locale value.
+  /// - If [options] is given, it overrides any non-null property over current
+  ///   options.
   ///
   /// Keys that allow both contextualization and pluralization must be declared
   /// in the order: `key_context_plural`
@@ -72,13 +74,14 @@ class I18Next {
     int count,
     Map<String, Object> variables,
     Locale locale,
+    I18NextOptions options,
   }) {
     assert(key != null);
 
     return Translator(
           locale ?? this.locale,
           dataSource,
-          options,
+          this.options.apply(options),
         ).translate(
           key,
           context: context,

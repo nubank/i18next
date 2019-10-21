@@ -6,8 +6,8 @@ import 'options.dart';
 class Interpolator {
   Interpolator(this.locale, this.options);
 
-  final I18NextOptions options;
   final Locale locale;
+  final I18NextOptions options;
 
   /// Replaces occurrences of matches in [string] for the named values
   /// in [variables] (if they exist), by first passing through the
@@ -18,10 +18,7 @@ class Interpolator {
   /// - 'Now is {{date, dd/MM}}' + {date: DateTime.now()} -> 'Now is 23/09'.
   ///   In this example, [I18NextOptions.formatter] must be able to
   ///   properly format the date.
-  String interpolate(
-    String string, {
-    Map<String, Object> variables,
-  }) {
+  String interpolate(String string, {Map<String, Object> variables}) {
     return string.splitMapJoin(
       options.interpolationPattern,
       onMatch: (match) {

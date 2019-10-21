@@ -3,7 +3,7 @@ import 'package:i18next/src/options.dart';
 
 void main() {
   test('default values', () {
-    final options = I18NextOptions();
+    final options = I18NextOptions.base;
     expect(options.namespaceSeparator, ':');
     expect(options.contextSeparator, '_');
 
@@ -11,45 +11,17 @@ void main() {
     expect(options.interpolationSuffix, r'\}\}');
     expect(options.interpolationSeparator, ',');
 
+    expect(options.nestingPrefix, r'\$t\(');
+    expect(options.nestingSuffix, r'\)');
+    expect(options.nestingSeparator, ',');
+
     expect(options.pluralSuffix, '_plural');
 
     expect(options.formatter, I18NextOptions.defaultFormatter);
   });
 
-  test('given interpolationPrefix null', () {
-    expect(
-      () => I18NextOptions(interpolationPrefix: null),
-      throwsAssertionError,
-    );
-  });
-
-  test('given interpolationPrefix empty', () {
-    final options = I18NextOptions(interpolationPrefix: '');
-    expect(options.interpolationPrefix, '');
-    expect(
-      options.interpolationPattern.pattern,
-      r'(?<variable>.*?)(,\s*(?<format>.*?)\s*)?\}\}',
-    );
-  });
-
-  test('given interpolationSuffix null', () {
-    expect(
-      () => I18NextOptions(interpolationSuffix: null),
-      throwsAssertionError,
-    );
-  });
-
-  test('given interpolationSuffix empty', () {
-    final options = I18NextOptions(interpolationSuffix: '');
-    expect(options.interpolationSuffix, '');
-    expect(
-      options.interpolationPattern.pattern,
-      r'\{\{(?<variable>.*?)(,\s*(?<format>.*?)\s*)?',
-    );
-  });
-
   group('#interpolationPattern', () {
-    final options = I18NextOptions();
+    final options = I18NextOptions.base;
 
     Iterable<List<String>> allMatches(String text) =>
         options.interpolationPattern.allMatches(text).map((match) => [
@@ -128,17 +100,6 @@ void main() {
     });
   });
 
-  test('given formatter null', () {
-    final options = I18NextOptions(formatter: null);
-    expect(options.formatter, isNotNull);
-  });
-
-  test('given formatter', () {
-    final formatter = expectAsync3((a, b, c) => a.toString(), count: 0);
-    final options = I18NextOptions(formatter: formatter);
-    expect(options.formatter, formatter);
-  });
-
   test('.defaultFormatter', () {
     const formatter = I18NextOptions.defaultFormatter;
     expect(formatter('My value', null, null), 'My value');
@@ -149,5 +110,49 @@ void main() {
 
     final date = DateTime.now();
     expect(formatter(date, null, null), date.toString());
+  });
+
+  group('#apply', () {
+    final base = I18NextOptions.base;
+    final empty = I18NextOptions();
+    final another = I18NextOptions(
+      namespaceSeparator: '',
+      contextSeparator: '',
+      interpolationPrefix: '',
+      interpolationSuffix: '',
+      interpolationSeparator: '',
+      nestingPrefix: '',
+      nestingSuffix: '',
+      nestingSeparator: '',
+      pluralSuffix: '',
+      formatter: (value, format, locale) => null,
+    );
+
+    test('given equal', () {
+      expect(base.apply(base), base);
+      expect(empty.apply(empty), empty);
+      expect(another.apply(another), another);
+    });
+
+    test('from empty given full', () {
+      expect(empty.apply(base), base);
+      expect(empty.apply(another), another);
+    });
+
+    test('from full given empty', () {
+      expect(base.apply(empty), base);
+      expect(another.apply(empty), another);
+    });
+
+    test('from full given full', () {
+      expect(base.apply(another), another);
+      expect(another.apply(base), base);
+    });
+
+    test('given null', () {
+      expect(base.apply(null), base);
+      expect(empty.apply(null), empty);
+      expect(another.apply(null), another);
+    });
   });
 }

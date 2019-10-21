@@ -5,31 +5,30 @@ import 'utils.dart';
 /// Contains all options for [I18Next] to work properly.
 class I18NextOptions {
   I18NextOptions({
-    this.namespaceSeparator = ':',
-    this.contextSeparator = '_',
-    String interpolationPrefix = '{{',
-    String interpolationSuffix = '}}',
-    String interpolationSeparator = ',',
-    String nestingPrefix = r'$t(',
-    String nestingSuffix = ')',
-    String nestingSeparator = ',',
-    this.pluralSuffix = '_plural',
-    ArgumentFormatter formatter,
-  })  : assert(namespaceSeparator != null),
-        assert(interpolationPrefix != null),
-        assert(interpolationSuffix != null),
-        assert(interpolationSeparator != null &&
-            interpolationSeparator.isNotEmpty),
-        assert(nestingPrefix != null),
-        assert(nestingSuffix != null),
-        assert(nestingSeparator != null && nestingSeparator.isNotEmpty),
-        interpolationPrefix = RegExp.escape(interpolationPrefix),
-        interpolationSuffix = RegExp.escape(interpolationSuffix),
-        interpolationSeparator = RegExp.escape(interpolationSeparator),
-        nestingPrefix = RegExp.escape(nestingPrefix),
-        nestingSuffix = RegExp.escape(nestingSuffix),
-        nestingSeparator = RegExp.escape(nestingSeparator),
-        formatter = formatter ?? defaultFormatter;
+    this.namespaceSeparator,
+    this.contextSeparator,
+    this.interpolationPrefix,
+    this.interpolationSuffix,
+    this.interpolationSeparator,
+    this.nestingPrefix,
+    this.nestingSuffix,
+    this.nestingSeparator,
+    this.pluralSuffix,
+    this.formatter,
+  });
+
+  static final base = I18NextOptions(
+    namespaceSeparator: ':',
+    contextSeparator: '_',
+    interpolationPrefix: RegExp.escape('{{'),
+    interpolationSuffix: RegExp.escape('}}'),
+    interpolationSeparator: RegExp.escape(','),
+    nestingPrefix: RegExp.escape(r'$t('),
+    nestingSuffix: RegExp.escape(')'),
+    nestingSeparator: RegExp.escape(','),
+    pluralSuffix: '_plural',
+    formatter: defaultFormatter,
+  );
 
   /// The pattern used to separate namespaces in keys
   ///
@@ -107,6 +106,55 @@ class I18NextOptions {
   RegExp get nestingPattern => RegExp('$nestingPrefix'
       '(?<key>.*?)($nestingSeparator\\s*(?<variables>.*?)\\s*)?'
       '$nestingSuffix');
+
+  /// Creates a new instance of [I18NextOptions] which overrides this
+  /// instance's values for [other]'s values when they aren't null.
+  I18NextOptions apply(I18NextOptions other) {
+    if (other == null) return this;
+
+    return I18NextOptions(
+      namespaceSeparator: other.namespaceSeparator ?? namespaceSeparator,
+      contextSeparator: other.contextSeparator ?? contextSeparator,
+      interpolationPrefix: other.interpolationPrefix ?? interpolationPrefix,
+      interpolationSuffix: other.interpolationSuffix ?? interpolationSuffix,
+      interpolationSeparator:
+          other.interpolationSeparator ?? interpolationSeparator,
+      nestingPrefix: other.nestingPrefix ?? nestingPrefix,
+      nestingSuffix: other.nestingSuffix ?? nestingSuffix,
+      nestingSeparator: other.nestingSeparator ?? nestingSeparator,
+      pluralSuffix: other.pluralSuffix ?? pluralSuffix,
+      formatter: other.formatter ?? formatter,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other.runtimeType == runtimeType &&
+      other is I18NextOptions &&
+      other.namespaceSeparator == namespaceSeparator &&
+      other.contextSeparator == contextSeparator &&
+      other.interpolationPrefix == interpolationPrefix &&
+      other.interpolationSuffix == interpolationSuffix &&
+      other.interpolationSeparator == interpolationSeparator &&
+      other.nestingPrefix == nestingPrefix &&
+      other.nestingSuffix == nestingSuffix &&
+      other.nestingSeparator == nestingSeparator &&
+      other.pluralSuffix == pluralSuffix &&
+      other.formatter == formatter;
+
+  @override
+  int get hashCode => hashValues(
+        namespaceSeparator,
+        contextSeparator,
+        interpolationPrefix,
+        interpolationSuffix,
+        interpolationSeparator,
+        nestingPrefix,
+        nestingSuffix,
+        nestingSeparator,
+        pluralSuffix,
+        formatter,
+      );
 
   /// Simply returns [value] in string form. Ignores [format] and [locale].
   static String defaultFormatter(Object value, String format, Locale locale) =>

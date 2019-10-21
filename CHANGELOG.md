@@ -6,6 +6,7 @@
 * Escapes interpolation strings in options for RegExp
 * Adds base nesting mechanism
 * Isolates Translator, PluralResolver, and Interpolator into separate classes
+* Makes I18NextOptions's properties optional and allows individual overrides
 
 ## [0.0.1+3]
 
