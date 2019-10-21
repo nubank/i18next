@@ -6,15 +6,18 @@ import 'utils.dart';
 class I18NextOptions {
   I18NextOptions({
     this.namespaceSeparator = ':',
-    this.interpolationPrefix = '{{',
-    this.interpolationSuffix = '}}',
-    this.interpolationSeparator = ',',
+    String interpolationPrefix = '{{',
+    String interpolationSuffix = '}}',
+    String interpolationSeparator = ',',
     this.pluralSuffix = '_plural',
     ArgumentFormatter formatter,
   })  : assert(interpolationPrefix != null),
         assert(interpolationSuffix != null),
         assert(interpolationSeparator != null &&
             interpolationSeparator.isNotEmpty),
+        interpolationPrefix = RegExp.escape(interpolationPrefix),
+        interpolationSuffix = RegExp.escape(interpolationSuffix),
+        interpolationSeparator = RegExp.escape(interpolationSeparator),
         formatter = formatter ?? defaultFormatter;
 
   final String namespaceSeparator;

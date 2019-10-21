@@ -6,8 +6,8 @@ void main() {
     final options = I18NextOptions();
     expect(options.namespaceSeparator, ':');
 
-    expect(options.interpolationPrefix, '{{');
-    expect(options.interpolationSuffix, '}}');
+    expect(options.interpolationPrefix, r'\{\{');
+    expect(options.interpolationSuffix, r'\}\}');
     expect(options.interpolationSeparator, ',');
 
     expect(options.pluralSuffix, '_plural');
@@ -27,7 +27,7 @@ void main() {
     expect(options.interpolationPrefix, '');
     expect(
       options.interpolationPattern.pattern,
-      '(?<variable>.*?)(,\\s*(?<format>.*?)\\s*)?}}',
+      r'(?<variable>.*?)(,\s*(?<format>.*?)\s*)?\}\}',
     );
   });
 
@@ -43,7 +43,7 @@ void main() {
     expect(options.interpolationSuffix, '');
     expect(
       options.interpolationPattern.pattern,
-      '{{(?<variable>.*?)(,\\s*(?<format>.*?)\\s*)?',
+      r'\{\{(?<variable>.*?)(,\s*(?<format>.*?)\s*)?',
     );
   });
 
@@ -59,7 +59,7 @@ void main() {
     test('default pattern', () {
       expect(
         options.interpolationPattern.pattern,
-        '{{(?<variable>.*?)(,\\s*(?<format>.*?)\\s*)?}}',
+        r'\{\{(?<variable>.*?)(,\s*(?<format>.*?)\s*)?\}\}',
       );
     });
 
