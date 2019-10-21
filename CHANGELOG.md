@@ -5,6 +5,7 @@
 * Updates I18Next inner workings to more contextualized methods.
 * Escapes interpolation strings in options for RegExp
 * Adds base nesting mechanism
+* Isolates Translator, PluralResolver, and Interpolator into separate classes
 
 ## [0.0.1+3]
 
