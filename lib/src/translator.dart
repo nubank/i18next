@@ -98,13 +98,13 @@ class Translator {
 
     dynamic object = data;
     for (final key in keys) {
-      if (object is Map && object.containsKey(key))
+      if (object is Map && object.containsKey(key)) {
         object = object[key];
-      else
-        return null;
+      } else {
+        object = null;
+        break;
+      }
     }
-
-    if (object is! String) return null;
-    return object;
+    return object is String ? object : null;
   }
 }
