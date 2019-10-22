@@ -20,7 +20,7 @@ class Translator {
     assert(options != null);
 
     String namespace = '', keyPath = key;
-    final match = options.namespacePattern.firstMatch(key);
+    final match = RegExp(options.namespaceSeparator).firstMatch(key);
     if (match != null) {
       namespace = key.substring(0, match.start);
       keyPath = key.substring(match.end);

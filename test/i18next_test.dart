@@ -12,12 +12,11 @@ void main() {
 
   void given(
     Map<String, Object> data, {
-    LocalizationDataSource dataSource,
     ArgumentFormatter formatter,
   }) {
     i18next = I18Next(
       locale,
-      dataSource ?? (namespace, locale) => data,
+      (namespace, locale) => data,
       options: I18NextOptions(formatter: formatter),
     );
   }

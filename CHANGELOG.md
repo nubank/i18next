@@ -9,6 +9,7 @@
 * Makes I18NextOptions's properties optional and allows individual overrides
 * Makes I18NextOption conform to Map<String, Object>
 * Reduces API surface by merging most of the optional properties into I18NextOptions itself
+* Moves pattern builders from options to the classes themselves
 
 ## [0.0.1+3]
 

@@ -22,7 +22,7 @@ class Interpolator {
     assert(options != null);
 
     return string.splitMapJoin(
-      options.interpolationPattern,
+      interpolationPattern(options),
       onMatch: (match) {
         RegExpMatch regExpMatch = match;
         final variable = regExpMatch.namedGroup('variable');
@@ -58,7 +58,7 @@ class Interpolator {
     assert(translate != null);
     assert(options != null);
 
-    return string.splitMapJoin(options.nestingPattern, onMatch: (match) {
+    return string.splitMapJoin(nestingPattern(options), onMatch: (match) {
       RegExpMatch regExpMatch = match;
       final key = regExpMatch.namedGroup('key');
 
@@ -80,4 +80,16 @@ class Interpolator {
       return result ?? regExpMatch.group(0);
     });
   }
+
+  static RegExp interpolationPattern(I18NextOptions options) => RegExp(
+        '${options.interpolationPrefix}'
+        '(?<variable>.*?)(${options.interpolationSeparator}\\s*(?<format>.*?)\\s*)?'
+        '${options.interpolationSuffix}',
+      );
+
+  static RegExp nestingPattern(I18NextOptions options) => RegExp(
+        '${options.nestingPrefix}'
+        '(?<key>.*?)(${options.nestingSeparator}\\s*(?<variables>.*?)\\s*)?'
+        '${options.nestingSuffix}',
+      );
 }

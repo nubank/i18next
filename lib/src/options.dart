@@ -149,20 +149,6 @@ class I18NextOptions extends MapView<String, Object> {
 
   set count(int value) => this['count'] = value;
 
-  RegExp get namespacePattern => RegExp(namespaceSeparator);
-
-  /// The matching pattern for interpolations.
-  ///
-  /// Default lazily catches the contents between a prefix `{{` and
-  /// suffix '}}'.
-  RegExp get interpolationPattern => RegExp('$interpolationPrefix'
-      '(?<variable>.*?)($interpolationSeparator\\s*(?<format>.*?)\\s*)?'
-      '$interpolationSuffix');
-
-  RegExp get nestingPattern => RegExp('$nestingPrefix'
-      '(?<key>.*?)($nestingSeparator\\s*(?<variables>.*?)\\s*)?'
-      '$nestingSuffix');
-
   /// Creates a new instance of [I18NextOptions] which overrides this
   /// instance's values for [other]'s values when they aren't null.
   ///
