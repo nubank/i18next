@@ -80,8 +80,11 @@ class I18Next {
     variables ??= {};
     if (count != null) variables['count'] ??= count;
     if (context != null) variables['context'] ??= context;
+
+    final newOptions = I18NextOptions.from(this.options.apply(options))
+      ..addAll(variables);
     return Translator(locale ?? this.locale, dataSource)
-            .translate(key, this.options.apply(variables)) ??
+            .translate(key, newOptions) ??
         key;
   }
 }

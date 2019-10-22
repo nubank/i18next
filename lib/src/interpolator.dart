@@ -75,7 +75,9 @@ class Interpolator {
           }
         }
 
-        result = translate(key, options.apply(variables));
+        final newOptions = I18NextOptions.from(options);
+        if (variables != null) newOptions..addAll(variables);
+        result = translate(key, newOptions);
       }
       return result ?? regExpMatch.group(0);
     });

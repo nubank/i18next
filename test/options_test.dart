@@ -32,17 +32,12 @@ void main() {
     });
 
     test('creates a new copy', () {
-      final original = <String, Object>{'my': 'value'};
+      final original = I18NextOptions.base;
       final options = I18NextOptions.from(original);
-      original['another'] = 'value';
-      expect(options, isNot(equals(original)));
-    });
+      expect(options, equals(original));
 
-    test('given unmatching property value', () {
-      const original = <String, Object>{'namespaceSeparator': 9.99};
-      final options = I18NextOptions.from(original);
-      expect(options['namespaceSeparator'], 9.99);
-      expect(options.namespaceSeparator, isNull);
+      options['my'] = 'value';
+      expect(options, isNot(equals(original)));
     });
   });
 
@@ -73,6 +68,12 @@ void main() {
       pluralSuffix: '',
       formatter: (value, format, locale) => null,
     );
+
+    test('inequality', () {
+      expect(base == empty, isFalse);
+      expect(empty == another, isFalse);
+      expect(another == base, isFalse);
+    });
 
     test('given equal', () {
       expect(base.apply(base), base);
