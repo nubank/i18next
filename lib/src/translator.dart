@@ -7,7 +7,9 @@ import 'utils.dart';
 
 class Translator {
   Translator(this.locale, this.dataSource)
-      : interpolator = Interpolator(locale),
+      : assert(locale != null),
+        assert(dataSource != null),
+        interpolator = Interpolator(locale),
         pluralResolver = PluralResolver();
 
   final Locale locale;

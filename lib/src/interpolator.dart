@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'options.dart';
 
 class Interpolator {
-  Interpolator(this.locale);
+  Interpolator(this.locale) : assert(locale != null);
 
   final Locale locale;
 
