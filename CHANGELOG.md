@@ -7,6 +7,7 @@
 * Adds base nesting mechanism
 * Isolates Translator, PluralResolver, and Interpolator into separate classes
 * Makes I18NextOptions's properties optional and allows individual overrides
+* Makes I18NextOption conform to Map<String, Object>
 
 ## [0.0.1+3]
 

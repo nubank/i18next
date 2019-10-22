@@ -20,6 +20,32 @@ void main() {
     expect(options.formatter, I18NextOptions.defaultFormatter);
   });
 
+  group('constructor', () {
+    test('given no values', () {
+      expect(I18NextOptions(), isEmpty);
+    });
+  });
+
+  group('.from', () {
+    test('given null', () {
+      expect(() => I18NextOptions.from(null), throwsNoSuchMethodError);
+    });
+
+    test('creates a new copy', () {
+      final original = <String, Object>{'my': 'value'};
+      final options = I18NextOptions.from(original);
+      original['another'] = 'value';
+      expect(options, isNot(equals(original)));
+    });
+
+    test('given unmatching property value', () {
+      const original = <String, Object>{'namespaceSeparator': 9.99};
+      final options = I18NextOptions.from(original);
+      expect(options['namespaceSeparator'], 9.99);
+      expect(options.namespaceSeparator, isNull);
+    });
+  });
+
   group('#interpolationPattern', () {
     final options = I18NextOptions.base;
 
