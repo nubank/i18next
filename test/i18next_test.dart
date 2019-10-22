@@ -368,7 +368,7 @@ void main() {
       given({
         'key': r'This is my $t(anotherKey)',
       });
-      expect(i18next.t('key'), r'This is my anotherKey');
+      expect(i18next.t('key'), r'This is my $t(anotherKey)');
     });
 
     test('simple key substitutions', () {

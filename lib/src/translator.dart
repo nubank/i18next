@@ -6,75 +6,94 @@ import 'plural_resolver.dart';
 import 'utils.dart';
 
 class Translator {
-  Translator(this.locale, this.dataSource, this.options)
-      : interpolator = Interpolator(locale, options),
+  Translator(this.locale, this.dataSource)
+      : interpolator = Interpolator(locale),
         pluralResolver = PluralResolver();
 
   final Locale locale;
   final LocalizationDataSource dataSource;
-  final I18NextOptions options;
   final Interpolator interpolator;
   final PluralResolver pluralResolver;
 
-  String translate(
-    String key, {
-    String context,
-    int count,
-    Map<String, Object> variables,
-  }) {
+  String translate(String key, I18NextOptions options) {
     assert(key != null);
-    variables ??= {};
+    assert(options != null);
 
     String namespace = '', keyPath = key;
-
     final match = options.namespacePattern.firstMatch(key);
     if (match != null) {
       namespace = key.substring(0, match.start);
       keyPath = key.substring(match.end);
     }
-
-    return translateKey(
-          namespace,
-          keyPath,
-          context: context,
-          count: count,
-          variables: variables,
-        ) ??
-        key;
+    return translateKey(namespace, keyPath, options);
   }
 
-  String translateKey(
-    String namespace,
-    String key, {
-    String context,
-    int count,
-    Map<String, Object> variables,
-  }) {
-    if (context != null && context.isNotEmpty) {
-      final contextKey = '$key${options.contextSeparator}$context';
-      final value = translateKey(namespace, contextKey,
-          count: count, variables: variables);
-      if (value != null) return value;
+  /// Order of key resolution:
+  ///
+  /// - context + pluralization:
+  ///   ['key_ctx_plr', 'key_ctx', 'key_plr', 'key']
+  /// - context only:
+  ///   ['key_ctx', 'key']
+  /// - pluralization only:
+  ///   ['key_plr', 'key']
+  /// - Otherwise:
+  ///   ['key']
+  String translateKey(String namespace, String key, I18NextOptions options) {
+    final context = options.context;
+    final count = options.count;
+    final needsContext = context != null && context.isNotEmpty;
+    final needsPlural = count != null;
+
+    String pluralSuffix;
+    if (needsPlural)
+      pluralSuffix =
+          pluralResolver.pluralize(options.pluralSuffix, count, locale);
+
+    String tempKey = key;
+    List<String> keys = [key];
+    if (needsContext && needsPlural) {
+      keys.add(tempKey + pluralSuffix);
+    }
+    if (needsContext) {
+      keys.add(tempKey += '${options.contextSeparator}$context');
+    }
+    if (needsPlural) {
+      keys.add(tempKey += pluralSuffix);
     }
 
-    if (count != null) {
-      final variablesWithCount = Map<String, Object>.from(variables);
-      variablesWithCount['count'] ??= count;
+    String result;
+    while (keys.isNotEmpty) {
+      final currentKey = keys.removeLast();
+      final found = find(namespace, currentKey, options);
+      if (found != null) {
+        result = found;
+        break;
+      }
+    }
+    return result;
+  }
 
-      final pluralKey =
-          pluralResolver.pluralize(key, options.pluralSuffix, count, locale);
-      final value =
-          translateKey(namespace, pluralKey, variables: variablesWithCount);
-      if (value != null) return value;
+  String find(String namespace, String key, I18NextOptions options) {
+    Map<String, Object> data = dataSource(namespace, locale);
+    final value = evaluate(key, data);
+    if (value == null) {
+      // TODO: fallback locales
+      // TODO: fallback namespaces
+      // TODO: fallback to default value
     }
 
-    return find(namespace, key, variables: variables);
+    String result;
+    if (value != null) {
+      result = interpolator.interpolate(value, options);
+      result = interpolator.nest(result, translate, options);
+    }
+    return result;
   }
 
   /// Given a key with multiple split points (`.`), this method navigates
   /// through the objects and returns the last node, expecting it to be a
   /// [String], null otherwise.
-  String evaluate(String path, Map<String, Object> data) {
+  static String evaluate(String path, Map<String, Object> data) {
     final keys = path.split('.');
 
     dynamic object = data;
@@ -87,24 +106,5 @@ class Translator {
 
     if (object is! String) return null;
     return object;
-  }
-
-  String find(String namespace, String key, {Map<String, Object> variables}) {
-    // TODO: find out if namespaces are loaded early
-    Map<String, Object> data = dataSource(namespace, locale);
-    final value = evaluate(key, data);
-    if (value == null) {
-      // TODO: fallback locales
-      // TODO: fallback namespaces
-      // TODO: fallback to default value
-    }
-
-    String result;
-    if (value != null) {
-      result = interpolator.interpolate(value, variables: variables);
-      result = interpolator.nest(result, translate, variables: variables);
-    }
-
-    return result;
   }
 }

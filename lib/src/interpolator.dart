@@ -4,13 +4,12 @@ import 'dart:ui';
 import 'options.dart';
 
 class Interpolator {
-  Interpolator(this.locale, this.options);
+  Interpolator(this.locale);
 
   final Locale locale;
-  final I18NextOptions options;
 
   /// Replaces occurrences of matches in [string] for the named values
-  /// in [variables] (if they exist), by first passing through the
+  /// in [options] (if they exist), by first passing through the
   /// [I18NextOptions.formatter] before joining the resulting string.
   ///
   /// - 'Hello {{name}}' + {name: 'World'} -> 'Hello World'.
@@ -18,7 +17,10 @@ class Interpolator {
   /// - 'Now is {{date, dd/MM}}' + {date: DateTime.now()} -> 'Now is 23/09'.
   ///   In this example, [I18NextOptions.formatter] must be able to
   ///   properly format the date.
-  String interpolate(String string, {Map<String, Object> variables}) {
+  String interpolate(String string, I18NextOptions options) {
+    assert(string != null);
+    assert(options != null);
+
     return string.splitMapJoin(
       options.interpolationPattern,
       onMatch: (match) {
@@ -26,7 +28,7 @@ class Interpolator {
         final variable = regExpMatch.namedGroup('variable');
 
         String result;
-        final value = variables[variable];
+        final value = options[variable];
         if (value != null) {
           final format = regExpMatch.namedGroup('format');
           result = options.formatter(value, format, locale);
@@ -47,8 +49,15 @@ class Interpolator {
   /// }
   /// i18Next.t('key1') // "Hello World!"
   /// ```
-  String nest(String string, Function translate,
-      {Map<String, Object> variables}) {
+  String nest(
+    String string,
+    String Function(String, I18NextOptions) translate,
+    I18NextOptions options,
+  ) {
+    assert(string != null);
+    assert(translate != null);
+    assert(options != null);
+
     return string.splitMapJoin(options.nestingPattern, onMatch: (match) {
       RegExpMatch regExpMatch = match;
       final key = regExpMatch.namedGroup('key');
@@ -56,25 +65,17 @@ class Interpolator {
       String result;
       if (key != null) {
         final varsString = regExpMatch.namedGroup('variables');
-        String context;
-        int count;
 
-        final copy = Map<String, Object>.from(variables);
+        Map<String, Object> variables;
         if (varsString != null && varsString.isNotEmpty) {
           try {
-            final Map<String, Object> vars = jsonDecode(varsString);
-            if (vars != null) {
-              context = vars['context'];
-              count = vars['count'];
-              copy.addAll(vars);
-            }
+            variables = jsonDecode(varsString);
           } catch (error) {
             assert(true, error);
           }
         }
 
-        result =
-            translate(key, context: context, count: count, variables: copy);
+        result = translate(key, options.apply(variables));
       }
       return result ?? regExpMatch.group(0);
     });

@@ -3,16 +3,17 @@ import 'dart:ui';
 class PluralResolver {
   PluralResolver() : super();
 
-  /// Returns the pluralized form for the [key] based on [locale] and [count].
-  String pluralize(String key, String suffix, int count, Locale locale) {
+  /// Returns the plural suffix based on [locale] and [count].
+  String pluralize(String suffix, int count, Locale locale) {
+    String result = '';
     if (count != 1) {
       final number = _numberForLocale(count.abs(), locale);
       if (number >= 0)
-        key = '$key${suffix}_$number';
+        result = '${suffix}_$number';
       else
-        key = '$key$suffix';
+        result = suffix;
     }
-    return key;
+    return result;
   }
 
   int _numberForLocale(int count, Locale locale) {

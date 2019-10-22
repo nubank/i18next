@@ -77,17 +77,11 @@ class I18Next {
     I18NextOptions options,
   }) {
     assert(key != null);
-
-    return Translator(
-          locale ?? this.locale,
-          dataSource,
-          this.options.apply(options),
-        ).translate(
-          key,
-          context: context,
-          count: count,
-          variables: variables,
-        ) ??
+    variables ??= {};
+    variables['count'] ??= count;
+    variables['context'] ??= context;
+    return Translator(locale ?? this.locale, dataSource)
+            .translate(key, this.options.apply(variables)) ??
         key;
   }
 }
