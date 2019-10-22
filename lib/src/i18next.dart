@@ -78,8 +78,8 @@ class I18Next {
   }) {
     assert(key != null);
     variables ??= {};
-    variables['count'] ??= count;
-    variables['context'] ??= context;
+    if (count != null) variables['count'] ??= count;
+    if (context != null) variables['context'] ??= context;
     return Translator(locale ?? this.locale, dataSource)
             .translate(key, this.options.apply(variables)) ??
         key;
