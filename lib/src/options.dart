@@ -17,8 +17,15 @@ class I18NextOptions extends MapBase<String, Object> {
     this.pluralSuffix,
     this.formatter,
     Map<String, Object> variables,
+    String context,
+    int count,
+    Locale locale,
   })  : _variables = variables ?? {},
-        super();
+        super() {
+    if (context != null) this.context = context;
+    if (count != null) this.count = count;
+    if (locale != null) this.locale = locale;
+  }
 
   /// Creates a new instance of [I18NextOptions] by making a copy of [other]'s
   /// values.
@@ -117,13 +124,17 @@ class I18NextOptions extends MapBase<String, Object> {
 
   final Map<String, Object> _variables;
 
-  String get context => _variables['context'];
+  String get context => this['context'];
 
-  set context(String value) => _variables['context'] = value;
+  set context(String value) => this['context'] = value;
 
-  int get count => _variables['count'];
+  int get count => this['count'];
 
-  set count(int value) => _variables['count'] = value;
+  set count(int value) => this['count'] = value;
+
+  Locale get locale => this['locale'];
+
+  set locale(Locale value) => this['locale'] = value;
 
   /// Creates a new instance of [I18NextOptions] which overrides this
   /// instance's values for [other]'s values when they aren't null.
@@ -155,7 +166,12 @@ class I18NextOptions extends MapBase<String, Object> {
   Object operator [](Object key) => _variables[key];
 
   @override
-  void operator []=(String key, Object value) => _variables[key] = value;
+  void operator []=(String key, Object value) {
+    if (value == null)
+      remove(key);
+    else
+      _variables[key] = value;
+  }
 
   @override
   Object remove(Object key) => _variables.remove(key);

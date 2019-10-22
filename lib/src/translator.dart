@@ -1,18 +1,14 @@
-import 'dart:ui';
-
 import 'interpolator.dart';
 import 'options.dart';
 import 'plural_resolver.dart';
 import 'utils.dart';
 
 class Translator {
-  Translator(this.locale, this.dataSource)
-      : assert(locale != null),
-        assert(dataSource != null),
-        interpolator = Interpolator(locale),
+  Translator(this.dataSource)
+      : assert(dataSource != null),
+        interpolator = Interpolator(),
         pluralResolver = PluralResolver();
 
-  final Locale locale;
   final LocalizationDataSource dataSource;
   final Interpolator interpolator;
   final PluralResolver pluralResolver;
@@ -49,7 +45,7 @@ class Translator {
     String pluralSuffix;
     if (needsPlural)
       pluralSuffix =
-          pluralResolver.pluralize(options.pluralSuffix, count, locale);
+          pluralResolver.pluralize(options.pluralSuffix, count, options.locale);
 
     String tempKey = key;
     List<String> keys = [key];
@@ -76,7 +72,7 @@ class Translator {
   }
 
   String find(String namespace, String key, I18NextOptions options) {
-    Map<String, Object> data = dataSource(namespace, locale);
+    Map<String, Object> data = dataSource(namespace, options.locale);
     final value = evaluate(key, data);
     if (value == null) {
       // TODO: fallback locales

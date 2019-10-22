@@ -11,6 +11,7 @@
 * Reduces API surface by merging most of the optional properties into I18NextOptions itself
 * Moves pattern builders from options to the classes themselves
 * Keeps property variables in I18NextOptions while keeping Map extension.
+* Adds/merges locale property in I18NextOptions
 
 ## [0.0.1+3]
 

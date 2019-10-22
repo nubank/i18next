@@ -1,12 +1,9 @@
 import 'dart:convert';
-import 'dart:ui';
 
 import 'options.dart';
 
 class Interpolator {
-  Interpolator(this.locale) : assert(locale != null);
-
-  final Locale locale;
+  Interpolator();
 
   /// Replaces occurrences of matches in [string] for the named values
   /// in [options] (if they exist), by first passing through the
@@ -31,7 +28,7 @@ class Interpolator {
         final value = options[variable];
         if (value != null) {
           final format = regExpMatch.namedGroup('format');
-          result = options.formatter(value, format, locale);
+          result = options.formatter(value, format, options.locale);
         }
         return result ?? regExpMatch.group(0);
       },

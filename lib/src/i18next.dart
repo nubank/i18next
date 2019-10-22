@@ -77,14 +77,12 @@ class I18Next {
     I18NextOptions options,
   }) {
     assert(key != null);
-    variables ??= {};
-    if (count != null) variables['count'] ??= count;
-    if (context != null) variables['context'] ??= context;
 
     final newOptions = I18NextOptions.from(this.options.apply(options))
-      ..addAll(variables);
-    return Translator(locale ?? this.locale, dataSource)
-            .translate(key, newOptions) ??
-        key;
+      ..addAll(variables ?? {})
+      ..context ??= context
+      ..count ??= count
+      ..locale ??= locale ?? this.locale;
+    return Translator(dataSource).translate(key, newOptions) ?? key;
   }
 }
