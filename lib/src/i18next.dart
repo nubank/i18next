@@ -65,6 +65,9 @@ class I18Next {
   /// - If [options] is given, it overrides any non-null property over current
   ///   options.
   ///
+  /// The named parameters in this method that are also declared by
+  /// [I18NextOptions] supersede [options]'s values.
+  ///
   /// Keys that allow both contextualization and pluralization must be declared
   /// in the order: `key_context_plural`
   String t(
@@ -78,10 +81,10 @@ class I18Next {
     assert(key != null);
 
     final newOptions = I18NextOptions.from(this.options.apply(options))
-      ..addAll(variables ?? {})
-      ..context ??= context
-      ..count ??= count
-      ..locale ??= locale ?? this.locale;
+      ..addAll(variables ?? {});
+    if (context != null) newOptions.context = context;
+    if (count != null) newOptions.count = count;
+    if (locale != null) newOptions.locale = locale;
     return Translator(resourceStore).translate(key, newOptions) ?? key;
   }
 }

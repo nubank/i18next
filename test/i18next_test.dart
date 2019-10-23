@@ -221,11 +221,11 @@ void main() {
     test('given key with both count property and in variables', () {
       expect(
         i18next.t('friend', count: 0, variables: {'count': 1}),
-        'A friend',
+        '0 friends',
       );
       expect(
         i18next.t('friend', count: 1, variables: {'count': 0}),
-        '0 friends',
+        'A friend',
       );
     });
 
@@ -273,11 +273,11 @@ void main() {
     test('given key with both mapped context property and in variables', () {
       expect(
         i18next.t('friend', context: 'female', variables: {'context': 'male'}),
-        'A boyfriend',
+        'A girlfriend',
       );
       expect(
         i18next.t('friend', context: 'male', variables: {'context': 'female'}),
-        'A girlfriend',
+        'A boyfriend',
       );
     });
 
