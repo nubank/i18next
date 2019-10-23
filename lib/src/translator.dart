@@ -43,9 +43,7 @@ class Translator {
     final needsPlural = count != null;
 
     String pluralSuffix;
-    if (needsPlural)
-      pluralSuffix =
-          pluralResolver.pluralize(options.pluralSuffix, count, options.locale);
+    if (needsPlural) pluralSuffix = pluralResolver.pluralize(count, options);
 
     String tempKey = key;
     List<String> keys = [key];

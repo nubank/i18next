@@ -6,6 +6,7 @@ void main() {
     final options = I18NextOptions.base;
     expect(options.namespaceSeparator, ':');
     expect(options.contextSeparator, '_');
+    expect(options.pluralSeparator, '_');
 
     expect(options.interpolationPrefix, r'\{\{');
     expect(options.interpolationSuffix, r'\}\}');
@@ -15,7 +16,7 @@ void main() {
     expect(options.nestingSuffix, r'\)');
     expect(options.nestingSeparator, ',');
 
-    expect(options.pluralSuffix, '_plural');
+    expect(options.pluralSuffix, 'plural');
 
     expect(options.formatter, I18NextOptions.defaultFormatter);
   });

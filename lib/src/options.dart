@@ -8,6 +8,7 @@ class I18NextOptions extends MapBase<String, Object> {
   I18NextOptions({
     this.namespaceSeparator,
     this.contextSeparator,
+    this.pluralSeparator,
     this.interpolationPrefix,
     this.interpolationSuffix,
     this.interpolationSeparator,
@@ -33,6 +34,7 @@ class I18NextOptions extends MapBase<String, Object> {
       : this(
           namespaceSeparator: other.namespaceSeparator,
           contextSeparator: other.contextSeparator,
+          pluralSeparator: other.pluralSeparator,
           interpolationPrefix: other.interpolationPrefix,
           interpolationSuffix: other.interpolationSuffix,
           interpolationSeparator: other.interpolationSeparator,
@@ -48,13 +50,14 @@ class I18NextOptions extends MapBase<String, Object> {
   static final base = I18NextOptions(
     namespaceSeparator: ':',
     contextSeparator: '_',
+    pluralSeparator: '_',
     interpolationPrefix: RegExp.escape('{{'),
     interpolationSuffix: RegExp.escape('}}'),
     interpolationSeparator: RegExp.escape(','),
     nestingPrefix: RegExp.escape(r'$t('),
     nestingSuffix: RegExp.escape(')'),
     nestingSeparator: RegExp.escape(','),
-    pluralSuffix: '_plural',
+    pluralSuffix: 'plural',
     formatter: defaultFormatter,
     variables: const {},
   );
@@ -70,9 +73,15 @@ class I18NextOptions extends MapBase<String, Object> {
   /// Defaults to '_'.
   final String contextSeparator;
 
+  /// The separator for plural suffixes, it is inserted between the key and the
+  /// plural value.
+  ///
+  /// Defaults to '_'.
+  final String pluralSeparator;
+
   /// [pluralSuffix] is used for the pluralization mechanism.
   ///
-  /// Defaults to '_plural' and is used for both simple and complex
+  /// Defaults to 'plural' and is used for both simple and complex
   /// pluralization rule cases.
   ///
   /// For example, in english where it only has singular or plural forms:
@@ -146,6 +155,7 @@ class I18NextOptions extends MapBase<String, Object> {
     return I18NextOptions(
       namespaceSeparator: other.namespaceSeparator ?? namespaceSeparator,
       contextSeparator: other.contextSeparator ?? contextSeparator,
+      pluralSeparator: other.pluralSeparator ?? pluralSeparator,
       interpolationPrefix: other.interpolationPrefix ?? interpolationPrefix,
       interpolationSuffix: other.interpolationSuffix ?? interpolationSuffix,
       interpolationSeparator:
@@ -189,6 +199,7 @@ class I18NextOptions extends MapBase<String, Object> {
       other._variables == _variables &&
       other.namespaceSeparator == namespaceSeparator &&
       other.contextSeparator == contextSeparator &&
+      other.pluralSeparator == pluralSeparator &&
       other.interpolationPrefix == interpolationPrefix &&
       other.interpolationSuffix == interpolationSuffix &&
       other.interpolationSeparator == interpolationSeparator &&
@@ -203,6 +214,7 @@ class I18NextOptions extends MapBase<String, Object> {
         super.hashCode,
         namespaceSeparator,
         contextSeparator,
+        pluralSeparator,
         interpolationPrefix,
         interpolationSuffix,
         interpolationSeparator,

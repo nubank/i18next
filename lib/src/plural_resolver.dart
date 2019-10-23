@@ -1,17 +1,19 @@
 import 'dart:ui';
 
+import 'options.dart';
+
 class PluralResolver {
   PluralResolver() : super();
 
-  /// Returns the plural suffix based on [locale] and [count].
-  String pluralize(String suffix, int count, Locale locale) {
+  /// Returns the plural suffix based on [count] and presented [options].
+  String pluralize(int count, I18NextOptions options) {
     String result = '';
     if (count != 1) {
-      final number = _numberForLocale(count.abs(), locale);
+      final number = _numberForLocale(count.abs(), options.locale);
       if (number >= 0)
-        result = '${suffix}_$number';
+        result = '${options.pluralSuffix}${options.pluralSeparator}$number';
       else
-        result = suffix;
+        result = '${options.pluralSeparator}${options.pluralSuffix}';
     }
     return result;
   }
