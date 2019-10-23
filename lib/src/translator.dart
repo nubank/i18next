@@ -71,7 +71,7 @@ class Translator {
 
   String find(String namespace, String key, I18NextOptions options) {
     Map<String, Object> data = dataSource(namespace, options.locale);
-    final value = evaluate(key, data);
+    final value = evaluate(key, data, options);
     if (value == null) {
       // TODO: fallback locales
       // TODO: fallback namespaces
@@ -86,11 +86,15 @@ class Translator {
     return result;
   }
 
-  /// Given a key with multiple split points (`.`), this method navigates
-  /// through the objects and returns the last node, expecting it to be a
-  /// [String], null otherwise.
-  static String evaluate(String path, Map<String, Object> data) {
-    final keys = path.split('.');
+  /// Given a key with multiple split points denoted by
+  /// [I18NextOptions.keySeparator], this method navigates through the objects
+  /// and returns the last node, expecting it to be a [String], null otherwise.
+  static String evaluate(
+    String path,
+    Map<String, Object> data,
+    I18NextOptions options,
+  ) {
+    final keys = path.split(options.keySeparator);
 
     dynamic object = data;
     for (final key in keys) {

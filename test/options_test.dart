@@ -7,6 +7,7 @@ void main() {
     expect(options.namespaceSeparator, ':');
     expect(options.contextSeparator, '_');
     expect(options.pluralSeparator, '_');
+    expect(options.keySeparator, '.');
 
     expect(options.interpolationPrefix, r'\{\{');
     expect(options.interpolationSuffix, r'\}\}');
