@@ -21,7 +21,7 @@ class Interpolator {
     return string.splitMapJoin(
       interpolationPattern(options),
       onMatch: (match) {
-        RegExpMatch regExpMatch = match;
+        final RegExpMatch regExpMatch = match;
         final variable = regExpMatch.namedGroup('variable');
 
         String result;
@@ -56,7 +56,7 @@ class Interpolator {
     assert(options != null);
 
     return string.splitMapJoin(nestingPattern(options), onMatch: (match) {
-      RegExpMatch regExpMatch = match;
+      final RegExpMatch regExpMatch = match;
       final key = regExpMatch.namedGroup('key');
 
       String result;
