@@ -1,15 +1,15 @@
 import 'interpolator.dart';
 import 'options.dart';
 import 'plural_resolver.dart';
-import 'utils.dart';
+import 'resource_store.dart';
 
 class Translator {
-  Translator(this.dataSource)
-      : assert(dataSource != null),
+  Translator(this.resourceStore)
+      : assert(resourceStore != null),
         interpolator = Interpolator(),
         pluralResolver = PluralResolver();
 
-  final LocalizationDataSource dataSource;
+  final ResourceStore resourceStore;
   final Interpolator interpolator;
   final PluralResolver pluralResolver;
 
@@ -46,7 +46,7 @@ class Translator {
     if (needsPlural) pluralSuffix = pluralResolver.pluralize(count, options);
 
     String tempKey = key;
-    List<String> keys = [key];
+    final List<String> keys = [key];
     if (needsContext && needsPlural) {
       keys.add(tempKey + pluralSuffix);
     }
@@ -69,9 +69,12 @@ class Translator {
     return result;
   }
 
+  /// Attempts to find the value given a [namespace] and [key].
+  ///
+  /// If one is not found directly, then tries to fallback (if necessary). May
+  /// still return null if none is found.
   String find(String namespace, String key, I18NextOptions options) {
-    Map<String, Object> data = dataSource(namespace, options.locale);
-    final value = evaluate(key, data, options);
+    final value = resourceStore.retrieve(namespace, key, options);
     if (value == null) {
       // TODO: fallback locales
       // TODO: fallback namespaces
@@ -84,27 +87,5 @@ class Translator {
       result = interpolator.nest(result, translate, options);
     }
     return result;
-  }
-
-  /// Given a key with multiple split points denoted by
-  /// [I18NextOptions.keySeparator], this method navigates through the objects
-  /// and returns the last node, expecting it to be a [String], null otherwise.
-  static String evaluate(
-    String path,
-    Map<String, Object> data,
-    I18NextOptions options,
-  ) {
-    final keys = path.split(options.keySeparator);
-
-    dynamic object = data;
-    for (final key in keys) {
-      if (object is Map && object.containsKey(key)) {
-        object = object[key];
-      } else {
-        object = null;
-        break;
-      }
-    }
-    return object is String ? object : null;
   }
 }

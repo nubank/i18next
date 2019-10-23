@@ -1,150 +1,120 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:i18next/i18next.dart';
+import 'package:mockito/mockito.dart';
+
+class MockResourceStore extends Mock implements ResourceStore {}
 
 void main() {
   const locale = Locale('en');
   I18Next i18next;
+  MockResourceStore resourceStore;
 
-  tearDown(() {
-    i18next = null;
+  setUp(() {
+    resourceStore = MockResourceStore();
+    i18next = I18Next(locale, resourceStore);
   });
 
-  void given(
-    Map<String, Object> data, {
-    ArgumentFormatter formatter,
-  }) {
-    i18next = I18Next(
-      locale,
-      (namespace, locale) => data,
-      options: I18NextOptions(formatter: formatter),
-    );
+  void mockKey(String key, String answer, {String ns = ''}) {
+    when(resourceStore.retrieve(ns, key, any)).thenReturn(answer);
   }
 
   group('given named namespaces', () {
     setUp(() {
-      i18next = I18Next(
-        locale,
-        (namespace, _) {
-          switch (namespace) {
-            case 'ns1':
-              return const {'key': 'My first value'};
-            case 'ns2':
-              return const {'key': 'My second value'};
-          }
-          return null;
-        },
-      );
+      mockKey('key', 'My first value', ns: 'ns1');
+      mockKey('key', 'My second value', ns: 'ns2');
     });
 
     test('given key for matching namespaces', () {
       expect(i18next.t('ns1:key'), 'My first value');
+      verify(resourceStore.retrieve('ns1', 'key', any));
+
       expect(i18next.t('ns2:key'), 'My second value');
+      verify(resourceStore.retrieve('ns2', 'key', any));
     });
 
     test('given key for unmatching namespaces', () {
       expect(i18next.t('ns3:key'), 'ns3:key');
+      verify(resourceStore.retrieve('ns3', 'key', any));
     });
 
     test('given key for partially matching namespaces', () {
       expect(i18next.t('ns:key'), 'ns:key');
+      verify(resourceStore.retrieve('ns', 'key', any));
     });
   });
 
-  test('given data source', () {
-    i18next = I18Next(
-      locale,
-      expectAsync2((namespace, loc) {
-        expect(namespace, 'ns');
-        expect(loc, locale);
-        return {'myKey': 'My value'};
-      }, count: 1),
-    );
-    expect(i18next.t('ns:myKey'), 'My value');
+  test('given resource store null', () {
+    expect(() => I18Next(locale, null), throwsAssertionError);
   });
 
-  test('given null namespace', () {
-    given(null);
+  test('given resource store', () {
+    mockKey('key', 'My value', ns: 'ns');
+
+    expect(i18next.t('ns:key'), 'My value');
+    verify(resourceStore.retrieve('ns', 'key', any)).called(1);
+  });
+
+  test('given key without namespace', () {
+    when(resourceStore.retrieve(any, any, any)).thenReturn(null);
+
     expect(i18next.t('someKey'), 'someKey');
     expect(i18next.t('some.key'), 'some.key');
   });
 
   test('given null key', () {
-    given({});
     expect(() => i18next.t(null), throwsAssertionError);
   });
 
   test('given an existing string key', () {
-    given({'myKey': 'This is my key'});
+    mockKey('myKey', 'This is my key');
     expect(i18next.t('myKey'), 'This is my key');
   });
 
-  test('given a non-existing key', () {
-    given({});
+  test('given a non-existing or non matching key', () {
     expect(i18next.t('someKey'), 'someKey');
     expect(i18next.t('some.key'), 'some.key');
   });
 
-  group('given nested data', () {
-    test('given a matching nested key', () {
-      given({
-        'my': {
-          'key': 'This is my key',
-          'nested': {
-            'key': 'This is a more nested key',
-          }
-        }
-      });
-      expect(i18next.t('my.key'), 'This is my key');
-      expect(i18next.t('my.nested.key'), 'This is a more nested key');
-    });
-
-    test('given a partially matching nested key', () {
-      given({
-        'my': {
-          'nested': {'key': 'This is a more nested key'},
-        }
-      });
-      expect(i18next.t('my'), 'my');
-      expect(i18next.t('my.nested'), 'my.nested');
-    });
-
-    test('given a over matching nested key', () {
-      given({
-        'my': {
-          'nested': {'key': 'This is a more nested key'},
-        }
-      });
-      expect(i18next.t('my.nested.key.here'), 'my.nested.key.here');
-    });
-  });
-
   test('given overriding locale', () {
     const anotherLocale = Locale('another');
-    i18next = I18Next(locale, expectAsync2((_, loc) {
-      expect(loc, anotherLocale);
-      return const {'key': 'my value'};
-    }));
+    mockKey('key', 'my value');
+
     expect(i18next.t('key', locale: anotherLocale), 'my value');
+    verify(resourceStore.retrieve(
+      '',
+      'key',
+      argThat(containsPair('locale', anotherLocale)),
+    )).called(1);
   });
 
   group('given formatter', () {
     test('with no interpolations', () {
-      given(
-        const {'key': 'no interpolations here'},
-        formatter: expectAsync3((value, format, locale) => null, count: 0),
+      i18next = I18Next(
+        locale,
+        resourceStore,
+        options: I18NextOptions(
+          formatter: expectAsync3((value, format, locale) => null, count: 0),
+        ),
       );
+      mockKey('key', 'no interpolations here');
+
       expect(i18next.t('key'), 'no interpolations here');
     });
 
     test('with no matching variables', () {
-      given(
-        const {'key': 'leading {{value, format}} trailing'},
-        formatter: expectAsync3(
-          (value, format, locale) => value.toString(),
-          count: 0,
+      i18next = I18Next(
+        locale,
+        resourceStore,
+        options: I18NextOptions(
+          formatter: expectAsync3(
+            (value, format, locale) => value.toString(),
+            count: 0,
+          ),
         ),
       );
+      mockKey('key', 'leading {{value, format}} trailing');
+
       expect(
         i18next.t('key', variables: {'name': 'World'}),
         'leading {{value, format}} trailing',
@@ -152,30 +122,40 @@ void main() {
     });
 
     test('with matching variables', () {
-      given(
-        const {'myKey': 'leading {{value, format}} trailing'},
-        formatter: expectAsync3((value, format, locale) => value.toString()),
+      i18next = I18Next(
+        locale,
+        resourceStore,
+        options: I18NextOptions(
+          formatter: expectAsync3((value, format, locale) => value.toString()),
+        ),
       );
+      mockKey('key', 'leading {{value, format}} trailing');
+
       expect(
-        i18next.t('myKey', variables: {'value': 'eulav'}),
+        i18next.t('key', variables: {'value': 'eulav'}),
         'leading eulav trailing',
       );
     });
 
     test('with one matching interpolation', () {
-      given(
-        const {'myKey': 'leading {{value, format}} trailing'},
-        formatter: expectAsync3(
-          (value, format, locale) {
-            expect(value, 'eulav');
-            expect(format, 'format');
-            expect(locale, locale);
-            return value.toString();
-          },
+      i18next = I18Next(
+        locale,
+        resourceStore,
+        options: I18NextOptions(
+          formatter: expectAsync3(
+            (value, format, locale) {
+              expect(value, 'eulav');
+              expect(format, 'format');
+              expect(locale, locale);
+              return value.toString();
+            },
+          ),
         ),
       );
+      mockKey('key', 'leading {{value, format}} trailing');
+
       expect(
-        i18next.t('myKey', variables: {'value': 'eulav'}),
+        i18next.t('key', variables: {'value': 'eulav'}),
         'leading eulav trailing',
       );
     });
@@ -183,22 +163,27 @@ void main() {
     test('with multiple matching interpolations', () {
       final values = <String>[];
       final formats = <String>[];
-      given(
-        const {
-          'myKey': 'leading {{value1, format1}} middle '
-              '{{value2, format2}} trailing'
-        },
-        formatter: expectAsync3(
-          (value, format, locale) {
-            values.add(value);
-            formats.add(format);
-            return value.toString();
-          },
-          count: 2,
+      i18next = I18Next(
+        locale,
+        resourceStore,
+        options: I18NextOptions(
+          formatter: expectAsync3(
+            (value, format, locale) {
+              values.add(value);
+              formats.add(format);
+              return value.toString();
+            },
+            count: 2,
+          ),
         ),
       );
+      mockKey(
+          'key',
+          'leading {{value1, format1}} middle '
+              '{{value2, format2}} trailing');
+
       expect(
-        i18next.t('myKey', variables: {
+        i18next.t('key', variables: {
           'value1': '1eulav',
           'value2': '2eulav',
         }),
@@ -211,10 +196,8 @@ void main() {
 
   group('pluralization', () {
     setUp(() {
-      given(const {
-        'friend': 'A friend',
-        'friend_plural': '{{count}} friends',
-      });
+      mockKey('friend', 'A friend');
+      mockKey('friend_plural', '{{count}} friends');
     });
 
     test('given key without count', () {
@@ -262,11 +245,9 @@ void main() {
 
   group('contextualization', () {
     setUp(() {
-      given(const {
-        'friend': 'A friend',
-        'friend_male': 'A boyfriend',
-        'friend_female': 'A girlfriend',
-      });
+      mockKey('friend', 'A friend');
+      mockKey('friend_male', 'A boyfriend');
+      mockKey('friend_female', 'A girlfriend');
     });
 
     test('given key without context', () {
@@ -329,14 +310,12 @@ void main() {
 
   group('contextualization and pluralization', () {
     setUp(() {
-      given(const {
-        'friend': 'A friend',
-        'friend_plural': '{{count}} friends',
-        'friend_male': 'A boyfriend',
-        'friend_male_plural': '{{count}} boyfriends',
-        'friend_female': 'A girlfriend',
-        'friend_female_plural': '{{count}} girlfriends',
-      });
+      mockKey('friend', 'A friend');
+      mockKey('friend_plural', '{{count}} friends');
+      mockKey('friend_male', 'A boyfriend');
+      mockKey('friend_male_plural', '{{count}} boyfriends');
+      mockKey('friend_female', 'A girlfriend');
+      mockKey('friend_female_plural', '{{count}} girlfriends');
     });
 
     test('given key with mapped context and count', () {
@@ -372,35 +351,35 @@ void main() {
 
   group('interpolation', () {
     setUp(() {
-      given(const {'myKey': '{{first}}, {{second}}, and then {{third}}!'});
+      mockKey('key', '{{first}}, {{second}}, and then {{third}}!');
     });
 
     test('given empty interpolation', () {
-      given({'key': 'This is some {{}}'});
+      mockKey('key', 'This is some {{}}');
       expect(i18next.t('key'), 'This is some {{}}');
     });
 
     test('given non matching arguments', () {
       expect(
-        i18next.t('myKey', variables: {'none': 'none'}),
+        i18next.t('key', variables: {'none': 'none'}),
         '{{first}}, {{second}}, and then {{third}}!',
       );
     });
 
     test('given partially matching arguments', () {
       expect(
-        i18next.t('myKey', variables: {'first': 'fst'}),
+        i18next.t('key', variables: {'first': 'fst'}),
         'fst, {{second}}, and then {{third}}!',
       );
       expect(
-        i18next.t('myKey', variables: {'first': 'fst', 'third': 'trd'}),
+        i18next.t('key', variables: {'first': 'fst', 'third': 'trd'}),
         'fst, {{second}}, and then trd!',
       );
     });
 
     test('given all matching arguments', () {
       expect(
-        i18next.t('myKey', variables: {
+        i18next.t('key', variables: {
           'first': 'fst',
           'second': 'snd',
           'third': 'trd',
@@ -411,7 +390,7 @@ void main() {
 
     test('given extra matching arguments', () {
       expect(
-        i18next.t('myKey', variables: {
+        i18next.t('key', variables: {
           'first': 'fst',
           'second': 'snd',
           'third': 'trd',
@@ -424,24 +403,23 @@ void main() {
 
   group('nesting', () {
     test('when nested key is not found', () {
-      given({'key': r'This is my $t(anotherKey)'});
+      mockKey('key', r'This is my $t(anotherKey)');
+
       expect(i18next.t('key'), r'This is my $t(anotherKey)');
     });
 
     test('given multiple simple key substitutions', () {
-      given({
-        'nesting1': r'1 $t(nesting2)',
-        'nesting2': r'2 $t(nesting3)',
-        'nesting3': '3',
-      });
+      mockKey('nesting1', r'1 $t(nesting2)');
+      mockKey('nesting2', r'2 $t(nesting3)');
+      mockKey('nesting3', '3');
+
       expect(i18next.t('nesting1'), '1 2 3');
     });
 
     test('interpolation from immediate variables', () {
-      given({
-        'key1': 'hello world',
-        'key2': 'say: {{val}}',
-      });
+      mockKey('key1', 'hello world');
+      mockKey('key2', 'say: {{val}}');
+
       expect(
         i18next.t('key2', variables: {'val': r'$t(key1)'}),
         'say: hello world',
@@ -449,10 +427,9 @@ void main() {
     });
 
     test('nested interpolations', () {
-      given({
-        'key1': 'hello {{name}}',
-        'key2': r'say: $t(key1)',
-      });
+      mockKey('key1', 'hello {{name}}');
+      mockKey('key2', r'say: $t(key1)');
+
       expect(
         i18next.t('key2', variables: {'name': 'world'}),
         'say: hello world',
@@ -460,13 +437,13 @@ void main() {
     });
 
     test('nested pluralization and interpolation ', () {
-      given({
-        'girlsAndBoys': r'$t(girls, {"count": {{girls}} }) and {{count}} boy',
-        'girlsAndBoys_plural':
-            r'$t(girls, {"count": {{girls}} }) and {{count}} boys',
-        'girls': "{{count}} girl",
-        'girls_plural': "{{count}} girls"
-      });
+      mockKey('girlsAndBoys',
+          r'$t(girls, {"count": {{girls}} }) and {{count}} boy');
+      mockKey('girlsAndBoys_plural',
+          r'$t(girls, {"count": {{girls}} }) and {{count}} boys');
+      mockKey('girls', '{{count}} girl');
+      mockKey('girls_plural', '{{count}} girls');
+
       expect(
         i18next.t('girlsAndBoys', count: 2, variables: {'girls': 3}),
         '3 girls and 2 boys',

@@ -2,6 +2,7 @@
 
 * Adds plural separator in I18NextOptions
 * Adds key separator in I18NextOptions
+* Adds and replaces LocalizationDataSource for ResourceStore
 
 ## [0.0.1+4]
 

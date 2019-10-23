@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'options.dart';
+import 'resource_store.dart';
 import 'translator.dart';
-import 'utils.dart';
 
 /// It translates the i18next localized format in your localization objects
 /// (provided by [dataSource]) to the final translation.
@@ -30,8 +30,8 @@ import 'utils.dart';
 /// I18Next.t('feature:title') // -> 'My feature title'
 /// ```
 class I18Next {
-  I18Next(this.locale, this.dataSource, {I18NextOptions options})
-      : assert(dataSource != null),
+  I18Next(this.locale, this.resourceStore, {I18NextOptions options})
+      : assert(resourceStore != null),
         options = I18NextOptions.base.apply(options);
 
   /// The current [Locale] for this instance.
@@ -39,12 +39,11 @@ class I18Next {
   /// It is used as the default locale for pluralization rules and [dataSource].
   final Locale locale;
 
-  /// Called when a key and namespace were identified and requires the namespace
-  /// object to retrieve the key.
+  /// The resources store that contains all the necessary values mapped by
+  /// [Locale], namespace, and keys.
   ///
-  /// If null in debug mode throws an assertion error, in release mode  it'll
-  /// just fallback to the key used.
-  final LocalizationDataSource dataSource;
+  /// Cannot be null.
+  final ResourceStore resourceStore;
 
   /// The options used to find and format matching interpolations.
   final I18NextOptions options;
@@ -83,6 +82,6 @@ class I18Next {
       ..context ??= context
       ..count ??= count
       ..locale ??= locale ?? this.locale;
-    return Translator(dataSource).translate(key, newOptions) ?? key;
+    return Translator(resourceStore).translate(key, newOptions) ?? key;
   }
 }
