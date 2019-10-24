@@ -1,10 +1,11 @@
-import 'dart:collection';
 import 'dart:ui';
+
+import 'package:flutter/foundation.dart';
 
 import 'utils.dart';
 
 /// Contains all options for [I18Next] to work properly.
-class I18NextOptions extends MapBase<String, Object> {
+class I18NextOptions extends Diagnosticable {
   I18NextOptions({
     this.namespaceSeparator,
     this.contextSeparator,
@@ -18,35 +19,7 @@ class I18NextOptions extends MapBase<String, Object> {
     this.nestingSeparator,
     this.pluralSuffix,
     this.formatter,
-    Map<String, Object> variables,
-    String context,
-    int count,
-    Locale locale,
-  })  : _variables = variables ?? {},
-        super() {
-    if (context != null) this.context = context;
-    if (count != null) this.count = count;
-    if (locale != null) this.locale = locale;
-  }
-
-  /// Creates a new instance of [I18NextOptions] by making a copy of [other]'s
-  /// values.
-  I18NextOptions.from(I18NextOptions other)
-      : this(
-          namespaceSeparator: other.namespaceSeparator,
-          contextSeparator: other.contextSeparator,
-          pluralSeparator: other.pluralSeparator,
-          keySeparator: other.keySeparator,
-          interpolationPrefix: other.interpolationPrefix,
-          interpolationSuffix: other.interpolationSuffix,
-          interpolationSeparator: other.interpolationSeparator,
-          nestingPrefix: other.nestingPrefix,
-          nestingSuffix: other.nestingSuffix,
-          nestingSeparator: other.nestingSeparator,
-          pluralSuffix: other.pluralSuffix,
-          formatter: other.formatter,
-          variables: Map.of(other._variables),
-        );
+  }) : super();
 
   /// Creates the base options
   static final base = I18NextOptions(
@@ -62,7 +35,6 @@ class I18NextOptions extends MapBase<String, Object> {
     nestingSeparator: RegExp.escape(','),
     pluralSuffix: 'plural',
     formatter: defaultFormatter,
-    variables: const {},
   );
 
   /// The separator used when splitting the key.
@@ -140,27 +112,12 @@ class I18NextOptions extends MapBase<String, Object> {
   /// String form ([Object.toString]).
   final ArgumentFormatter formatter;
 
-  final Map<String, Object> _variables;
-
-  String get context => this['context'];
-
-  set context(String value) => this['context'] = value;
-
-  int get count => this['count'];
-
-  set count(int value) => this['count'] = value;
-
-  Locale get locale => this['locale'];
-
-  set locale(Locale value) => this['locale'] = value;
-
   /// Creates a new instance of [I18NextOptions] which overrides this
   /// instance's values for [other]'s values when they aren't null.
   ///
-  /// If [other] is null, returns this instance.
+  /// If [other] is null, returns this instance itself.
   I18NextOptions apply(I18NextOptions other) {
     if (other == null) return this;
-
     return I18NextOptions(
       namespaceSeparator: other.namespaceSeparator ?? namespaceSeparator,
       contextSeparator: other.contextSeparator ?? contextSeparator,
@@ -175,38 +132,29 @@ class I18NextOptions extends MapBase<String, Object> {
       nestingSeparator: other.nestingSeparator ?? nestingSeparator,
       pluralSuffix: other.pluralSuffix ?? pluralSuffix,
       formatter: other.formatter ?? formatter,
-    )..addAll(other);
-  }
-
-  /// Simply returns [value] in string form. Ignores [format] and [locale].
-  static String defaultFormatter(Object value, String format, Locale locale) =>
-      value.toString();
-
-  @override
-  Object operator [](Object key) => _variables[key];
-
-  @override
-  void operator []=(String key, Object value) {
-    if (value == null)
-      remove(key);
-    else
-      _variables[key] = value;
+    );
   }
 
   @override
-  Object remove(Object key) => _variables.remove(key);
-
-  @override
-  void clear() => _variables.clear();
-
-  @override
-  Iterable<String> get keys => _variables.keys;
+  int get hashCode => hashValues(
+        namespaceSeparator,
+        contextSeparator,
+        pluralSeparator,
+        keySeparator,
+        interpolationPrefix,
+        interpolationSuffix,
+        interpolationSeparator,
+        nestingPrefix,
+        nestingSuffix,
+        nestingSeparator,
+        pluralSuffix,
+        formatter,
+      );
 
   @override
   bool operator ==(Object other) =>
       other.runtimeType == runtimeType &&
       other is I18NextOptions &&
-      other._variables == _variables &&
       other.namespaceSeparator == namespaceSeparator &&
       other.contextSeparator == contextSeparator &&
       other.pluralSeparator == pluralSeparator &&
@@ -221,19 +169,24 @@ class I18NextOptions extends MapBase<String, Object> {
       other.formatter == formatter;
 
   @override
-  int get hashCode => hashValues(
-        super.hashCode,
-        namespaceSeparator,
-        contextSeparator,
-        pluralSeparator,
-        keySeparator,
-        interpolationPrefix,
-        interpolationSuffix,
-        interpolationSeparator,
-        nestingPrefix,
-        nestingSuffix,
-        nestingSeparator,
-        pluralSuffix,
-        formatter,
-      );
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(StringProperty('namespaceSeparator', namespaceSeparator))
+      ..add(StringProperty('contextSeparator', contextSeparator))
+      ..add(StringProperty('pluralSeparator', pluralSeparator))
+      ..add(StringProperty('keySeparator', keySeparator))
+      ..add(StringProperty('interpolationPrefix', interpolationPrefix))
+      ..add(StringProperty('interpolationSuffix', interpolationSuffix))
+      ..add(StringProperty('interpolationSeparator', interpolationSeparator))
+      ..add(StringProperty('nestingPrefix', nestingPrefix))
+      ..add(StringProperty('nestingSuffix', nestingSuffix))
+      ..add(StringProperty('nestingSeparator', nestingSeparator))
+      ..add(StringProperty('pluralSuffix', pluralSuffix))
+      ..add(StringProperty('formatter', '$formatter'));
+  }
+
+  /// Simply returns [value] in string form. Ignores [format] and [locale].
+  static String defaultFormatter(Object value, String format, Locale locale) =>
+      value.toString();
 }

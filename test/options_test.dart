@@ -24,22 +24,19 @@ void main() {
 
   group('constructor', () {
     test('given no values', () {
-      expect(I18NextOptions(), isEmpty);
-    });
-  });
-
-  group('.from', () {
-    test('given null', () {
-      expect(() => I18NextOptions.from(null), throwsNoSuchMethodError);
-    });
-
-    test('creates a new copy', () {
-      final original = I18NextOptions.base;
-      final options = I18NextOptions.from(original);
-      expect(options, equals(original));
-
-      options['my'] = 'value';
-      expect(options, isNot(equals(original)));
+      final options = I18NextOptions();
+      expect(options.namespaceSeparator, isNull);
+      expect(options.contextSeparator, isNull);
+      expect(options.pluralSeparator, isNull);
+      expect(options.keySeparator, isNull);
+      expect(options.interpolationPrefix, isNull);
+      expect(options.interpolationSuffix, isNull);
+      expect(options.interpolationSeparator, isNull);
+      expect(options.nestingPrefix, isNull);
+      expect(options.nestingSuffix, isNull);
+      expect(options.nestingSeparator, isNull);
+      expect(options.pluralSuffix, isNull);
+      expect(options.formatter, isNull);
     });
   });
 
@@ -61,6 +58,8 @@ void main() {
     final another = I18NextOptions(
       namespaceSeparator: '',
       contextSeparator: '',
+      pluralSeparator: '',
+      keySeparator: '',
       interpolationPrefix: '',
       interpolationSuffix: '',
       interpolationSeparator: '',
@@ -99,9 +98,17 @@ void main() {
     });
 
     test('given null', () {
-      expect(base.apply(null), base);
+      expect(base.apply(null), equals(base));
       expect(empty.apply(null), empty);
       expect(another.apply(null), another);
+
+      expect(identical(base.apply(null), base), isTrue);
+    });
+
+    test('creates a new copy', () {
+      final result = base.apply(base);
+      expect(result, equals(base));
+      expect(identical(result, base), isFalse);
     });
   });
 }

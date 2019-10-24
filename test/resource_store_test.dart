@@ -7,7 +7,7 @@ void main() {
   I18NextOptions options;
 
   setUp(() {
-    options = I18NextOptions.from(I18NextOptions.base);
+    options = I18NextOptions.base;
   });
 
   group('#retrieve', () {
@@ -33,66 +33,97 @@ void main() {
     });
 
     test('with null locale', () {
-      options.locale = null;
-      expect(store.retrieve(validNamespace, 'key', options), isNull);
+      expect(store.retrieve(null, validNamespace, 'key', options), isNull);
     });
 
     test('with unmatching locale', () {
-      options.locale = const Locale('pt');
-      expect(store.retrieve(validNamespace, 'key', options), isNull);
+      const anotherLocale = Locale('pt');
+      expect(
+        store.retrieve(anotherLocale, validNamespace, 'key', options),
+        isNull,
+      );
     });
 
     group('with matching locale', () {
-      setUp(() {
-        options.locale = validLocale;
-      });
+      const locale = validLocale;
 
       test('with null namespace', () {
-        expect(store.retrieve(null, 'key', options), isNull);
+        expect(store.retrieve(locale, null, 'key', options), isNull);
       });
 
       test('with unmatching namespace', () {
-        expect(store.retrieve('', 'key', options), isNull);
+        expect(store.retrieve(locale, '', 'key', options), isNull);
       });
 
       group('with matching namespace', () {
         const namespace = validNamespace;
 
         test('given null key', () {
-          expect(store.retrieve(namespace, null, options), isNull);
+          expect(store.retrieve(locale, namespace, null, options), isNull);
         });
 
         test('given a non matching key', () {
-          expect(store.retrieve(namespace, 'another.key', options), isNull);
+          expect(
+            store.retrieve(locale, namespace, 'another.key', options),
+            isNull,
+          );
         });
 
         test('given a partially matching key', () {
-          expect(store.retrieve(namespace, 'my', options), isNull);
-          expect(store.retrieve(namespace, 'my.nested', options), isNull);
+          expect(store.retrieve(locale, namespace, 'my', options), isNull);
+          expect(
+            store.retrieve(locale, namespace, 'my.nested', options),
+            isNull,
+          );
         });
 
         test('given a matching key', () {
           expect(
-            store.retrieve(namespace, 'key', options),
+            store.retrieve(locale, namespace, 'key', options),
             'This is a simple key',
           );
           expect(
-            store.retrieve(namespace, 'my.key', options),
+            store.retrieve(locale, namespace, 'my.key', options),
             'This is a nested key',
           );
           expect(
-            store.retrieve(namespace, 'my.nested.key', options),
+            store.retrieve(locale, namespace, 'my.nested.key', options),
             'This is a more nested key',
           );
         });
 
         test('given an over matching key', () {
           expect(
-            store.retrieve(namespace, 'my.nested.key.value', options),
+            store.retrieve(locale, namespace, 'my.nested.key.value', options),
             isNull,
           );
         });
       });
+    });
+
+    test('given a keySeparator', () {
+      final newOptions = options.apply(I18NextOptions(
+        keySeparator: '+++',
+      ));
+      expect(
+        store.retrieve(
+          validLocale,
+          validNamespace,
+          'my+++nested+++key',
+          newOptions,
+        ),
+        'This is a more nested key',
+      );
+
+      expect(
+        store.retrieve(
+          validLocale,
+          validNamespace,
+          'my.nested/key',
+          newOptions,
+        ),
+        isNull,
+      );
     });
   });
 

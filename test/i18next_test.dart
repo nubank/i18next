@@ -16,7 +16,7 @@ void main() {
   });
 
   void mockKey(String key, String answer, {String ns = ''}) {
-    when(resourceStore.retrieve(ns, key, any)).thenReturn(answer);
+    when(resourceStore.retrieve(any, ns, key, any)).thenReturn(answer);
   }
 
   group('given named namespaces', () {
@@ -27,20 +27,20 @@ void main() {
 
     test('given key for matching namespaces', () {
       expect(i18next.t('ns1:key'), 'My first value');
-      verify(resourceStore.retrieve('ns1', 'key', any));
+      verify(resourceStore.retrieve(locale, 'ns1', 'key', any));
 
       expect(i18next.t('ns2:key'), 'My second value');
-      verify(resourceStore.retrieve('ns2', 'key', any));
+      verify(resourceStore.retrieve(locale, 'ns2', 'key', any));
     });
 
     test('given key for unmatching namespaces', () {
       expect(i18next.t('ns3:key'), 'ns3:key');
-      verify(resourceStore.retrieve('ns3', 'key', any));
+      verify(resourceStore.retrieve(locale, 'ns3', 'key', any));
     });
 
     test('given key for partially matching namespaces', () {
       expect(i18next.t('ns:key'), 'ns:key');
-      verify(resourceStore.retrieve('ns', 'key', any));
+      verify(resourceStore.retrieve(locale, 'ns', 'key', any));
     });
   });
 
@@ -52,11 +52,11 @@ void main() {
     mockKey('key', 'My value', ns: 'ns');
 
     expect(i18next.t('ns:key'), 'My value');
-    verify(resourceStore.retrieve('ns', 'key', any)).called(1);
+    verify(resourceStore.retrieve(locale, 'ns', 'key', any)).called(1);
   });
 
   test('given key without namespace', () {
-    when(resourceStore.retrieve(any, any, any)).thenReturn(null);
+    when(resourceStore.retrieve(any, any, any, any)).thenReturn(null);
 
     expect(i18next.t('someKey'), 'someKey');
     expect(i18next.t('some.key'), 'some.key');
@@ -82,9 +82,10 @@ void main() {
 
     expect(i18next.t('key', locale: anotherLocale), 'my value');
     verify(resourceStore.retrieve(
+      anotherLocale,
       '',
       'key',
-      argThat(containsPair('locale', anotherLocale)),
+      any,
     )).called(1);
   });
 

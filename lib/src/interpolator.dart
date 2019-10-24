@@ -1,6 +1,10 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'options.dart';
+
+typedef Translate = String Function(
+    String, Locale, Map<String, Object>, I18NextOptions);
 
 class Interpolator {
   Interpolator();
@@ -14,7 +18,12 @@ class Interpolator {
   /// - 'Now is {{date, dd/MM}}' + {date: DateTime.now()} -> 'Now is 23/09'.
   ///   In this example, [I18NextOptions.formatter] must be able to
   ///   properly format the date.
-  String interpolate(String string, I18NextOptions options) {
+  String interpolate(
+    Locale locale,
+    String string,
+    Map<String, Object> variables,
+    I18NextOptions options,
+  ) {
     assert(string != null);
     assert(options != null);
 
@@ -25,10 +34,10 @@ class Interpolator {
         final variable = regExpMatch.namedGroup('variable');
 
         String result;
-        final value = options[variable];
+        final value = variables[variable];
         if (value != null) {
           final format = regExpMatch.namedGroup('format');
-          result = options.formatter(value, format, options.locale);
+          result = options.formatter(value, format, locale);
         }
         return result ?? regExpMatch.group(0);
       },
@@ -47,8 +56,10 @@ class Interpolator {
   /// i18Next.t('key1') // "Hello World!"
   /// ```
   String nest(
+    Locale locale,
     String string,
-    String Function(String, I18NextOptions) translate,
+    Translate translate,
+    Map<String, Object> variables,
     I18NextOptions options,
   ) {
     assert(string != null);
@@ -63,18 +74,17 @@ class Interpolator {
       if (key != null) {
         final varsString = regExpMatch.namedGroup('variables');
 
-        Map<String, Object> variables;
+        Map<String, Object> nestVariables;
         if (varsString != null && varsString.isNotEmpty) {
           try {
-            variables = jsonDecode(varsString);
+            nestVariables = jsonDecode(varsString);
           } catch (error) {
             assert(true, error);
           }
         }
 
-        final newOptions = I18NextOptions.from(options);
-        if (variables != null) newOptions..addAll(variables);
-        result = translate(key, newOptions);
+        final newVariables = Map.of(variables)..addAll(nestVariables ?? {});
+        result = translate(key, locale, newVariables, options);
       }
       return result ?? regExpMatch.group(0);
     });

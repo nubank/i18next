@@ -1,21 +1,30 @@
+import 'dart:ui';
+
 import 'interpolator.dart';
 import 'options.dart';
 import 'plural_resolver.dart';
 import 'resource_store.dart';
 
 class Translator {
-  Translator(this.resourceStore)
-      : assert(resourceStore != null),
-        interpolator = Interpolator(),
-        pluralResolver = PluralResolver();
+  Translator(
+    this.interpolator,
+    this.pluralResolver,
+    this.resourceStore,
+  )   : assert(interpolator != null),
+        assert(pluralResolver != null),
+        assert(resourceStore != null);
 
-  final ResourceStore resourceStore;
   final Interpolator interpolator;
   final PluralResolver pluralResolver;
+  final ResourceStore resourceStore;
 
-  String translate(String key, I18NextOptions options) {
+  String translate(
+    String key,
+    Locale locale,
+    Map<String, Object> variables,
+    I18NextOptions options,
+  ) {
     assert(key != null);
-    assert(options != null);
 
     String namespace = '', keyPath = key;
     final match = RegExp(options.namespaceSeparator).firstMatch(key);
@@ -23,7 +32,7 @@ class Translator {
       namespace = key.substring(0, match.start);
       keyPath = key.substring(match.end);
     }
-    return translateKey(namespace, keyPath, options);
+    return translateKey(locale, namespace, keyPath, variables, options);
   }
 
   /// Order of key resolution:
@@ -36,14 +45,21 @@ class Translator {
   ///   ['key_plr', 'key']
   /// - Otherwise:
   ///   ['key']
-  String translateKey(String namespace, String key, I18NextOptions options) {
-    final context = options.context;
-    final count = options.count;
+  String translateKey(
+    Locale locale,
+    String namespace,
+    String key,
+    Map<String, Object> variables,
+    I18NextOptions options,
+  ) {
+    final String context = variables['context'];
+    final int count = variables['count'];
     final needsContext = context != null && context.isNotEmpty;
     final needsPlural = count != null;
 
     String pluralSuffix;
-    if (needsPlural) pluralSuffix = pluralResolver.pluralize(count, options);
+    if (needsPlural)
+      pluralSuffix = pluralResolver.pluralize(locale, count, options);
 
     String tempKey = key;
     final List<String> keys = [key];
@@ -60,7 +76,7 @@ class Translator {
     String result;
     while (keys.isNotEmpty) {
       final currentKey = keys.removeLast();
-      final found = find(namespace, currentKey, options);
+      final found = find(locale, namespace, currentKey, variables, options);
       if (found != null) {
         result = found;
         break;
@@ -73,8 +89,14 @@ class Translator {
   ///
   /// If one is not found directly, then tries to fallback (if necessary). May
   /// still return null if none is found.
-  String find(String namespace, String key, I18NextOptions options) {
-    final value = resourceStore.retrieve(namespace, key, options);
+  String find(
+    Locale locale,
+    String namespace,
+    String key,
+    Map<String, Object> variables,
+    I18NextOptions options,
+  ) {
+    final value = resourceStore.retrieve(locale, namespace, key, options);
     if (value == null) {
       // TODO: fallback locales
       // TODO: fallback namespaces
@@ -83,8 +105,8 @@ class Translator {
 
     String result;
     if (value != null) {
-      result = interpolator.interpolate(value, options);
-      result = interpolator.nest(result, translate, options);
+      result = interpolator.interpolate(locale, value, variables, options);
+      result = interpolator.nest(locale, result, translate, variables, options);
     }
     return result;
   }

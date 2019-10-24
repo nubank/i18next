@@ -20,8 +20,13 @@ class ResourceStore {
   ///   when creating a navigation path.
   ///
   /// May return null if not found.
-  String retrieve(String namespace, String key, I18NextOptions options) {
-    final path = <Object>[options.locale, namespace];
+  String retrieve(
+    Locale locale,
+    String namespace,
+    String key,
+    I18NextOptions options,
+  ) {
+    final path = <Object>[locale, namespace];
     if (key != null) path.addAll(key.split(options.keySeparator));
 
     final value = evaluate(path, data);

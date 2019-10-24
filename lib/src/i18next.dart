@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'interpolator.dart';
 import 'options.dart';
+import 'plural_resolver.dart';
 import 'resource_store.dart';
 import 'translator.dart';
 
@@ -32,6 +34,8 @@ import 'translator.dart';
 class I18Next {
   I18Next(this.locale, this.resourceStore, {I18NextOptions options})
       : assert(resourceStore != null),
+        interpolator = Interpolator(),
+        pluralResolver = PluralResolver(),
         options = I18NextOptions.base.apply(options);
 
   /// The current [Locale] for this instance.
@@ -44,6 +48,8 @@ class I18Next {
   ///
   /// Cannot be null.
   final ResourceStore resourceStore;
+  final Interpolator interpolator;
+  final PluralResolver pluralResolver;
 
   /// The options used to find and format matching interpolations.
   final I18NextOptions options;
@@ -72,19 +78,26 @@ class I18Next {
   /// in the order: `key_context_plural`
   String t(
     String key, {
+    Locale locale,
     String context,
     int count,
     Map<String, Object> variables,
-    Locale locale,
     I18NextOptions options,
   }) {
     assert(key != null);
 
-    final newOptions = I18NextOptions.from(this.options.apply(options))
-      ..addAll(variables ?? {});
-    if (context != null) newOptions.context = context;
-    if (count != null) newOptions.count = count;
-    if (locale != null) newOptions.locale = locale;
-    return Translator(resourceStore).translate(key, newOptions) ?? key;
+    variables ??= {};
+    if (context != null) variables['context'] = context;
+    if (count != null) variables['count'] = count;
+
+    locale ??= this.locale;
+    final newOptions = this.options.apply(options);
+
+    return Translator(
+          interpolator,
+          pluralResolver,
+          resourceStore,
+        ).translate(key, locale, variables, newOptions) ??
+        key;
   }
 }
