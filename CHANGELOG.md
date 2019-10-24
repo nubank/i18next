@@ -6,6 +6,7 @@
 * Makes `I18Next.t`'s parameters supersede the options parameter
 * Removes `Map` extension from `I18NextOptions`
 * Makes `I18NextOptions` `Diagnosticable`
+* Improves and adds more cases on `Interpolator`
 
 ## [0.0.1+4]
 

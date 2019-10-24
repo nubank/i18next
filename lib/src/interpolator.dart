@@ -26,6 +26,7 @@ class Interpolator {
   ) {
     assert(string != null);
     assert(options != null);
+    variables ??= {};
 
     return string.splitMapJoin(
       interpolationPattern(options),
@@ -65,25 +66,24 @@ class Interpolator {
     assert(string != null);
     assert(translate != null);
     assert(options != null);
+    variables ??= {};
 
     return string.splitMapJoin(nestingPattern(options), onMatch: (match) {
       final RegExpMatch regExpMatch = match;
       final key = regExpMatch.namedGroup('key');
 
       String result;
-      if (key != null) {
+      if (key != null && key.isNotEmpty) {
+        final newVariables = Map<String, Object>.of(variables);
         final varsString = regExpMatch.namedGroup('variables');
-
-        Map<String, Object> nestVariables;
         if (varsString != null && varsString.isNotEmpty) {
           try {
-            nestVariables = jsonDecode(varsString);
+            newVariables.addAll(jsonDecode(varsString));
           } catch (error) {
             assert(true, error);
           }
         }
 
-        final newVariables = Map.of(variables)..addAll(nestVariables ?? {});
         result = translate(key, locale, newVariables, options);
       }
       return result ?? regExpMatch.group(0);
@@ -92,13 +92,15 @@ class Interpolator {
 
   static RegExp interpolationPattern(I18NextOptions options) => RegExp(
         '${options.interpolationPrefix}'
-        '(?<variable>.*?)(${options.interpolationSeparator}\\s*(?<format>.*?)\\s*)?'
+        '(?<variable>.*?)'
+        '(${options.interpolationSeparator}\\s*(?<format>.*?)\\s*)?'
         '${options.interpolationSuffix}',
       );
 
   static RegExp nestingPattern(I18NextOptions options) => RegExp(
         '${options.nestingPrefix}'
-        '(?<key>.*?)(${options.nestingSeparator}\\s*(?<variables>.*?)\\s*)?'
+        '(?<key>.*?)'
+        '(${options.nestingSeparator}\\s*(?<variables>.*?)\\s*)?'
         '${options.nestingSuffix}',
       );
 }
