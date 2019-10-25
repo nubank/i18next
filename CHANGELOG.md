@@ -1,6 +1,7 @@
 ## [0.0.1+6]
 
 * Migrated repository to `williamhjcho/i18next`
+* Reduce description size
 
 ## [0.0.1+5]
 
