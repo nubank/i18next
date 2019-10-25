@@ -1,3 +1,7 @@
+## [0.0.1+6]
+
+* Migrated repository to `williamhjcho/i18next`
+
 ## [0.0.1+5]
 
 * Adds plural separator in I18NextOptions
