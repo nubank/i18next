@@ -13,8 +13,8 @@ Mind that this is still a pre-1.0.0 so breaking changes may occur frequently.
 - [x] Get string or object tree
 - [x] Support for nesting
 - [ ] Sprintf support
-- [ ] Retrieve resource files from server
-- [ ] Resource caching
+- [ ] Resource caching :wip:
+- [ ] Retrieve resource files from server :wip:
 - [ ] Custom post processing
 
 ## Usage
