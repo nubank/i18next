@@ -3,18 +3,19 @@
 This is an adaptation of i18next standard in dart. This package is still a work in progress.
 Mind that this is still a pre-1.0.0 so breaking changes may occur frequently.
 
-- [x]  Support for variables
-- [x]  Support for namespaces
-- [x]  Support for context
-- [x]  Support for simple plural forms (one or plural)
-- [ ]  Support for multiple plural forms (one, few, many, plural, ...)
-- [x]  Graceful translation lookup
-- [x]  Get string or object tree
-- [x]  Support for nesting
-- [ ]  Sprintf support
-- [ ]  Retrieve resource files from server
-- [ ]  Resource caching
-- [ ]  Custom post processing
+- [x] Support for variables
+- [x] Support for namespaces
+- [x] Support for context
+- [x] Support for simple plural forms (one or plural)
+- [ ] Support for multiple plural forms (one, few, many, plural, ...)
+- [x] Plural and context fallbacks
+- [ ] Locale and namespace fallbacks 
+- [x] Get string or object tree
+- [x] Support for nesting
+- [ ] Sprintf support
+- [ ] Retrieve resource files from server
+- [ ] Resource caching
+- [ ] Custom post processing
 
 ## Usage
 
@@ -183,6 +184,27 @@ For example:
 ```dart
 i18next.t('common:myKey'); // 'This key is in common'
 i18next.t('feature:myKey'); // 'This key is in my feature'
+```
+
+- Context/plural fallback mechanism:
+
+```json
+{
+  "friend": "A friend",
+  "friend_female": "A girlfriend" 
+}
+```
+
+```dart
+i18next.t('friend'); // 'A friend'
+
+i18next.t('friend', count: 1); // 'A friend'
+// It fallbacks to `friend` since `friend_plural` is not present
+i18next.t('friend', count: 2); // 'A friend' 
+
+i18next.t('friend', context: 'female'); // 'A girlfriend'
+// It fallbacks to `friend` since `friend_male` is not present
+i18next.t('friend', context: 'male'); // 'A friend' 
 ```
 
 There is a way to also set the default namespace or a order of namespaces so a key knows where to start looking for the translation.
