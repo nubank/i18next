@@ -2,6 +2,7 @@
 
 * Migrated repository to `williamhjcho/i18next`
 * Reduce description size
+* Change the namespaces type from `Map<String, Map<String, Object>> -> Map<String, Object>`
 
 ## [0.0.1+5]
 

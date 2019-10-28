@@ -17,7 +17,7 @@ void main() {
     ResourceStore store;
 
     setUp(() {
-      store = ResourceStore({
+      store = ResourceStore(data: {
         validLocale: {
           validNamespace: {
             'key': 'This is a simple key',

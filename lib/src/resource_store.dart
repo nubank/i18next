@@ -7,11 +7,11 @@ import 'options.dart';
 ///
 /// The access is done by [Locale], Namespace, and key in that order.
 class ResourceStore {
-  ResourceStore([Map<Locale, Map<String, Map<String, Object>>> data])
+  ResourceStore({Map<Locale, Map<String, Object>> data})
       : data = data ?? {},
         super();
 
-  final Map<Locale, Map<String, Map<String, Object>>> data;
+  final Map<Locale, Map<String, Object>> data;
 
   /// Attempts to retrieve a value given [Locale] in [options], [namespace],
   /// and [key].
