@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:flutter/widgets.dart';
+
 import 'interpolator.dart';
 import 'options.dart';
 import 'plural_resolver.dart';
@@ -100,4 +102,13 @@ class I18Next {
         ).translate(key, locale, variables, newOptions) ??
         key;
   }
+
+  /// Returns the localized [I18Next] in the widget tree that corresponds to
+  /// the given [context] via [Localizations].
+  ///
+  /// Returns null if not found.
+  ///
+  /// An instance is usually registered and created by the
+  /// [I18NextLocalizationDelegate].
+  static I18Next of(BuildContext context) => Localizations.of(context, I18Next);
 }

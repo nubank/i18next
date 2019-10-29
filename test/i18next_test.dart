@@ -5,6 +5,9 @@ import 'package:mockito/mockito.dart';
 
 class MockResourceStore extends Mock implements ResourceStore {}
 
+class MockLocalizationsDataSource extends Mock
+    implements LocalizationDataSource {}
+
 void main() {
   const locale = Locale('en');
   I18Next i18next;
@@ -449,6 +452,43 @@ void main() {
         i18next.t('girlsAndBoys', count: 2, variables: {'girls': 3}),
         '3 girls and 2 boys',
       );
+    });
+  });
+
+  group('.of', () {
+    BuildContext capturedContext;
+
+    final builder = Builder(builder: (context) {
+      capturedContext = context;
+      return Container();
+    });
+
+    setUp(() {
+      capturedContext = null;
+    });
+
+    testWidgets('when not registered in the widget tree', (tester) async {
+      await tester.pumpWidget(builder);
+      expect(I18Next.of(capturedContext), isNull);
+    });
+
+    testWidgets('when is registered in the widget tree', (tester) async {
+      final dataSource = MockLocalizationsDataSource();
+      when(dataSource.load(any)).thenAnswer((_) async => {});
+
+      await tester.pumpWidget(Localizations(
+        child: builder,
+        locale: locale,
+        delegates: [
+          DefaultWidgetsLocalizations.delegate,
+          I18NextLocalizationDelegate(
+            locales: [locale],
+            dataSource: dataSource,
+          ),
+        ],
+      ));
+      await tester.pump();
+      expect(I18Next.of(capturedContext), isNotNull);
     });
   });
 }
