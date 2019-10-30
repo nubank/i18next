@@ -13,6 +13,8 @@ Mind that this is still a pre-1.0.0 so breaking changes may occur frequently.
 - [x] Get string or object tree
 - [x] Support for nesting
 - [ ] Sprintf support
+- [x] Flutter's `LocalizationsDelegate` support
+- [x] Asset bundle localizations data source (retrieves from `pubspec.yaml`). See the example for more details.
 - [ ] Resource caching :wip:
 - [ ] Retrieve resource files from server :wip:
 - [ ] Custom post processing
@@ -26,14 +28,37 @@ dependencies:
   i18next: ^0.0.1
 ```
 
-Then create your instance of `I18Next` class providing a `locale`, `data source``, and `interpolation options`.
+To use it with flutter's `LcoalizationsDelegate` you first create `I18NextLocalizationDelegate` and register it in your `WidgetsApp` (`MaterialApp` or `CupertinoApp`).
+
+```dart
+I18NextLocalizationDelegate(
+  locales: widget.locales,
+  // this data source is from where the delegate will retrieve the localizations from (namespaces Map)
+  dataSource: ...,
+  // optional extra options can be added here
+  options: I18NextOptions(...),
+),
+```
+
+Then to access and use it, simply call
+
+```dart
+Widget build(BuildContext context) {
+  // It finds the i18next instance on the widgets tree via `Localizations.of`
+  I18Next.of(context).t(...);
+  ...
+}
+```
+
+But if you want to handle it yourself, then simply instantiate it:
 
 ```dart
 I18Next(
   locale,
-  (namespace, locale) => /* return your namespace file here */,
-    // this can be omitted by the default options
-  interpolation: InterpolationOptions(formatter: customFormatter),
+  // This store is from where i18next will attempt to retrieve the localizations from.
+  resourceStore: ...,
+  // Optional extra options can be added here
+  options: I18NextOptions(...)
 );
 ```
 
