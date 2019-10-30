@@ -1,0 +1,6 @@
+{
+  "clickMe": "Click me",
+  "clicked": "You clicked {{count}} time!",
+  "clicked_plural": "You clicked {{count}} times!",
+  "resetCounter": "Reset Counter"
+}

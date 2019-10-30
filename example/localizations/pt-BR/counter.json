@@ -1,0 +1,6 @@
+{
+  "clickMe": "Clique em mim",
+  "clicked": "Você clicou {{count}} vez!",
+  "clicked_plural": "Você clicou {{count}} vezes!",
+  "resetCounter": "Resetar contador"
+}

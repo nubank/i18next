@@ -1,0 +1,8 @@
+{
+  "genderMessage": "Eles",
+  "genderMessage_female": "Ela",
+  "genderMessage_male": "Ele",
+  "today": "Hoje é {{date, dd/MM/yyyy}}",
+  "helloMessage": "Olá {{name}} no {{world, uppercase}} world",
+  "title": "Olá pt_BR"
+}
