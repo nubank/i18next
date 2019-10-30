@@ -1,6 +1,6 @@
 name: i18next
 description: A localization formatter based on the i18next standard. It is not yet a fully i18n tool only the formatting itself.
-version: 0.0.1+6
+version: 0.0.1+7
 author: William Hong Jun Cho <williamhjcho@gmail.com>
 repository: https://github.com/nubank/i18next
 homepage: https://github.com/nubank/i18next

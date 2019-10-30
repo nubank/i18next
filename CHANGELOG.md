@@ -1,7 +1,5 @@
-## [0.0.1+6]
+## [0.0.1+7]
 
-* Migrated repository to `williamhjcho/i18next`
-* Reduce description size
 * Change the namespaces type from `Map<String, Map<String, Object>> -> Map<String, Object>`
 * Adds I18Next.of(BuildContext) from Localizations
 * Adds `I18NextLocalizationDelegate`
@@ -9,6 +7,11 @@
 * Adds asset bundle data source and the LocalizationDataSource interface
 * Changes links to nubank/i18next
 * Adds example app
+
+## [0.0.1+6]
+
+* Migrated repository to `williamhjcho/i18next`
+* Reduce description size
 
 ## [0.0.1+5]
 
