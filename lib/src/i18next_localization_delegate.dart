@@ -10,14 +10,14 @@ import 'resource_store.dart';
 ///
 /// See [LocalizationsDelegate] for the base lifecycle calls.
 class I18NextLocalizationDelegate extends LocalizationsDelegate<I18Next> {
-  const I18NextLocalizationDelegate({
+  I18NextLocalizationDelegate({
     @required this.locales,
     @required this.dataSource,
-    @required this.resourceStore,
+    ResourceStore resourceStore,
     this.options,
   })  : assert(locales != null),
         assert(dataSource != null),
-        assert(resourceStore != null),
+        resourceStore = resourceStore ?? ResourceStore(),
         super();
 
   /// The list of supported locales by this delegate.

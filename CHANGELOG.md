@@ -6,6 +6,7 @@
 * Adds I18Next.of(BuildContext) from Localizations
 * Adds `I18NextLocalizationDelegate`
 * Adds convenience methods to `ResourceStore` for adding, removing, and verifiying locales and namespaces
+* Adds asset bundle data source and the LocalizationDataSource interface
 
 ## [0.0.1+5]
 
