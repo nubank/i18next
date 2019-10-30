@@ -5,6 +5,7 @@
 * Change the namespaces type from `Map<String, Map<String, Object>> -> Map<String, Object>`
 * Adds I18Next.of(BuildContext) from Localizations
 * Adds `I18NextLocalizationDelegate`
+* Adds convenience methods to `ResourceStore` for adding, removing, and verifiying locales and namespaces
 
 ## [0.0.1+5]
 

@@ -4,21 +4,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:i18next/i18next.dart';
 
 void main() {
+  const locale = Locale('any');
+  const data = <String, Object>{'a': '0', 'b': '1'};
+
   I18NextOptions options;
+  ResourceStore store;
 
   setUp(() {
     options = I18NextOptions.base;
+    store = ResourceStore();
   });
 
   group('#retrieve', () {
-    const validLocale = Locale('en');
     const validNamespace = 'ns';
-
-    ResourceStore store;
 
     setUp(() {
       store = ResourceStore(data: {
-        validLocale: {
+        locale: {
           validNamespace: {
             'key': 'This is a simple key',
             'my': {
@@ -45,8 +47,6 @@ void main() {
     });
 
     group('with matching locale', () {
-      const locale = validLocale;
-
       test('with null namespace', () {
         expect(store.retrieve(locale, null, 'key', options), isNull);
       });
@@ -107,7 +107,7 @@ void main() {
       ));
       expect(
         store.retrieve(
-          validLocale,
+          locale,
           validNamespace,
           'my+++nested+++key',
           newOptions,
@@ -117,13 +117,137 @@ void main() {
 
       expect(
         store.retrieve(
-          validLocale,
+          locale,
           validNamespace,
           'my.nested/key',
           newOptions,
         ),
         isNull,
       );
+    });
+  });
+
+  group('#addNamespace', () {
+    test('given null locale', () {
+      expect(() => store.addNamespace(null, '', {}), throwsAssertionError);
+    });
+
+    test('given null namespace', () {
+      expect(() => store.addNamespace(locale, null, {}), throwsAssertionError);
+    });
+
+    test('given null data', () {
+      expect(() => store.addNamespace(locale, '', null), throwsAssertionError);
+    });
+  });
+
+  group('given an unregistered locale', () {
+    test('#isLocaleRegistered', () {
+      expect(store.isLocaleRegistered(locale), isFalse);
+    });
+
+    test('#addNamespace', () {
+      const namespace = 'ns';
+      expect(store.isNamespaceRegistered(locale, namespace), isFalse);
+
+      store.addNamespace(locale, namespace, data);
+      expect(store.isNamespaceRegistered(locale, namespace), isTrue);
+    });
+
+    test('#removeNamespace', () {
+      expect(() => store.removeNamespace(locale, 'ns'), returnsNormally);
+    });
+
+    test('#removeLocale', () {
+      expect(() => store.removeLocale(locale), returnsNormally);
+      expect(store.isLocaleRegistered(locale), isFalse);
+    });
+
+    test('#removeAll', () {
+      expect(() => store.removeAll(), returnsNormally);
+      expect(store.isLocaleRegistered(locale), isFalse);
+    });
+  });
+
+  group('given a registered locale and namespace', () {
+    const registeredNamespace = 'ns1';
+
+    setUp(() {
+      store.addNamespace(locale, registeredNamespace, data);
+    });
+
+    test('#removeLocale', () {
+      store.removeLocale(locale);
+      expect(store.isLocaleRegistered(locale), isFalse);
+    });
+
+    test('#removeAll', () {
+      store.removeAll();
+      expect(store.isLocaleRegistered(locale), isFalse);
+    });
+
+    test('#isNamespaceRegistered', () {
+      expect(store.isNamespaceRegistered(locale, 'ns1'), isTrue);
+    });
+
+    test('#isLocaleRegistered', () {
+      expect(store.isLocaleRegistered(locale), isTrue);
+    });
+
+    group('given an unregistered namespace', () {
+      const newNamespace = 'ns2';
+
+      test('#addNamespace', () {
+        expect(store.isNamespaceRegistered(locale, newNamespace), isFalse);
+
+        store.addNamespace(locale, newNamespace, data);
+        expect(store.isNamespaceRegistered(locale, newNamespace), isTrue);
+        expect(
+          store.isNamespaceRegistered(locale, registeredNamespace),
+          isTrue,
+        );
+      });
+
+      test('#removeNamespace', () {
+        expect(store.isNamespaceRegistered(locale, newNamespace), isFalse);
+
+        store.removeNamespace(locale, newNamespace);
+        expect(store.isNamespaceRegistered(locale, newNamespace), isFalse);
+        expect(
+          store.isNamespaceRegistered(locale, registeredNamespace),
+          isTrue,
+        );
+      });
+    });
+
+    group('given a registered namespace', () {
+      test('#addNamespace', () {
+        const anotherData = {'a': '00', 'b': '11'};
+        store.addNamespace(locale, registeredNamespace, anotherData);
+        expect(
+            store.isNamespaceRegistered(locale, registeredNamespace), isTrue);
+        expect(
+          store.retrieve(locale, registeredNamespace, 'a', options),
+          equals('00'),
+        );
+        expect(
+          store.retrieve(locale, registeredNamespace, 'b', options),
+          equals('11'),
+        );
+      });
+
+      test('#removeNamespace', () {
+        expect(
+          store.isNamespaceRegistered(locale, registeredNamespace),
+          isTrue,
+        );
+
+        store.removeNamespace(locale, registeredNamespace);
+        expect(
+          store.isNamespaceRegistered(locale, registeredNamespace),
+          isFalse,
+        );
+      });
     });
   });
 
