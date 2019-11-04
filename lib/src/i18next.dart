@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:flutter/widgets.dart';
+
 import 'interpolator.dart';
 import 'options.dart';
 import 'plural_resolver.dart';
@@ -7,7 +9,7 @@ import 'resource_store.dart';
 import 'translator.dart';
 
 /// It translates the i18next localized format in your localization objects
-/// (provided by [dataSource]) to the final translation.
+/// (provided by [resourceStore]) to the final translation.
 ///
 /// Usually the most common usage:
 ///
@@ -38,9 +40,7 @@ class I18Next {
         pluralResolver = PluralResolver(),
         options = I18NextOptions.base.apply(options);
 
-  /// The current [Locale] for this instance.
-  ///
-  /// It is used as the default locale for pluralization rules and [dataSource].
+  /// The current and default [Locale] for this instance.
   final Locale locale;
 
   /// The resources store that contains all the necessary values mapped by
@@ -100,4 +100,13 @@ class I18Next {
         ).translate(key, locale, variables, newOptions) ??
         key;
   }
+
+  /// Returns the localized [I18Next] in the widget tree that corresponds to
+  /// the given [context] via [Localizations].
+  ///
+  /// Returns null if not found.
+  ///
+  /// An instance is usually registered and created by the
+  /// [I18NextLocalizationDelegate].
+  static I18Next of(BuildContext context) => Localizations.of(context, I18Next);
 }

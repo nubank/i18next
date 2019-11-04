@@ -1,0 +1,28 @@
+name: example
+description: I18next example project
+
+version: 0.0.0+1
+
+environment:
+  sdk: ">=2.3.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  i18next:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    # flutter asset generator/resolver isn't able to deal with wildcards yet
+    # due to how asset resolution works (1x, 2x, 3x, ...)
+    # for now, we'll have to add them manually
+    - localizations/en-US/
+    - localizations/pt-BR/
