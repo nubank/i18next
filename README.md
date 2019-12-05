@@ -89,7 +89,7 @@ i18next.t('unspecifiedKey'); // 'unspecifiedKey'
 
 ```json
 {
-  "myKey": "Hello {{name}}!"
+  "key": "Hello {{name}}!"
 }
 ```
 
