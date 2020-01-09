@@ -30,7 +30,7 @@ dependencies:
   i18next: ^0.0.1
 ```
 
-To use it with flutter's `LcoalizationsDelegate` you first create `I18NextLocalizationDelegate` and register it in your `WidgetsApp` (`MaterialApp` or `CupertinoApp`).
+To use it with flutter's `LocalizationsDelegate` you first create `I18NextLocalizationDelegate` and register it in your `WidgetsApp` (`MaterialApp` or `CupertinoApp`).
 
 ```dart
 I18NextLocalizationDelegate(
