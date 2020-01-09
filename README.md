@@ -2,7 +2,7 @@
 
 [![Build Status](https://app.bitrise.io/app/31aaaf8a0dd4fffd/status.svg?token=61YeV61VhkB_DSdLUtRvjw&branch=master)](https://app.bitrise.io/app/31aaaf8a0dd4fffd)
 
-This is an adaptation of i18next standard in dart. This package is still a work in progress.
+This is an adaptation of i18next standard for Dart with support for Flutter localization techniques. This package is still a work in progress.
 Mind that this is still a pre-1.0.0 so breaking changes may occur frequently.
 
 - [x] Support for variables
