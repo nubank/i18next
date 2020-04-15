@@ -477,7 +477,6 @@ void main() {
       when(dataSource.load(any)).thenAnswer((_) async => {});
 
       await tester.pumpWidget(Localizations(
-        child: builder,
         locale: locale,
         delegates: [
           DefaultWidgetsLocalizations.delegate,
@@ -486,6 +485,7 @@ void main() {
             dataSource: dataSource,
           ),
         ],
+        child: builder,
       ));
       await tester.pump();
       expect(I18Next.of(capturedContext), isNotNull);

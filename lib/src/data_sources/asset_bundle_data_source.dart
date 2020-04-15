@@ -57,7 +57,7 @@ class AssetBundleLocalizationDataSource implements LocalizationDataSource {
 
     final assetFiles = await bundle
         .loadString(manifest)
-        .then<Map<String, dynamic>>((string) => jsonDecode(string))
+        .then<Map<String, dynamic>>((string) => json.decode(string))
         .then((map) => map.keys);
 
     final bundleLocalePath = path.join(bundlePath, locale.toLanguageTag());

@@ -22,7 +22,7 @@ class I18NextOptions extends Diagnosticable {
   }) : super();
 
   /// Creates the base options
-  static final base = I18NextOptions(
+  static final I18NextOptions base = I18NextOptions(
     namespaceSeparator: ':',
     contextSeparator: '_',
     pluralSeparator: '_',

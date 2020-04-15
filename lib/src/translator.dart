@@ -26,7 +26,7 @@ class Translator {
   ) {
     assert(key != null);
 
-    String namespace = '', keyPath = key;
+    var namespace = '', keyPath = key;
     final match = RegExp(options.namespaceSeparator).firstMatch(key);
     if (match != null) {
       namespace = key.substring(0, match.start);
@@ -58,11 +58,12 @@ class Translator {
     final needsPlural = count != null;
 
     String pluralSuffix;
-    if (needsPlural)
+    if (needsPlural) {
       pluralSuffix = pluralResolver.pluralize(locale, count, options);
+    }
 
-    String tempKey = key;
-    final List<String> keys = [key];
+    var tempKey = key;
+    final keys = <String>[key];
     if (needsContext && needsPlural) {
       keys.add(tempKey + pluralSuffix);
     }
