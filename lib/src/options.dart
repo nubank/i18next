@@ -7,6 +7,7 @@ import 'utils.dart';
 /// Contains all options for [I18Next] to work properly.
 class I18NextOptions extends Diagnosticable {
   I18NextOptions({
+    this.fallbackNamespace,
     this.namespaceSeparator,
     this.contextSeparator,
     this.pluralSeparator,
@@ -23,6 +24,7 @@ class I18NextOptions extends Diagnosticable {
 
   /// Creates the base options
   static final I18NextOptions base = I18NextOptions(
+    fallbackNamespace: null,
     namespaceSeparator: ':',
     contextSeparator: '_',
     pluralSeparator: '_',
@@ -36,6 +38,12 @@ class I18NextOptions extends Diagnosticable {
     pluralSuffix: 'plural',
     formatter: defaultFormatter,
   );
+
+  /// The namespace used to fallback when no key matches were found on the
+  /// current namespace.
+  ///
+  /// Defaults to null.
+  final String fallbackNamespace;
 
   /// The separator used when splitting the key.
   ///
@@ -119,6 +127,7 @@ class I18NextOptions extends Diagnosticable {
   I18NextOptions apply(I18NextOptions other) {
     if (other == null) return this;
     return I18NextOptions(
+      fallbackNamespace: other.fallbackNamespace ?? fallbackNamespace,
       namespaceSeparator: other.namespaceSeparator ?? namespaceSeparator,
       contextSeparator: other.contextSeparator ?? contextSeparator,
       pluralSeparator: other.pluralSeparator ?? pluralSeparator,

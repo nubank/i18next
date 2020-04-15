@@ -9,6 +9,7 @@ class MockLocalizationsDataSource extends Mock
     implements LocalizationDataSource {}
 
 void main() {
+  const namespace = 'local_namespace';
   const locale = Locale('en');
   I18Next i18next;
   MockResourceStore resourceStore;
@@ -18,7 +19,7 @@ void main() {
     i18next = I18Next(locale, resourceStore);
   });
 
-  void mockKey(String key, String answer, {String ns = ''}) {
+  void mockKey(String key, String answer, {String ns = namespace}) {
     when(resourceStore.retrieve(any, ns, key, any)).thenReturn(answer);
   }
 
@@ -71,7 +72,7 @@ void main() {
 
   test('given an existing string key', () {
     mockKey('myKey', 'This is my key');
-    expect(i18next.t('myKey'), 'This is my key');
+    expect(i18next.t('$namespace:myKey'), 'This is my key');
   });
 
   test('given a non-existing or non matching key', () {
@@ -83,10 +84,10 @@ void main() {
     const anotherLocale = Locale('another');
     mockKey('key', 'my value');
 
-    expect(i18next.t('key', locale: anotherLocale), 'my value');
+    expect(i18next.t('$namespace:key', locale: anotherLocale), 'my value');
     verify(resourceStore.retrieve(
       anotherLocale,
-      '',
+      namespace,
       'key',
       any,
     )).called(1);
@@ -103,7 +104,7 @@ void main() {
       );
       mockKey('key', 'no interpolations here');
 
-      expect(i18next.t('key'), 'no interpolations here');
+      expect(i18next.t('$namespace:key'), 'no interpolations here');
     });
 
     test('with no matching variables', () {
@@ -120,7 +121,7 @@ void main() {
       mockKey('key', 'leading {{value, format}} trailing');
 
       expect(
-        i18next.t('key', variables: {'name': 'World'}),
+        i18next.t('$namespace:key', variables: {'name': 'World'}),
         'leading {{value, format}} trailing',
       );
     });
@@ -136,7 +137,7 @@ void main() {
       mockKey('key', 'leading {{value, format}} trailing');
 
       expect(
-        i18next.t('key', variables: {'value': 'eulav'}),
+        i18next.t('$namespace:key', variables: {'value': 'eulav'}),
         'leading eulav trailing',
       );
     });
@@ -159,7 +160,7 @@ void main() {
       mockKey('key', 'leading {{value, format}} trailing');
 
       expect(
-        i18next.t('key', variables: {'value': 'eulav'}),
+        i18next.t('$namespace:key', variables: {'value': 'eulav'}),
         'leading eulav trailing',
       );
     });
@@ -187,7 +188,7 @@ void main() {
               '{{value2, format2}} trailing');
 
       expect(
-        i18next.t('key', variables: {
+        i18next.t('$namespace:key', variables: {
           'value1': '1eulav',
           'value2': '2eulav',
         }),
@@ -205,41 +206,53 @@ void main() {
     });
 
     test('given key without count', () {
-      expect(i18next.t('friend'), 'A friend');
+      expect(i18next.t('$namespace:friend'), 'A friend');
     });
 
     test('given key with count', () {
-      expect(i18next.t('friend', count: 0), '0 friends');
-      expect(i18next.t('friend', count: 1), 'A friend');
-      expect(i18next.t('friend', count: -1), '-1 friends');
-      expect(i18next.t('friend', count: 99), '99 friends');
+      expect(i18next.t('$namespace:friend', count: 0), '0 friends');
+      expect(i18next.t('$namespace:friend', count: 1), 'A friend');
+      expect(i18next.t('$namespace:friend', count: -1), '-1 friends');
+      expect(i18next.t('$namespace:friend', count: 99), '99 friends');
     });
 
     test('given key with count in variables', () {
-      expect(i18next.t('friend', variables: {'count': 0}), '0 friends');
-      expect(i18next.t('friend', variables: {'count': 1}), 'A friend');
-      expect(i18next.t('friend', variables: {'count': -1}), '-1 friends');
-      expect(i18next.t('friend', variables: {'count': 99}), '99 friends');
+      expect(
+        i18next.t('$namespace:friend', variables: {'count': 0}),
+        '0 friends',
+      );
+      expect(
+        i18next.t('$namespace:friend', variables: {'count': 1}),
+        'A friend',
+      );
+      expect(
+        i18next.t('$namespace:friend', variables: {'count': -1}),
+        '-1 friends',
+      );
+      expect(
+        i18next.t('$namespace:friend', variables: {'count': 99}),
+        '99 friends',
+      );
     });
 
     test('given key with both count property and in variables', () {
       expect(
-        i18next.t('friend', count: 0, variables: {'count': 1}),
+        i18next.t('$namespace:friend', count: 0, variables: {'count': 1}),
         '0 friends',
       );
       expect(
-        i18next.t('friend', count: 1, variables: {'count': 0}),
+        i18next.t('$namespace:friend', count: 1, variables: {'count': 0}),
         'A friend',
       );
     });
 
     test('given key with count and unmmaped context', () {
       expect(
-        i18next.t('friend', count: 1, context: 'something'),
+        i18next.t('$namespace:friend', count: 1, context: 'something'),
         'A friend',
       );
       expect(
-        i18next.t('friend', count: 99, context: 'something'),
+        i18next.t('$namespace:friend', count: 99, context: 'something'),
         '99 friends',
       );
     });
@@ -255,58 +268,66 @@ void main() {
     });
 
     test('given key without context', () {
-      expect(i18next.t('friend'), 'A friend');
+      expect(i18next.t('$namespace:friend'), 'A friend');
     });
 
     test('given key with mapped context', () {
-      expect(i18next.t('friend', context: 'male'), 'A boyfriend');
-      expect(i18next.t('friend', context: 'female'), 'A girlfriend');
+      expect(i18next.t('$namespace:friend', context: 'male'), 'A boyfriend');
+      expect(i18next.t('$namespace:friend', context: 'female'), 'A girlfriend');
     });
 
     test('given key with mapped context in variables', () {
       expect(
-        i18next.t('friend', variables: {'context': 'male'}),
+        i18next.t('$namespace:friend', variables: {'context': 'male'}),
         'A boyfriend',
       );
       expect(
-        i18next.t('friend', variables: {'context': 'female'}),
+        i18next.t('$namespace:friend', variables: {'context': 'female'}),
         'A girlfriend',
       );
     });
 
     test('given key with both mapped context property and in variables', () {
       expect(
-        i18next.t('friend', context: 'female', variables: {'context': 'male'}),
+        i18next.t(
+          '$namespace:friend',
+          context: 'female',
+          variables: {'context': 'male'},
+        ),
         'A girlfriend',
       );
       expect(
-        i18next.t('friend', context: 'male', variables: {'context': 'female'}),
+        i18next.t(
+          '$namespace:friend',
+          context: 'male',
+          variables: {'context': 'female'},
+        ),
         'A boyfriend',
       );
     });
 
     test('given key with unmaped context', () {
-      expect(i18next.t('friend', context: 'other'), 'A friend');
+      expect(i18next.t('$namespace:friend', context: 'other'), 'A friend');
     });
 
     test('given key with mapped context and count', () {
       expect(
-        i18next.t('friend', context: 'male', count: 0),
+        i18next.t('$namespace:friend', context: 'male', count: 0),
         'A boyfriend',
       );
       expect(
-        i18next.t('friend', context: 'male', count: 1),
+        i18next.t('$namespace:friend', context: 'male', count: 1),
         'A boyfriend',
       );
     });
 
     test('given key with unmapped context and count', () {
       expect(
-        i18next.t('friend', context: 'other', count: 1),
+        i18next.t('$namespace:friend', context: 'other', count: 1),
         'A friend',
       );
       expect(
-        i18next.t('friend', context: 'other', count: 99),
+        i18next.t('$namespace:friend', context: 'other', count: 99),
         'A friend',
       );
     });
@@ -324,30 +345,30 @@ void main() {
 
     test('given key with mapped context and count', () {
       expect(
-        i18next.t('friend', context: 'male', count: 0),
+        i18next.t('$namespace:friend', context: 'male', count: 0),
         '0 boyfriends',
       );
       expect(
-        i18next.t('friend', context: 'male', count: 1),
+        i18next.t('$namespace:friend', context: 'male', count: 1),
         'A boyfriend',
       );
       expect(
-        i18next.t('friend', context: 'female', count: 0),
+        i18next.t('$namespace:friend', context: 'female', count: 0),
         '0 girlfriends',
       );
       expect(
-        i18next.t('friend', context: 'female', count: 1),
+        i18next.t('$namespace:friend', context: 'female', count: 1),
         'A girlfriend',
       );
     });
 
     test('given key with unmmaped context and count', () {
       expect(
-        i18next.t('friend', context: 'other', count: 0),
+        i18next.t('$namespace:friend', context: 'other', count: 0),
         '0 friends',
       );
       expect(
-        i18next.t('friend', context: 'other', count: 1),
+        i18next.t('$namespace:friend', context: 'other', count: 1),
         'A friend',
       );
     });
@@ -360,30 +381,33 @@ void main() {
 
     test('given empty interpolation', () {
       mockKey('key', 'This is some {{}}');
-      expect(i18next.t('key'), 'This is some {{}}');
+      expect(i18next.t('$namespace:key'), 'This is some {{}}');
     });
 
     test('given non matching arguments', () {
       expect(
-        i18next.t('key', variables: {'none': 'none'}),
+        i18next.t('$namespace:key', variables: {'none': 'none'}),
         '{{first}}, {{second}}, and then {{third}}!',
       );
     });
 
     test('given partially matching arguments', () {
       expect(
-        i18next.t('key', variables: {'first': 'fst'}),
+        i18next.t('$namespace:key', variables: {'first': 'fst'}),
         'fst, {{second}}, and then {{third}}!',
       );
       expect(
-        i18next.t('key', variables: {'first': 'fst', 'third': 'trd'}),
+        i18next.t(
+          '$namespace:key',
+          variables: {'first': 'fst', 'third': 'trd'},
+        ),
         'fst, {{second}}, and then trd!',
       );
     });
 
     test('given all matching arguments', () {
       expect(
-        i18next.t('key', variables: {
+        i18next.t('$namespace:key', variables: {
           'first': 'fst',
           'second': 'snd',
           'third': 'trd',
@@ -394,7 +418,7 @@ void main() {
 
     test('given extra matching arguments', () {
       expect(
-        i18next.t('key', variables: {
+        i18next.t('$namespace:key', variables: {
           'first': 'fst',
           'second': 'snd',
           'third': 'trd',
@@ -409,7 +433,7 @@ void main() {
     test('when nested key is not found', () {
       mockKey('key', r'This is my $t(anotherKey)');
 
-      expect(i18next.t('key'), r'This is my $t(anotherKey)');
+      expect(i18next.t('$namespace:key'), r'This is my $t(anotherKey)');
     });
 
     test('given multiple simple key substitutions', () {
@@ -417,7 +441,51 @@ void main() {
       mockKey('nesting2', r'2 $t(nesting3)');
       mockKey('nesting3', '3');
 
-      expect(i18next.t('nesting1'), '1 2 3');
+      expect(i18next.t('$namespace:nesting1'), '1 2 3');
+    });
+
+    test('given a grouped key substitution', () {
+      mockKey('keyA', 'A');
+      mockKey('group.keyB', 'B');
+      mockKey('local', r'$t(keyA), and $t(group.keyB)!');
+
+      expect(i18next.t('$namespace:local'), 'A, and B!');
+    });
+
+    test('given a global fallback key substitution', () {
+      const fallbackNamespace = 'fallback_namespace';
+      i18next = I18Next(
+        locale,
+        resourceStore,
+        options: I18NextOptions(fallbackNamespace: fallbackNamespace),
+      );
+
+      mockKey('keyZ', 'Z', ns: fallbackNamespace);
+      mockKey('keyA', 'A', ns: namespace);
+
+      mockKey('example', r'$t(keyA), and $t(keyZ)!', ns: namespace);
+
+      expect(i18next.t('$namespace:example'), 'A, and Z!');
+    });
+
+    test('when nested local and fallback namespaces have same key', () {
+      const fallbackNamespace = 'fallback_namespace';
+      i18next = I18Next(
+        locale,
+        resourceStore,
+        options: I18NextOptions(fallbackNamespace: fallbackNamespace),
+      );
+
+      mockKey('keyX', 'Global X', ns: fallbackNamespace);
+      mockKey('keyX', 'Local X', ns: namespace);
+      mockKey(
+        'example',
+        // explicit namespace key nesting
+        '\$t(keyX), and \$t($fallbackNamespace:keyX)!',
+        ns: namespace,
+      );
+
+      expect(i18next.t('$namespace:example'), 'Local X, and Global X!');
     });
 
     test('interpolation from immediate variables', () {
@@ -425,7 +493,7 @@ void main() {
       mockKey('key2', 'say: {{val}}');
 
       expect(
-        i18next.t('key2', variables: {'val': r'$t(key1)'}),
+        i18next.t('$namespace:key2', variables: {'val': r'$t(key1)'}),
         'say: hello world',
       );
     });
@@ -435,7 +503,7 @@ void main() {
       mockKey('key2', r'say: $t(key1)');
 
       expect(
-        i18next.t('key2', variables: {'name': 'world'}),
+        i18next.t('$namespace:key2', variables: {'name': 'world'}),
         'say: hello world',
       );
     });
@@ -449,7 +517,7 @@ void main() {
       mockKey('girls_plural', '{{count}} girls');
 
       expect(
-        i18next.t('girlsAndBoys', count: 2, variables: {'girls': 3}),
+        i18next.t('$namespace:girlsAndBoys', count: 2, variables: {'girls': 3}),
         '3 girls and 2 boys',
       );
     });

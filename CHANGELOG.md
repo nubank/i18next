@@ -1,6 +1,9 @@
 ## [0.0.1+8]
 
 * Bumps analysis options #9
+* Adds fallback namespace #10
+* Refactors Translator to a callable class #10
+* Refactors interpolator class to global pure functions #10
 
 ## [0.0.1+7]
 

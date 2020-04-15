@@ -1,24 +1,23 @@
 import 'dart:ui';
 
-import 'interpolator.dart';
+import 'interpolator.dart' as interpolator;
 import 'options.dart';
 import 'plural_resolver.dart';
 import 'resource_store.dart';
 
 class Translator {
   Translator(
-    this.interpolator,
     this.pluralResolver,
-    this.resourceStore,
-  )   : assert(interpolator != null),
-        assert(pluralResolver != null),
+    this.resourceStore, [
+    this.contextNamespace,
+  ])  : assert(pluralResolver != null),
         assert(resourceStore != null);
 
-  final Interpolator interpolator;
   final PluralResolver pluralResolver;
   final ResourceStore resourceStore;
+  final String contextNamespace;
 
-  String translate(
+  String call(
     String key,
     Locale locale,
     Map<String, Object> variables,
@@ -26,7 +25,8 @@ class Translator {
   ) {
     assert(key != null);
 
-    var namespace = '', keyPath = key;
+    var namespace = contextNamespace ?? '';
+    var keyPath = key;
     final match = RegExp(options.namespaceSeparator).firstMatch(key);
     if (match != null) {
       namespace = key.substring(0, match.start);
@@ -75,14 +75,23 @@ class Translator {
     }
 
     String result;
-    while (keys.isNotEmpty) {
-      final currentKey = keys.removeLast();
-      final found = find(locale, namespace, currentKey, variables, options);
-      if (found != null) {
-        result = found;
-        break;
+    final namespaces = [
+      namespace,
+      if (options.fallbackNamespace != null) options.fallbackNamespace
+    ];
+    for (final currentNamespace in namespaces) {
+      for (final currentKey in keys.reversed) {
+        final found = find(
+          locale,
+          currentNamespace,
+          currentKey,
+          variables,
+          options,
+        );
+        if (found != null) return found;
       }
     }
+
     return result;
   }
 
@@ -98,16 +107,15 @@ class Translator {
     I18NextOptions options,
   ) {
     final value = resourceStore.retrieve(locale, namespace, key, options);
-    if (value == null) {
-      // TODO: fallback locales
-      // TODO: fallback namespaces
-      // TODO: fallback to default value
-    }
-
     String result;
     if (value != null) {
       result = interpolator.interpolate(locale, value, variables, options);
-      result = interpolator.nest(locale, result, translate, variables, options);
+      result = interpolator.nest(
+          locale,
+          result,
+          Translator(pluralResolver, resourceStore, namespace),
+          variables,
+          options);
     }
     return result;
   }
