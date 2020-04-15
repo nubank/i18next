@@ -1,3 +1,7 @@
+## [0.0.1+8]
+
+* Bumps analysis options #9
+
 ## [0.0.1+7]
 
 * Change the namespaces type from `Map<String, Map<String, Object>> -> Map<String, Object>`

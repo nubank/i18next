@@ -9,7 +9,7 @@ import 'localizations.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
-  final locales = const [
+  final List<Locale> locales = const [
     Locale('en', 'US'),
     Locale('pt', 'BR'),
     // TODO: add multi plural language(s)
@@ -114,11 +114,9 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             CupertinoSegmentedControl<Locale>(
-              children: Map.fromIterable(
-                widget.supportedLocales,
-                key: (dynamic loc) => loc,
-                value: (dynamic locale) => Text(locale.toString()),
-              ),
+              children: {
+                for (var e in widget.supportedLocales) e: Text(e.toString())
+              },
               groupValue: Localizations.localeOf(context),
               onValueChanged: widget.onUpdateLocale,
             ),
@@ -148,8 +146,8 @@ class _MyHomePageState extends State<MyHomePage> {
               style: theme.textTheme.display1,
             ),
             FlatButton(
-              child: Text(counterL10n.resetCounter),
               onPressed: resetCounter,
+              child: Text(counterL10n.resetCounter),
             ),
           ],
         ),

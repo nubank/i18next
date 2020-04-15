@@ -61,11 +61,12 @@ class I18NextLocalizationDelegate extends LocalizationsDelegate<I18Next> {
   /// - Both 'en_US' and 'en' => 'en_US'
   /// - Both 'pt_BR' and 'pt' => 'pt'
   Locale normalizeLocale(Locale locale) {
-    if (!locales.contains(locale))
+    if (!locales.contains(locale)) {
       locale = locales.firstWhere(
         (l) => l.languageCode == locale.languageCode,
         orElse: () => throw Exception('Unsupported locale $locale'),
       );
+    }
     return locale;
   }
 
