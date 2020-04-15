@@ -15,7 +15,7 @@ class Translator {
   final PluralResolver pluralResolver;
   final ResourceStore resourceStore;
 
-  String translate(
+  String call(
     String key,
     Locale locale,
     Map<String, Object> variables,
@@ -104,7 +104,7 @@ class Translator {
     String result;
     if (value != null) {
       result = interpolator.interpolate(locale, value, variables, options);
-      result = interpolator.nest(locale, result, translate, variables, options);
+      result = interpolator.nest(locale, result, call, variables, options);
     }
     return result;
   }

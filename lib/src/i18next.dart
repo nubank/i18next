@@ -91,7 +91,7 @@ class I18Next {
     final newOptions = this.options.apply(options);
 
     return Translator(pluralResolver, resourceStore)
-            .translate(key, locale, variables, newOptions) ??
+            .call(key, locale, variables, newOptions) ??
         key;
   }
 
