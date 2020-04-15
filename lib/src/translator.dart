@@ -1,20 +1,17 @@
 import 'dart:ui';
 
-import 'interpolator.dart';
+import 'interpolator.dart' as interpolator;
 import 'options.dart';
 import 'plural_resolver.dart';
 import 'resource_store.dart';
 
 class Translator {
   Translator(
-    this.interpolator,
     this.pluralResolver,
     this.resourceStore,
-  )   : assert(interpolator != null),
-        assert(pluralResolver != null),
+  )   : assert(pluralResolver != null),
         assert(resourceStore != null);
 
-  final Interpolator interpolator;
   final PluralResolver pluralResolver;
   final ResourceStore resourceStore;
 

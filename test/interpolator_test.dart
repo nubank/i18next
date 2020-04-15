@@ -6,40 +6,35 @@ import 'package:i18next/src/interpolator.dart';
 
 void main() {
   final baseOptions = I18NextOptions.base;
-  Interpolator interpolator;
 
-  setUp(() {
-    interpolator = Interpolator();
-  });
-
-  group('#interpolate', () {
-    String interpolate(
+  group('interpolate', () {
+    String interpol(
       String string, {
       Map<String, Object> variables,
       Locale locale,
       ArgumentFormatter formatter,
     }) {
       final options = baseOptions.apply(I18NextOptions(formatter: formatter));
-      return interpolator.interpolate(locale, string, variables, options);
+      return interpolate(locale, string, variables, options);
     }
 
     test('given string null', () {
       expect(
-        () => interpolator.interpolate(null, null, null, baseOptions),
+        () => interpolate(null, null, null, baseOptions),
         throwsAssertionError,
       );
     });
 
     test('given options null', () {
       expect(
-        () => interpolator.interpolate(null, '', null, null),
+        () => interpolate(null, '', null, null),
         throwsAssertionError,
       );
     });
 
     test('given a non matching string', () {
       expect(
-        interpolate(
+        interpol(
           'This is a normal string',
           formatter: expectAsync3(null, count: 0),
         ),
@@ -50,7 +45,7 @@ void main() {
     group('given a matching string', () {
       test('without variable or format', () {
         expect(
-          interpolate(
+          interpol(
             'This is a {{}} string',
             formatter: expectAsync3(null, count: 0),
           ),
@@ -61,7 +56,7 @@ void main() {
       group('with variable only', () {
         test('without variables', () {
           expect(
-            interpolate(
+            interpol(
               'This is a {{variable}} string',
               formatter: expectAsync3(null, count: 0),
             ),
@@ -71,7 +66,7 @@ void main() {
 
         test('with replaceable variables', () {
           expect(
-            interpolate(
+            interpol(
               'This is a {{variable}} string',
               variables: {'variable': 'my variable'},
               formatter: expectAsync3((variable, format, locale) {
@@ -87,7 +82,7 @@ void main() {
 
         test('without replaceable variables', () {
           expect(
-            interpolate(
+            interpol(
               'This is a {{variable}} string',
               variables: {'another': 'value'},
               formatter: expectAsync3(null, count: 0),
@@ -99,7 +94,7 @@ void main() {
 
       test('with format only', () {
         expect(
-          interpolate(
+          interpol(
             'This is a {{, some format}} string',
             formatter: expectAsync3(null, count: 0),
           ),
@@ -109,7 +104,7 @@ void main() {
 
       test('with variable and format and replaceable variables', () {
         expect(
-          interpolate(
+          interpol(
             'This is a {{variable, format}} string',
             variables: {'variable': 'my variable'},
             formatter: expectAsync3((variable, format, locale) {
@@ -126,7 +121,7 @@ void main() {
       test('given locale', () {
         const locale = Locale('any');
         expect(
-          interpolate(
+          interpol(
             'This is a {{variable}} string',
             locale: locale,
             variables: {'variable': 'my variable'},
@@ -143,8 +138,8 @@ void main() {
     });
   });
 
-  group('#nest', () {
-    String nest(
+  group('nest', () {
+    String nst(
       String string, {
       Locale locale,
       Map<String, Object> variables,
@@ -152,13 +147,12 @@ void main() {
       I18NextOptions options,
     }) {
       translate ??= (a, b, c, d) => a;
-      return interpolator.nest(
-          locale, string, translate, variables, options ?? baseOptions);
+      return nest(locale, string, translate, variables, options ?? baseOptions);
     }
 
     test('given string null', () {
       expect(
-        () => interpolator.nest(
+        () => nest(
           null,
           null,
           expectAsync4(null, count: 0),
@@ -171,14 +165,14 @@ void main() {
 
     test('given translate null', () {
       expect(
-        () => interpolator.nest(null, '', null, null, baseOptions),
+        () => nest(null, '', null, null, baseOptions),
         throwsAssertionError,
       );
     });
 
     test('given options null', () {
       expect(
-        () => interpolator.nest(
+        () => nest(
           null,
           '',
           expectAsync4(null, count: 0),
@@ -191,7 +185,7 @@ void main() {
 
     test('given a non matching string', () {
       expect(
-        nest(
+        nst(
           'This is my unmatching string',
           translate: expectAsync4(null, count: 0),
         ),
@@ -202,7 +196,7 @@ void main() {
     group('given a nesting string', () {
       test('without key or variables', () {
         expect(
-          nest(
+          nst(
             r'This is my $t() string',
             translate: expectAsync4(null, count: 0),
           ),
@@ -212,7 +206,7 @@ void main() {
 
       test('with key only', () {
         expect(
-          nest(
+          nst(
             r'This is my $t(key) string',
             translate: expectAsync4((key, b, c, d) {
               expect(key, 'key');
@@ -225,7 +219,7 @@ void main() {
 
       test('with variables only', () {
         expect(
-          nest(
+          nst(
             r'This is my $t(, {"x": "y"}) string',
             translate: expectAsync4(null, count: 0),
           ),
@@ -239,7 +233,7 @@ void main() {
 
           test('the deserialized variables are passed', () {
             expect(
-              nest(
+              nst(
                 r'This is my $t(key, {"x":"y"}) string',
                 translate: expectAsync4((key, b, variables, d) {
                   expect(key, 'key');
@@ -253,7 +247,7 @@ void main() {
 
           test('the new variables are merged with the previous variables', () {
             expect(
-              nest(
+              nst(
                 string,
                 variables: const {'x': 'x', 'y': 'y', 'z': 'z'},
                 translate: expectAsync4((key, b, variables, d) {
@@ -273,7 +267,7 @@ void main() {
 
         test('when variables are a malformed json', () {
           expect(
-            nest(
+            nst(
               r'This is my $t(key, "x") string',
               translate: expectAsync4((key, b, variables, d) {
                 expect(key, 'key');
@@ -288,7 +282,7 @@ void main() {
 
       test('with multiple split points', () {
         expect(
-          nest(
+          nst(
             r'This is my $t(key, {"a":"a"}, {"b":"b"}) string',
             translate: expectAsync4((key, b, variables, d) {
               expect(key, 'key');
@@ -304,7 +298,7 @@ void main() {
         const locale = Locale('any');
 
         expect(
-          nest(
+          nst(
             r'This is my $t(key) string',
             locale: locale,
             options: baseOptions,
@@ -320,8 +314,8 @@ void main() {
     });
   });
 
-  group('.interpolationPattern', () {
-    final pattern = Interpolator.interpolationPattern(baseOptions);
+  group('interpolationPattern', () {
+    final pattern = interpolationPattern(baseOptions);
 
     Iterable<List<String>> allMatches(String text) =>
         pattern.allMatches(text).map((match) => [
@@ -400,8 +394,8 @@ void main() {
     });
   });
 
-  group('.nestingPattern', () {
-    final pattern = Interpolator.nestingPattern(baseOptions);
+  group('nestingPattern', () {
+    final pattern = nestingPattern(baseOptions);
 
     Iterable<List<String>> allMatches(String text) =>
         pattern.allMatches(text).map((match) => [

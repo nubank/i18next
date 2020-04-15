@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
 
-import 'interpolator.dart';
 import 'options.dart';
 import 'plural_resolver.dart';
 import 'resource_store.dart';
@@ -36,7 +35,6 @@ import 'translator.dart';
 class I18Next {
   I18Next(this.locale, this.resourceStore, {I18NextOptions options})
       : assert(resourceStore != null),
-        interpolator = Interpolator(),
         pluralResolver = PluralResolver(),
         options = I18NextOptions.base.apply(options);
 
@@ -48,7 +46,6 @@ class I18Next {
   ///
   /// Cannot be null.
   final ResourceStore resourceStore;
-  final Interpolator interpolator;
   final PluralResolver pluralResolver;
 
   /// The options used to find and format matching interpolations.
@@ -93,11 +90,8 @@ class I18Next {
     locale ??= this.locale;
     final newOptions = this.options.apply(options);
 
-    return Translator(
-          interpolator,
-          pluralResolver,
-          resourceStore,
-        ).translate(key, locale, variables, newOptions) ??
+    return Translator(pluralResolver, resourceStore)
+            .translate(key, locale, variables, newOptions) ??
         key;
   }
 
