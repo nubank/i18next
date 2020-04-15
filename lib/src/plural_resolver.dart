@@ -2,25 +2,38 @@ import 'dart:ui';
 
 import 'options.dart';
 
+/// A callback function to determine if exists
+/// the key for an specifc plural modifier
+typedef CheckerKeyFunction = bool Function(
+  String pluralModifier,
+);
+
 class PluralResolver {
   PluralResolver() : super();
 
   /// Returns the plural suffix based on [count] and presented [options].
-  String pluralize(Locale locale, int count, I18NextOptions options) {
-    var result = '';
-    if (count != 1) {
-      final number = _numberForLocale(count.abs(), locale);
-      if (number >= 0) {
-        result = '${options.pluralSuffix}${options.pluralSeparator}$number';
-      } else {
-        result = '${options.pluralSeparator}${options.pluralSuffix}';
-      }
-    }
-    return result;
+  String pluralize(
+    int count,
+    I18NextOptions options,
+    CheckerKeyFunction find,
+  ) {
+    final shouldLookForPluralKeys = count != 1;
+    const resultForNonRequiredPlural = '';
+
+    return !shouldLookForPluralKeys
+        ? resultForNonRequiredPlural
+        : _pluralKey(count, options, find);
   }
 
-  int _numberForLocale(int count, Locale locale) {
-    // TODO: add locale based rules
-    return -1;
+  String _pluralKey(
+    int count,
+    I18NextOptions options,
+    CheckerKeyFunction find,
+  ) {
+    final baseKey = '${options.pluralSeparator}${options.pluralSuffix}';
+    final specicPluralKey = '$baseKey${options.pluralSeparator}$count';
+    final existSpecicPlural = find(specicPluralKey);
+
+    return existSpecicPlural ? specicPluralKey : baseKey;
   }
 }

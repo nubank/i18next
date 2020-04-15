@@ -59,7 +59,17 @@ class Translator {
 
     String pluralSuffix;
     if (needsPlural) {
-      pluralSuffix = pluralResolver.pluralize(locale, count, options);
+      pluralSuffix = pluralResolver.pluralize(
+        count,
+        options,
+        (pluralModifier) => _checkForPluralKey(
+          pluralModifier,
+          baseKey: key,
+          locale: locale,
+          namespace: namespace,
+          options: options,
+        ),
+      );
     }
 
     var tempKey = key;
@@ -110,5 +120,22 @@ class Translator {
       result = interpolator.nest(locale, result, translate, variables, options);
     }
     return result;
+  }
+
+  bool _checkForPluralKey(
+    String pluralModifier, {
+    Locale locale,
+    String namespace,
+    String baseKey,
+    I18NextOptions options,
+  }) {
+    final value = resourceStore.retrieve(
+      locale,
+      namespace,
+      '$baseKey$pluralModifier',
+      options,
+    );
+
+    return value != null;
   }
 }
