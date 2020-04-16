@@ -3,60 +3,82 @@ import 'package:i18next/i18next.dart';
 import 'package:i18next/src/plural_resolver.dart';
 import 'package:mockito/mockito.dart';
 
-abstract class FakeCheckerKeyFunction {
+class MockKeyExists extends Mock {
   bool call(String pluralModifier);
 }
 
-class MockCheckerKeyFunction extends Mock implements FakeCheckerKeyFunction {}
-
 void main() {
-  group('PluralResolver', () {
-    MockCheckerKeyFunction checkerKeyFnc;
-    PluralResolver subject;
+  MockKeyExists keyExists;
+  PluralResolver subject;
 
-    setUpAll(() {
-      checkerKeyFnc = MockCheckerKeyFunction();
-      subject = PluralResolver();
-    });
+  setUp(() {
+    keyExists = MockKeyExists();
+    subject = PluralResolver();
+  });
 
-    test('when count is equal 1 returns empty string', () {
-      const count = 1;
+  group('given count equals 0', () {
+    test('when exists the specfic key', () {
+      when(keyExists.call('_0')).thenReturn(true);
+      const count = 0;
       final result = subject.pluralize(
         count,
         I18NextOptions.base,
-        checkerKeyFnc,
+        keyExists,
       );
 
-      verifyZeroInteractions(checkerKeyFnc);
-      expect(result, equals(''));
+      expect(result, equals('_0'));
     });
 
-    group('when count is different than 1', () {
-      test('when exists the specfic key', () {
-        const count = 2;
-        when(checkerKeyFnc.call('_plural_2')).thenReturn(true);
+    test('when does not exist the specfic key', () {
+      when(keyExists.call('_0')).thenReturn(false);
+      const count = 0;
+      final result = subject.pluralize(
+        count,
+        I18NextOptions.base,
+        keyExists,
+      );
 
-        final result = subject.pluralize(
-          count,
-          I18NextOptions.base,
-          checkerKeyFnc,
-        );
+      expect(result, equals('_plural'));
+    });
+  });
 
-        expect(result, equals('_plural_2'));
-      });
+  test('given count equals 1', () {
+    const count = 1;
+    final result = subject.pluralize(
+      count,
+      I18NextOptions.base,
+      keyExists,
+    );
 
-      test('when does not exist the specfic key', () {
-        const count = 2;
-        when(checkerKeyFnc.call('_plural_2')).thenReturn(false);
+    verifyZeroInteractions(keyExists);
+    expect(result, equals(''));
+  });
 
-        final result = subject.pluralize(
-          count,
-          I18NextOptions.base,
-          checkerKeyFnc,
-        );
+  group('when count is different than 1', () {
+    test('when exists the specfic key', () {
+      const count = 2;
+      when(keyExists.call('_2')).thenReturn(true);
 
-        expect(result, equals('_plural'));
-      });
+      final result = subject.pluralize(
+        count,
+        I18NextOptions.base,
+        keyExists,
+      );
+
+      expect(result, equals('_2'));
+    });
+
+    test('when does not exist the specfic key', () {
+      const count = 2;
+      when(keyExists.call('_2')).thenReturn(false);
+
+      final result = subject.pluralize(
+        count,
+        I18NextOptions.base,
+        keyExists,
+      );
+
+      expect(result, equals('_plural'));
     });
   });
 }

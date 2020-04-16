@@ -62,7 +62,7 @@ class Translator {
       pluralSuffix = pluralResolver.pluralize(
         count,
         options,
-        (pluralModifier) => _checkForPluralKey(
+        (pluralModifier) => _hasPluralKey(
           pluralModifier,
           baseKey: key,
           locale: locale,
@@ -122,7 +122,7 @@ class Translator {
     return result;
   }
 
-  bool _checkForPluralKey(
+  bool _hasPluralKey(
     String pluralModifier, {
     Locale locale,
     String namespace,

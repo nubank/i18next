@@ -4,7 +4,7 @@ import 'options.dart';
 
 /// A callback function to determine if exists
 /// the key for an specifc plural modifier
-typedef CheckerKeyFunction = bool Function(
+typedef KeyExists = bool Function(
   String pluralModifier,
 );
 
@@ -15,24 +15,24 @@ class PluralResolver {
   String pluralize(
     int count,
     I18NextOptions options,
-    CheckerKeyFunction find,
+    KeyExists validateKey,
   ) {
     final shouldLookForPluralKeys = count != 1;
     const resultForNonRequiredPlural = '';
 
-    return !shouldLookForPluralKeys
-        ? resultForNonRequiredPlural
-        : _pluralKey(count, options, find);
+    return shouldLookForPluralKeys
+        ? _pluralKey(count, options, validateKey)
+        : resultForNonRequiredPlural;
   }
 
   String _pluralKey(
     int count,
     I18NextOptions options,
-    CheckerKeyFunction find,
+    KeyExists validateKey,
   ) {
     final baseKey = '${options.pluralSeparator}${options.pluralSuffix}';
-    final specicPluralKey = '$baseKey${options.pluralSeparator}$count';
-    final existSpecicPlural = find(specicPluralKey);
+    final specicPluralKey = '${options.pluralSeparator}$count';
+    final existSpecicPlural = validateKey(specicPluralKey);
 
     return existSpecicPlural ? specicPluralKey : baseKey;
   }

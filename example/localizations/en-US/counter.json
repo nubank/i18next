@@ -2,7 +2,7 @@
   "clickMe": "Click me",
   "clicked": "You clicked {{count}} time!",
   "clicked_plural": "You clicked {{count}} times!",
-  "clicked_plural_0": "No clicks",
-  "clicked_plural_2": "Double tap",
+  "clicked_0": "No clicks",
+  "clicked_2": "Double click",
   "resetCounter": "Reset Counter"
 }

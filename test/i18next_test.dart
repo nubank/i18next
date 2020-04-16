@@ -202,6 +202,9 @@ void main() {
     setUp(() {
       mockKey('friend', 'A friend');
       mockKey('friend_plural', '{{count}} friends');
+      mockKey('clicked', 'You clicked {{count}} time!');
+      mockKey('clicked_2', 'Double click!');
+      mockKey('clicked_plural', 'You clicked {{count}} times!');
     });
 
     test('given key without count', () {
@@ -244,7 +247,24 @@ void main() {
       );
     });
 
-    // TODO: add special pluralization rules
+    test('given key with specific rule count', () {
+      expect(
+        i18next.t('clicked', count: 0),
+        'You clicked 0 times!',
+      );
+      expect(
+        i18next.t('clicked', count: 1),
+        'You clicked 1 time!',
+      );
+      expect(
+        i18next.t('clicked', count: 2),
+        'Double click!',
+      );
+      expect(
+        i18next.t('clicked', count: 99),
+        'You clicked 99 times!',
+      );
+    });
   });
 
   group('contextualization', () {
