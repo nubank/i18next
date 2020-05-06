@@ -123,11 +123,11 @@ class _MyHomePageState extends State<MyHomePage> {
             const Divider(),
             Text(
               homepageL10n.hello(name: 'Name', world: 'Flutter'),
-              style: theme.textTheme.title,
+              style: theme.textTheme.headline6,
             ),
             Text(
               homepageL10n.today(DateTime.now()),
-              style: theme.textTheme.subtitle,
+              style: theme.textTheme.subtitle2,
             ),
             CupertinoSegmentedControl<String>(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -143,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
             const Divider(),
             Text(
               counterL10n.clicked(_counter),
-              style: theme.textTheme.display1,
+              style: theme.textTheme.headline4,
             ),
             FlatButton(
               onPressed: resetCounter,

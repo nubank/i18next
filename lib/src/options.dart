@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'utils.dart';
 
 /// Contains all options for [I18Next] to work properly.
-class I18NextOptions extends Diagnosticable {
+class I18NextOptions with DiagnosticableMixin {
   I18NextOptions({
     this.fallbackNamespace,
     this.namespaceSeparator,

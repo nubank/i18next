@@ -1,7 +1,7 @@
 name: example
 description: I18next example project
 
-version: 0.0.0+1
+version: 0.1.0
 
 environment:
   sdk: ">=2.3.0 <3.0.0"
