@@ -1,3 +1,7 @@
+## [0.1.0]
+
+* Bumps to match flutter version 1.17
+
 ## [0.0.1+8]
 
 * Bumps analysis options #9
