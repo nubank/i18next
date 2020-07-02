@@ -57,7 +57,8 @@ class I18NextOptions with DiagnosticableMixin {
   final String contextSeparator;
 
   /// The separator for plural suffixes, it is inserted between the key and the
-  /// plural value.
+  /// plural value ("plural" for simple rules, or a numeric index for complex
+  /// rules with multiple plurals).
   ///
   /// Defaults to '_'.
   final String pluralSeparator;
@@ -70,8 +71,7 @@ class I18NextOptions with DiagnosticableMixin {
 
   /// [pluralSuffix] is used for the pluralization mechanism.
   ///
-  /// Defaults to 'plural' and is used for both simple and complex
-  /// pluralization rule cases.
+  /// Defaults to 'plural' and is used for simple pluralization rules.
   ///
   /// For example, in english where it only has singular or plural forms:
   ///

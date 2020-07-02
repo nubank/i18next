@@ -9,7 +9,7 @@ Mind that this is still a pre-1.0.0 so breaking changes may occur frequently.
 - [x] Support for namespaces
 - [x] Support for context
 - [x] Support for simple plural forms (one or plural)
-- [ ] Support for multiple plural forms (one, few, many, plural, ...)
+- [x] Support for multiple plural forms (one, few, many, plural, ...)
 - [x] Plural and context fallbacks
 - [ ] Locale and namespace fallbacks 
 - [x] Get string or object tree
