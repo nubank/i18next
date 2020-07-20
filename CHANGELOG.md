@@ -2,6 +2,7 @@
 
 * Updates README bitrise badge
 
+
 ## [0.1.0]
 
 * Bumps to match flutter version 1.17
