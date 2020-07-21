@@ -226,8 +226,7 @@ void main() {
     });
 
     test('given key without count', () {
-      expect(i18next.t('$namespace:friend-no-count', count: 1), 'A friend');
-      expect(i18next.t('$namespace:friend-no-count', count: 99), 'Friends');
+      expect(i18next.t('$namespace:friend-no-count'), 'A friend');
     });
 
     test('given key with count', () {
