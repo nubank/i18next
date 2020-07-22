@@ -19,8 +19,9 @@ void main() {
     i18next = I18Next(locale, resourceStore);
   });
 
-  void mockKey(String key, String answer, {String ns = namespace}) {
-    when(resourceStore.retrieve(any, ns, key, any)).thenReturn(answer);
+  void mockKey(String key, String answer,
+      {String ns = namespace, Locale locale = const Locale('en')}) {
+    when(resourceStore.retrieve(locale, ns, key, any)).thenReturn(answer);
   }
 
   group('given named namespaces', () {
@@ -82,7 +83,7 @@ void main() {
 
   test('given overriding locale', () {
     const anotherLocale = Locale('another');
-    mockKey('key', 'my value');
+    mockKey('key', 'my value', locale: anotherLocale);
 
     expect(i18next.t('$namespace:key', locale: anotherLocale), 'my value');
     verify(resourceStore.retrieve(
@@ -201,19 +202,57 @@ void main() {
 
   group('pluralization', () {
     setUp(() {
-      mockKey('friend', 'A friend');
+      // English, which is "simple" (key and key_plural):
+      mockKey('friend-no-count', 'A friend');
+      mockKey('friend-no-count_plural', 'Friends');
+      mockKey('friend', '{{count}} friend');
       mockKey('friend_plural', '{{count}} friends');
+
+      // Icelandic, which is also "simple" but has a subtly different rule.
+      // (In Icelandic, you say "twenty and one friend".)
+      const ic = Locale('is');
+      mockKey('friend', '{{count}} vinur', locale: ic);
+      mockKey('friend_plural', '{{count}} vinir', locale: ic);
+
+      // Russian, which has three pluralization forms:
+      const ru = Locale('ru');
+      mockKey('friend_0', '{{count}} друг', locale: ru);
+      mockKey('friend_1', '{{count}} друга', locale: ru);
+      mockKey('friend_2', '{{count}} друзей', locale: ru);
+
+      // Japanese, which has none:
+      const ja = Locale('ja');
+      mockKey('friend', '友達{{count}}人', locale: ja);
     });
 
     test('given key without count', () {
-      expect(i18next.t('$namespace:friend'), 'A friend');
+      expect(i18next.t('$namespace:friend-no-count'), 'A friend');
     });
 
     test('given key with count', () {
       expect(i18next.t('$namespace:friend', count: 0), '0 friends');
-      expect(i18next.t('$namespace:friend', count: 1), 'A friend');
-      expect(i18next.t('$namespace:friend', count: -1), '-1 friends');
+      expect(i18next.t('$namespace:friend', count: 1), '1 friend');
       expect(i18next.t('$namespace:friend', count: 99), '99 friends');
+    });
+
+    test('given key with count in Icelandic (alternate plural rule)', () {
+      const ic = Locale('is');
+      expect(i18next.t('$namespace:friend', count: 1, locale: ic), '1 vinur');
+      expect(i18next.t('$namespace:friend', count: 20, locale: ic), '20 vinir');
+      expect(i18next.t('$namespace:friend', count: 21, locale: ic), '21 vinur');
+    });
+
+    test('given key with count in Russian (multiple plurals)', () {
+      const ru = Locale('ru');
+      expect(i18next.t('$namespace:friend', count: 1, locale: ru), '1 друг');
+      expect(i18next.t('$namespace:friend', count: 2, locale: ru), '2 друга');
+      expect(i18next.t('$namespace:friend', count: 9, locale: ru), '9 друзей');
+    });
+
+    test('given key with count in Japanese (no plurals)', () {
+      const ja = Locale('ja');
+      expect(i18next.t('$namespace:friend', count: 1, locale: ja), '友達1人');
+      expect(i18next.t('$namespace:friend', count: 5, locale: ja), '友達5人');
     });
 
     test('given key with count in variables', () {
@@ -223,11 +262,11 @@ void main() {
       );
       expect(
         i18next.t('$namespace:friend', variables: {'count': 1}),
-        'A friend',
+        '1 friend',
       );
       expect(
         i18next.t('$namespace:friend', variables: {'count': -1}),
-        '-1 friends',
+        '-1 friend',
       );
       expect(
         i18next.t('$namespace:friend', variables: {'count': 99}),
@@ -242,14 +281,14 @@ void main() {
       );
       expect(
         i18next.t('$namespace:friend', count: 1, variables: {'count': 0}),
-        'A friend',
+        '1 friend',
       );
     });
 
     test('given key with count and unmmaped context', () {
       expect(
         i18next.t('$namespace:friend', count: 1, context: 'something'),
-        'A friend',
+        '1 friend',
       );
       expect(
         i18next.t('$namespace:friend', count: 99, context: 'something'),
