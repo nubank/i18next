@@ -1,6 +1,7 @@
-## [Next Release]
+## [0.2.0]
 
 * Updates README bitrise badge
+* Adds pluralization to non-english locales (Fixes #6) @lynn
 
 ## [0.1.0]
 
