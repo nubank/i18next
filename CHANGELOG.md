@@ -1,3 +1,7 @@
+## [0.3.0]
+
+* Bumps to flutter stable 1.20
+
 ## [0.2.0]
 
 * Updates README bitrise badge
