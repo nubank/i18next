@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'I18nu Demo',
       theme: ThemeData(
-        dividerTheme: DividerThemeData(
+        dividerTheme: const DividerThemeData(
           color: Colors.black45,
           space: 32.0,
         ),
@@ -155,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: incrementCounter,
         tooltip: counterL10n.clickMe,
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
