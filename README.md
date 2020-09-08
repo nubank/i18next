@@ -1,6 +1,6 @@
 # i18next
 
-![build](https://github.com/nubank/i18next/workflows/build/badge.svg)[![codecov](https://codecov.io/gh/nubank/i18next/branch/master/graph/badge.svg)](https://codecov.io/gh/nubank/i18next)
+![build](https://github.com/nubank/i18next/workflows/build/badge.svg) [![codecov](https://codecov.io/gh/nubank/i18next/branch/master/graph/badge.svg)](https://codecov.io/gh/nubank/i18next)
 
 This is an adaptation of i18next standard for Dart with support for Flutter localization techniques. This package is still a work in progress.
 Mind that this is still a pre-1.0.0 so breaking changes may occur frequently.
