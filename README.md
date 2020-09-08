@@ -1,6 +1,6 @@
 # i18next
 
-[![Build Status](https://app.bitrise.io/app/ff14ed5dfde1aead/status.svg?token=pgHjBm9ZPQUWBP45oU1-qg&branch=master)](https://app.bitrise.io/app/ff14ed5dfde1aead)
+![build](https://github.com/nubank/i18next/workflows/build/badge.svg)
 
 This is an adaptation of i18next standard for Dart with support for Flutter localization techniques. This package is still a work in progress.
 Mind that this is still a pre-1.0.0 so breaking changes may occur frequently.
