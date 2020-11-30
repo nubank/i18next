@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../utils.dart';
 import 'options.dart';
 
 /// This store handles the access to a specific resource (e.g. String) or a
@@ -69,20 +70,5 @@ class ResourceStore {
 
     final value = evaluate(path, _data);
     return value is String ? value : null;
-  }
-
-  /// Given a [path] list, this method navigates through [data] and returns
-  /// the last path, or null otherwise.
-  static Object evaluate(Iterable<Object> path, Map<Object, Object> data) {
-    dynamic object = data;
-    for (final current in path) {
-      if (object is Map && object.containsKey(current)) {
-        object = object[current];
-      } else {
-        object = null;
-        break;
-      }
-    }
-    return object;
   }
 }

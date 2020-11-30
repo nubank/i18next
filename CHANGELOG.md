@@ -1,6 +1,7 @@
 ## Next version
 
 * Renames `utils.dart -> definitions.dart`
+* Adds and moves `evaluate` to `lib/utils.dart` as a part of the package, but without explicitly exporting it.
 
 ## [0.3.0]
 
