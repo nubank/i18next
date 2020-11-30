@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'interpolator.dart' as interpolator;
+import '../interpolator.dart' as interpolator;
 import 'options.dart';
 import 'plural_resolver.dart';
 import 'resource_store.dart';

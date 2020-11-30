@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import '../utils.dart';
-import 'options.dart';
+import 'src/options.dart';
+import 'utils.dart';
 
 typedef Translate = String Function(
     String, Locale, Map<String, Object>, I18NextOptions);

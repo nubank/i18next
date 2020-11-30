@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:i18next/i18next.dart';
-import 'package:i18next/src/interpolator.dart';
+import 'package:i18next/interpolator.dart';
 
 void main() {
   final baseOptions = I18NextOptions.base;
