@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
-import 'utils.dart';
+import 'definitions.dart';
 
 /// Contains all options for [I18Next] to work properly.
 class I18NextOptions with Diagnosticable {

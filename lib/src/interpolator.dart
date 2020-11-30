@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import '../utils.dart';
 import 'options.dart';
 
 typedef Translate = String Function(
@@ -15,6 +16,9 @@ typedef Translate = String Function(
 /// - 'Now is {{date, dd/MM}}' + {date: DateTime.now()} -> 'Now is 23/09'.
 ///   In this example, [I18NextOptions.formatter] must be able to
 ///   properly format the date.
+/// - 'A string with {{grouped.key}}' + {'grouped': {'key': "grouped keys}} ->
+///   'A string with grouped keys'. In this example the variables are in the
+///   grouped formation (denoted by the [I18NextOptions.keySeparator]).
 String interpolate(
   Locale locale,
   String string,
@@ -32,7 +36,8 @@ String interpolate(
       final variable = regExpMatch.namedGroup('variable');
 
       String result;
-      final value = variables[variable];
+      final path = variable.split(options.keySeparator);
+      final value = evaluate(path, variables);
       if (value != null) {
         final format = regExpMatch.namedGroup('format');
         result = options.formatter(value, format, locale);

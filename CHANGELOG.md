@@ -1,3 +1,10 @@
+## Next version
+
+* Renames `utils.dart -> definitions.dart`
+* Adds and moves `evaluate` to `lib/utils.dart` as a part of the package, but without explicitly exporting it.
+* Allows interpolations to access grouped variables like so:
+  `'An example with {{grouped.key}}' + {'grouped': {'key': 'grouped keys'}} = 'An example with grouped keys'`
+
 ## [0.3.0]
 
 * Bumps to flutter stable 1.20

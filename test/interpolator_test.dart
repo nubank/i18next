@@ -80,6 +80,32 @@ void main() {
           );
         });
 
+        test('with replaceable grouped variables', () {
+          expect(
+            interpol(
+              'This is a {{grouped.key.variable}} string',
+              variables: {
+                'grouped': {
+                  'key': {'variable': 'grouped variable'}
+                }
+              },
+            ),
+            'This is a grouped variable string',
+          );
+        });
+
+        test('with partially matching replaceable grouped variables', () {
+          expect(
+            interpol(
+              'This is a {{grouped.key.variable}} string',
+              variables: {
+                'grouped': {'key': 'grouped variable'}
+              },
+            ),
+            'This is a {{grouped.key.variable}} string',
+          );
+        });
+
         test('without replaceable variables', () {
           expect(
             interpol(
