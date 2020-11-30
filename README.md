@@ -11,7 +11,7 @@ Mind that this is still a pre-1.0.0 so breaking changes may occur frequently.
 - [x] Support for simple plural forms (one or plural)
 - [x] Support for multiple plural forms (one, few, many, plural, ...)
 - [x] Plural and context fallbacks
-- [ ] Locale and namespace fallbacks 
+- [ ] Locale and namespace fallbacks
 - [x] Get string or object tree
 - [x] Support for nesting
 - [ ] Sprintf support
@@ -89,12 +89,14 @@ i18next.t('unspecifiedKey'); // 'unspecifiedKey'
 
 ```json
 {
-  "key": "Hello {{name}}!"
+  "key": "Hello {{name}}!",
+  "grouped_key": "Hello {{grouped.name}}"
 }
 ```
 
 ```dart
 i18next.t('key', arguments: {'name': 'World'}); // 'Hello World!'
+i18next.t('grouped_key', arguments: {'grouped': {'name': 'Grouped World'}}); // 'Hello Grouped World!'
 ```
 
 - [Nesting](https://www.i18next.com/translation-function/nesting):
@@ -137,7 +139,7 @@ There are also ways of dealing with locales with multiple plural: `zero, one, fe
 
 ```json
 {
-    "genderMessage": "They", 
+    "genderMessage": "They",
     "genderMessage_male": "Him",
     "genderMessage_female": "Her"
 }
@@ -218,7 +220,7 @@ i18next.t('feature:myKey'); // 'This key is in my feature'
 ```json
 {
   "friend": "A friend",
-  "friend_female": "A girlfriend" 
+  "friend_female": "A girlfriend"
 }
 ```
 
@@ -227,11 +229,11 @@ i18next.t('friend'); // 'A friend'
 
 i18next.t('friend', count: 1); // 'A friend'
 // It fallbacks to `friend` since `friend_plural` is not present
-i18next.t('friend', count: 2); // 'A friend' 
+i18next.t('friend', count: 2); // 'A friend'
 
 i18next.t('friend', context: 'female'); // 'A girlfriend'
 // It fallbacks to `friend` since `friend_male` is not present
-i18next.t('friend', context: 'male'); // 'A friend' 
+i18next.t('friend', context: 'male'); // 'A friend'
 ```
 
 There is a way to also set the default namespace or a order of namespaces so a key knows where to start looking for the translation.
