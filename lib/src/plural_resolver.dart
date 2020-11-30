@@ -239,49 +239,128 @@ class PluralResolver {
 
   // Pluralization rules from: https://github.com/i18next/i18next/blob/4bfa7a3ace9d5eb6f7dee2fe4640b918242ba441/src/PluralResolver.js#L41
   static int _rule1(int n) => n > 1 ? 1 : 0;
+
   static int _rule2(int n) => n != 1 ? 1 : 0;
+
   static int _rule3(int n) => 0;
+
   static int _rule4(int n) => n % 10 == 1 && n % 100 != 11
       ? 0
-      : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2;
+      : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)
+          ? 1
+          : 2;
+
   static int _rule5(int n) => n == 0
       ? 0
       : n == 1
           ? 1
           : n == 2
               ? 2
-              : n % 100 >= 3 && n % 100 <= 10 ? 3 : n % 100 >= 11 ? 4 : 5;
-  static int _rule6(int n) => n == 1 ? 0 : n >= 2 && n <= 4 ? 1 : 2;
+              : n % 100 >= 3 && n % 100 <= 10
+                  ? 3
+                  : n % 100 >= 11
+                      ? 4
+                      : 5;
+
+  static int _rule6(int n) => n == 1
+      ? 0
+      : n >= 2 && n <= 4
+          ? 1
+          : 2;
+
   static int _rule7(int n) => n == 1
       ? 0
-      : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2;
-  static int _rule8(int n) =>
-      (n == 1) ? 0 : (n == 2) ? 1 : (n != 8 && n != 11) ? 2 : 3;
+      : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)
+          ? 1
+          : 2;
+
+  static int _rule8(int n) => (n == 1)
+      ? 0
+      : (n == 2)
+          ? 1
+          : (n != 8 && n != 11)
+              ? 2
+              : 3;
+
   static int _rule9(int n) => n >= 2 ? 1 : 0;
-  static int _rule10(int n) =>
-      n == 1 ? 0 : n == 2 ? 1 : n < 7 ? 2 : n < 11 ? 3 : 4;
-  static int _rule11(int n) =>
-      n == 1 || n == 11 ? 0 : n == 2 || n == 12 ? 1 : n > 2 && n < 20 ? 2 : 3;
+
+  static int _rule10(int n) => n == 1
+      ? 0
+      : n == 2
+          ? 1
+          : n < 7
+              ? 2
+              : n < 11
+                  ? 3
+                  : 4;
+
+  static int _rule11(int n) => n == 1 || n == 11
+      ? 0
+      : n == 2 || n == 12
+          ? 1
+          : n > 2 && n < 20
+              ? 2
+              : 3;
+
   static int _rule12(int n) => n % 10 != 1 || n % 100 == 11 ? 1 : 0;
+
   static int _rule13(int n) => n != 0 ? 1 : 0;
-  static int _rule14(int n) => n == 1 ? 0 : (n == 2) ? 1 : (n == 3) ? 2 : 3;
+
+  static int _rule14(int n) => n == 1
+      ? 0
+      : (n == 2)
+          ? 1
+          : (n == 3)
+              ? 2
+              : 3;
+
   static int _rule15(int n) => n % 10 == 1 && n % 100 != 11
       ? 0
-      : n % 10 >= 2 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2;
-  static int _rule16(int n) =>
-      n % 10 == 1 && n % 100 != 11 ? 0 : n != 0 ? 1 : 2;
+      : n % 10 >= 2 && (n % 100 < 10 || n % 100 >= 20)
+          ? 1
+          : 2;
+
+  static int _rule16(int n) => n % 10 == 1 && n % 100 != 11
+      ? 0
+      : n != 0
+          ? 1
+          : 2;
+
   static int _rule17(int n) => n == 1 || n % 10 == 1 && n % 100 != 11 ? 0 : 1;
-  static int _rule18(int n) => n == 0 ? 0 : n == 1 ? 1 : 2;
+
+  static int _rule18(int n) => n == 0
+      ? 0
+      : n == 1
+          ? 1
+          : 2;
+
   static int _rule19(int n) => n == 1
       ? 0
       : n == 0 || (n % 100 > 1 && n % 100 < 11)
           ? 1
-          : n % 100 > 10 && n % 100 < 20 ? 2 : 3;
-  static int _rule20(int n) =>
-      n == 1 ? 0 : n == 0 || n % 100 > 0 && n % 100 < 20 ? 1 : 2;
+          : n % 100 > 10 && n % 100 < 20
+              ? 2
+              : 3;
+
+  static int _rule20(int n) => n == 1
+      ? 0
+      : n == 0 || n % 100 > 0 && n % 100 < 20
+          ? 1
+          : 2;
+
   static int _rule21(int n) => n % 100 == 1
       ? 1
-      : n % 100 == 2 ? 2 : n % 100 == 3 || n % 100 == 4 ? 3 : 0;
-  static int _rule22(int n) =>
-      n == 1 ? 0 : n == 2 ? 1 : (n < 0 || n > 10) && n % 10 == 0 ? 2 : 3;
+      : n % 100 == 2
+          ? 2
+          : n % 100 == 3 || n % 100 == 4
+              ? 3
+              : 0;
+
+  static int _rule22(int n) => n == 1
+      ? 0
+      : n == 2
+          ? 1
+          : (n < 0 || n > 10) && n % 10 == 0
+              ? 2
+              : 3;
 }
