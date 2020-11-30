@@ -1,3 +1,7 @@
+## Next version
+
+* Renames `utils.dart -> definitions.dart`
+
 ## [0.3.0]
 
 * Bumps to flutter stable 1.20
