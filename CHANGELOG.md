@@ -4,6 +4,8 @@
 * Adds and moves `evaluate` to `lib/utils.dart` as a part of the package, but without explicitly exporting it.
 * Allows interpolations to access grouped variables like so:
   `'An example with {{grouped.key}}' + {'grouped': {'key': 'grouped keys'}} = 'An example with grouped keys'`
+* Moves `lib/src/interpolator.dart` to `lib/interpolator.dart`
+  To allow the interpolator usage as a separate package import
 
 ## [0.3.0]
 
