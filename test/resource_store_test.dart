@@ -7,11 +7,11 @@ void main() {
   const locale = Locale('any');
   const data = <String, Object>{'a': '0', 'b': '1'};
 
-  I18NextOptions options;
-  ResourceStore store;
+  late I18NextOptions options;
+  late ResourceStore store;
 
   setUp(() {
-    options = I18NextOptions.base;
+    options = I18NextOptions();
     store = ResourceStore();
   });
 
@@ -34,10 +34,6 @@ void main() {
       });
     });
 
-    test('with null locale', () {
-      expect(store.retrieve(null, validNamespace, 'key', options), isNull);
-    });
-
     test('with unmatching locale', () {
       const anotherLocale = Locale('pt');
       expect(
@@ -47,20 +43,12 @@ void main() {
     });
 
     group('with matching locale', () {
-      test('with null namespace', () {
-        expect(store.retrieve(locale, null, 'key', options), isNull);
-      });
-
       test('with unmatching namespace', () {
         expect(store.retrieve(locale, '', 'key', options), isNull);
       });
 
       group('with matching namespace', () {
         const namespace = validNamespace;
-
-        test('given null key', () {
-          expect(store.retrieve(locale, namespace, null, options), isNull);
-        });
 
         test('given a non matching key', () {
           expect(
@@ -102,9 +90,9 @@ void main() {
     });
 
     test('given a keySeparator', () {
-      final newOptions = options.apply(I18NextOptions(
+      final newOptions = options.copyWith(
         keySeparator: '+++',
-      ));
+      );
       expect(
         store.retrieve(
           locale,
@@ -119,25 +107,21 @@ void main() {
         store.retrieve(
           locale,
           validNamespace,
-          'my.nested/key',
+          'my.nested.key',
           newOptions,
         ),
         isNull,
       );
-    });
-  });
 
-  group('#addNamespace', () {
-    test('given null locale', () {
-      expect(() => store.addNamespace(null, '', {}), throwsAssertionError);
-    });
-
-    test('given null namespace', () {
-      expect(() => store.addNamespace(locale, null, {}), throwsAssertionError);
-    });
-
-    test('given null data', () {
-      expect(() => store.addNamespace(locale, '', null), throwsAssertionError);
+      expect(
+        store.retrieve(
+          locale,
+          validNamespace,
+          'my/nested/key',
+          newOptions,
+        ),
+        isNull,
+      );
     });
   });
 

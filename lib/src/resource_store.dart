@@ -8,7 +8,7 @@ import 'options.dart';
 ///
 /// The access is done by [Locale], Namespace, and key in that order.
 class ResourceStore {
-  ResourceStore({Map<Locale, Map<String, Object>> data})
+  ResourceStore({Map<Locale, Map<String, Object>>? data})
       : _data = data ?? {},
         super();
 
@@ -22,12 +22,8 @@ class ResourceStore {
     String namespace,
     Map<String, Object> data,
   ) {
-    assert(locale != null);
-    assert(namespace != null);
-    assert(data != null);
-
     _data[locale] ??= {};
-    _data[locale][namespace] = data;
+    _data[locale]?[namespace] = data;
   }
 
   /// Removes [namespace] given [locale] from the store.
@@ -47,7 +43,7 @@ class ResourceStore {
 
   /// Whether [locale] and [namespace] are registered in this store.
   bool isNamespaceRegistered(Locale locale, String namespace) =>
-      isLocaleRegistered(locale) && _data[locale][namespace] != null;
+      isLocaleRegistered(locale) && _data[locale]?[namespace] != null;
 
   /// Whether [locale] is registered in this store.
   bool isLocaleRegistered(Locale locale) => _data[locale] != null;
@@ -59,15 +55,17 @@ class ResourceStore {
   ///   when creating a navigation path.
   ///
   /// Returns null if not found.
-  String retrieve(
+  String? retrieve(
     Locale locale,
     String namespace,
     String key,
     I18NextOptions options,
   ) {
-    final path = <Object>[locale, namespace];
-    if (key != null) path.addAll(key.split(options.keySeparator));
-
+    final path = <Object>[
+      locale,
+      namespace,
+      ...key.split(options.keySeparator),
+    ];
     final value = evaluate(path, _data);
     return value is String ? value : null;
   }
