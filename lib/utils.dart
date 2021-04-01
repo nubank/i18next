@@ -6,7 +6,7 @@
 ///
 /// e.g.:
 /// ['my', 'key'] + {'my': {'key': 'Value!'}} = 'Value!'
-Object? evaluate(Iterable<Object> path, Map<Object, Object>? data) {
+Object? evaluate(Iterable<Object> path, Map<Object, dynamic>? data) {
   Object? object = data;
   for (final current in path) {
     if (object is Map && object.containsKey(current)) {

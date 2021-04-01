@@ -4,8 +4,12 @@ import 'dart:ui';
 import 'src/options.dart';
 import 'utils.dart';
 
-typedef Translate = String Function(
-    String, Locale, Map<String, Object>, I18NextOptions);
+typedef Translate = String? Function(
+  String,
+  Locale,
+  Map<String, dynamic>,
+  I18NextOptions,
+);
 
 /// Replaces occurrences of matches in [string] for the named values
 /// in [options] (if they exist), by first passing through the
@@ -22,27 +26,28 @@ typedef Translate = String Function(
 String interpolate(
   Locale locale,
   String string,
-  Map<String, Object> variables,
+  Map<String, dynamic> variables,
   I18NextOptions options,
 ) {
-  assert(string != null);
-  assert(options != null);
-  variables ??= {};
+  final pattern = interpolationPattern(options);
 
   return string.splitMapJoin(
-    interpolationPattern(options),
+    pattern,
     onMatch: (match) {
-      final RegExpMatch regExpMatch = match;
+      final regExpMatch = match as RegExpMatch;
       final variable = regExpMatch.namedGroup('variable');
 
-      String result;
-      final path = variable.split(options.keySeparator);
-      final value = evaluate(path, variables);
-      if (value != null) {
-        final format = regExpMatch.namedGroup('format');
-        result = options.formatter(value, format, locale);
+      String? result;
+      if (variable != null) {
+        final path = variable.split(options.keySeparator);
+        final value = evaluate(path, variables);
+        // TODO: throw error or fallback behavior on options here?
+        if (value != null) {
+          final format = regExpMatch.namedGroup('format');
+          result = options.formatter(value, format, locale);
+        }
       }
-      return result ?? regExpMatch.group(0);
+      return result ?? regExpMatch.group(0)!;
     },
   );
 }
@@ -62,33 +67,31 @@ String nest(
   Locale locale,
   String string,
   Translate translate,
-  Map<String, Object> variables,
+  Map<String, dynamic> variables,
   I18NextOptions options,
 ) {
-  assert(string != null);
-  assert(translate != null);
-  assert(options != null);
-  variables ??= {};
-
-  return string.splitMapJoin(nestingPattern(options), onMatch: (match) {
-    final RegExpMatch regExpMatch = match;
+  final pattern = nestingPattern(options);
+  return string.splitMapJoin(pattern, onMatch: (match) {
+    final regExpMatch = match as RegExpMatch;
     final key = regExpMatch.namedGroup('key');
 
-    String result;
+    String? result;
     if (key != null && key.isNotEmpty) {
-      final newVariables = Map<String, Object>.of(variables);
+      final newVariables = Map<String, dynamic>.of(variables);
       final varsString = regExpMatch.namedGroup('variables');
       if (varsString != null && varsString.isNotEmpty) {
         try {
-          newVariables.addAll(jsonDecode(varsString));
+          final Map<String, dynamic> decoded = jsonDecode(varsString);
+          newVariables.addAll(decoded);
         } catch (error) {
+          // TODO: throw/fallback nesting failure(s)?
           assert(true, error);
         }
       }
 
       result = translate(key, locale, newVariables, options);
     }
-    return result ?? regExpMatch.group(0);
+    return result ?? regExpMatch.group(0)!;
   });
 }
 

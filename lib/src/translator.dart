@@ -20,7 +20,7 @@ class Translator {
   String call(
     String key,
     Locale locale,
-    Map<String, Object> variables,
+    Map<String, dynamic> variables,
     I18NextOptions options,
   ) {
     assert(key != null);
@@ -49,7 +49,7 @@ class Translator {
     Locale locale,
     String namespace,
     String key,
-    Map<String, Object> variables,
+    Map<String, dynamic> variables,
     I18NextOptions options,
   ) {
     final String context = variables['context'];
@@ -103,7 +103,7 @@ class Translator {
     Locale locale,
     String namespace,
     String key,
-    Map<String, Object> variables,
+    Map<String, dynamic> variables,
     I18NextOptions options,
   ) {
     final value = resourceStore.retrieve(locale, namespace, key, options);
