@@ -14,7 +14,7 @@ class HomePageL10n {
   String today(DateTime date) =>
       i18next.t('homepage:today', variables: {'date': date});
 
-  String hello({String name, String world}) => i18next.t(
+  String hello({required String name, required String world}) => i18next.t(
         'homepage:helloMessage',
         variables: {'name': name, 'world': world},
       );

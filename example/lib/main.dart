@@ -20,7 +20,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Locale locale;
+  late Locale locale;
 
   @override
   void initState() {
@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
             bundlePath: 'localizations',
           ),
           // extra formatting options can be added here
-          options: I18NextOptions(formatter: formatter),
+          options: const I18NextOptions(formatter: formatter),
         ),
       ],
       home: MyHomePage(
@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  static String formatter(Object value, String format, Locale locale) {
+  static String formatter(Object value, String? format, Locale? locale) {
     switch (format) {
       case 'uppercase':
         return value.toString().toUpperCase();
@@ -84,9 +84,9 @@ class _MyAppState extends State<MyApp> {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({
-    Key key,
-    @required this.supportedLocales,
-    @required this.onUpdateLocale,
+    Key? key,
+    required this.supportedLocales,
+    required this.onUpdateLocale,
   }) : super(key: key);
 
   final List<Locale> supportedLocales;
@@ -145,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
               counterL10n.clicked(_counter),
               style: theme.textTheme.headline4,
             ),
-            FlatButton(
+            TextButton(
               onPressed: resetCounter,
               child: Text(counterL10n.resetCounter),
             ),
