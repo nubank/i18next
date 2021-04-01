@@ -6,12 +6,11 @@ import 'package:i18next/i18next.dart';
 void main() {
   const locale = Locale('any');
   const data = <String, Object>{'a': '0', 'b': '1'};
+  const options = I18NextOptions();
 
-  late I18NextOptions options;
   late ResourceStore store;
 
   setUp(() {
-    options = I18NextOptions();
     store = ResourceStore();
   });
 

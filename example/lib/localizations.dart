@@ -7,7 +7,7 @@ class HomePageL10n {
   final I18Next i18next;
 
   static HomePageL10n of(BuildContext context) =>
-      HomePageL10n(I18Next.of(context));
+      HomePageL10n(I18Next.of(context)!);
 
   String get title => i18next.t('homepage:title');
 
@@ -29,7 +29,7 @@ class CounterL10n {
   final I18Next i18next;
 
   static CounterL10n of(BuildContext context) =>
-      CounterL10n(I18Next.of(context));
+      CounterL10n(I18Next.of(context)!);
 
   String clicked(int count) => i18next.t('counter:clicked', count: count);
 
