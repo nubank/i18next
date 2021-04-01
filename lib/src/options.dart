@@ -2,7 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
-import 'definitions.dart';
+typedef ArgumentFormatter = String Function(
+  Object value,
+  String? format,
+  Locale locale,
+);
 
 /// Contains all options for [I18Next] to work properly.
 class I18NextOptions with Diagnosticable {
@@ -192,6 +196,6 @@ class I18NextOptions with Diagnosticable {
   }
 
   /// Simply returns [value] in string form. Ignores [format] and [locale].
-  static String defaultFormatter(Object value, String format, Locale locale) =>
+  static String defaultFormatter(Object value, String? format, Locale locale) =>
       value.toString();
 }
