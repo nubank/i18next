@@ -35,7 +35,7 @@ import 'translator.dart';
 class I18Next {
   I18Next(this.locale, this.resourceStore, {I18NextOptions? options})
       : pluralResolver = const PluralResolver(),
-        options = options ?? const I18NextOptions();
+        options = I18NextOptions.base.merge(options);
 
   /// The current and default [Locale] for this instance.
   final Locale locale;
@@ -85,7 +85,7 @@ class I18Next {
     if (count != null) variables['count'] = count;
 
     locale ??= this.locale;
-    final newOptions = options ?? this.options;
+    final newOptions = this.options.merge(options);
 
     // TODO: when translator fails, allow a fallback behavior (null or throw)
     return Translator(pluralResolver, resourceStore)

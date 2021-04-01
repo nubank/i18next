@@ -4,20 +4,37 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:i18next/src/options.dart';
 
 void main() {
+  const base = I18NextOptions.base;
+
   test('default values', () {
     const options = I18NextOptions();
-    expect(options.namespaceSeparator, ':');
-    expect(options.contextSeparator, '_');
-    expect(options.pluralSeparator, '_');
-    expect(options.keySeparator, '.');
-    expect(options.interpolationPrefix, r'\{\{');
-    expect(options.interpolationSuffix, r'\}\}');
-    expect(options.interpolationSeparator, ',');
-    expect(options.nestingPrefix, r'\$t\(');
-    expect(options.nestingSuffix, r'\)');
-    expect(options.nestingSeparator, ',');
-    expect(options.pluralSuffix, 'plural');
-    expect(options.formatter, I18NextOptions.defaultFormatter);
+    expect(options.namespaceSeparator, isNull);
+    expect(options.contextSeparator, isNull);
+    expect(options.pluralSeparator, isNull);
+    expect(options.keySeparator, isNull);
+    expect(options.interpolationPrefix, isNull);
+    expect(options.interpolationSuffix, isNull);
+    expect(options.interpolationSeparator, isNull);
+    expect(options.nestingPrefix, isNull);
+    expect(options.nestingSuffix, isNull);
+    expect(options.nestingSeparator, isNull);
+    expect(options.pluralSuffix, isNull);
+    expect(options.formatter, isNull);
+  });
+
+  test('default base values', () {
+    expect(base.namespaceSeparator, ':');
+    expect(base.contextSeparator, '_');
+    expect(base.pluralSeparator, '_');
+    expect(base.keySeparator, '.');
+    expect(base.interpolationPrefix, '{{');
+    expect(base.interpolationSuffix, '}}');
+    expect(base.interpolationSeparator, ',');
+    expect(base.nestingPrefix, r'$t(');
+    expect(base.nestingSuffix, ')');
+    expect(base.nestingSeparator, ',');
+    expect(base.pluralSuffix, 'plural');
+    expect(base.formatter, I18NextOptions.defaultFormatter);
   });
 
   test('.defaultFormatter', () {
@@ -35,8 +52,57 @@ void main() {
     expect(formatter(date, format, locale), date.toString());
   });
 
+  group('#merge', () {
+    const empty = I18NextOptions();
+    final another = I18NextOptions(
+      fallbackNamespace: 'Some fallbackNamespace',
+      namespaceSeparator: 'Some namespaceSeparator',
+      contextSeparator: 'Some contextSeparator',
+      pluralSeparator: 'Some pluralSeparator',
+      keySeparator: 'Some keySeparator',
+      interpolationPrefix: 'Some interpolationPrefix',
+      interpolationSuffix: 'Some interpolationSuffix',
+      interpolationSeparator: 'Some interpolationSeparator',
+      nestingPrefix: 'Some nestingPrefix',
+      nestingSuffix: 'Some nestingSuffix',
+      nestingSeparator: 'Some nestingSeparator',
+      pluralSuffix: 'Some pluralSuffix',
+      formatter: (value, format, locale) => value.toString(),
+    );
+
+    test('given no values', () {
+      expect(base.merge(base), base);
+      expect(base.copyWith(), base);
+      expect(empty.merge(empty), empty);
+      expect(another.copyWith(), another);
+      expect(another.merge(another), another);
+    });
+
+    test('from empty given full', () {
+      expect(empty.merge(base), base);
+      expect(empty.merge(another), another);
+    });
+
+    test('from full given empty', () {
+      expect(base.merge(empty), base);
+      expect(another.merge(empty), another);
+    });
+
+    test('from full given full', () {
+      expect(base.merge(another), another);
+      expect(another.merge(another), another);
+    });
+
+    test('given null', () {
+      expect(base.merge(null), equals(base));
+      expect(empty.merge(null), empty);
+      expect(another.merge(null), another);
+
+      expect(identical(base.merge(null), base), isTrue);
+    });
+  });
+
   group('#copyWith', () {
-    const base = I18NextOptions();
     final another = I18NextOptions(
       fallbackNamespace: 'Some fallbackNamespace',
       namespaceSeparator: 'Some namespaceSeparator',
@@ -66,17 +132,17 @@ void main() {
 
     for (final permutation in _generatePermutations([
       another.fallbackNamespace!,
-      another.namespaceSeparator,
-      another.contextSeparator,
-      another.pluralSeparator,
-      another.keySeparator,
-      another.interpolationPrefix,
-      another.interpolationSuffix,
-      another.interpolationSeparator,
-      another.nestingPrefix,
-      another.nestingSuffix,
-      another.nestingSeparator,
-      another.pluralSuffix,
+      another.namespaceSeparator!,
+      another.contextSeparator!,
+      another.pluralSeparator!,
+      another.keySeparator!,
+      another.interpolationPrefix!,
+      another.interpolationSuffix!,
+      another.interpolationSeparator!,
+      another.nestingPrefix!,
+      another.nestingSuffix!,
+      another.nestingSeparator!,
+      another.pluralSuffix!,
     ])) {
       test('given individual values=$permutation', () {
         final result = base.copyWith(

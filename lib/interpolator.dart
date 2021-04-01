@@ -30,6 +30,7 @@ String interpolate(
   I18NextOptions options,
 ) {
   final pattern = interpolationPattern(options);
+  final keySeparator = options.keySeparator ?? '.';
 
   return string.splitMapJoin(
     pattern,
@@ -39,12 +40,15 @@ String interpolate(
 
       String? result;
       if (variable != null) {
-        final path = variable.split(options.keySeparator);
+        final path = variable.split(keySeparator);
         final value = evaluate(path, variables);
         // TODO: throw error or fallback behavior on options here?
         if (value != null) {
-          final format = regExpMatch.namedGroup('format');
-          result = options.formatter(value, format, locale);
+          final formatter = options.formatter;
+          if (formatter != null) {
+            final format = regExpMatch.namedGroup('format');
+            result = formatter(value, format, locale);
+          }
         }
       }
       return result ?? regExpMatch.group(0)!;
@@ -95,16 +99,26 @@ String nest(
   });
 }
 
-RegExp interpolationPattern(I18NextOptions options) => RegExp(
-      '${options.interpolationPrefix}'
-      '(?<variable>.*?)'
-      '(${options.interpolationSeparator}\\s*(?<format>.*?)\\s*)?'
-      '${options.interpolationSuffix}',
-    );
+RegExp interpolationPattern(I18NextOptions options) {
+  final prefix = RegExp.escape(options.interpolationPrefix ?? '{{');
+  final suffix = RegExp.escape(options.interpolationSuffix ?? '}}');
+  final separator = RegExp.escape(options.interpolationSeparator ?? ',');
+  return RegExp(
+    '$prefix'
+    '(?<variable>.*?)'
+    '($separator\\s*(?<format>.*?)\\s*)?'
+    '$suffix',
+  );
+}
 
-RegExp nestingPattern(I18NextOptions options) => RegExp(
-      '${options.nestingPrefix}'
-      '(?<key>.*?)'
-      '(${options.nestingSeparator}\\s*(?<variables>.*?)\\s*)?'
-      '${options.nestingSuffix}',
-    );
+RegExp nestingPattern(I18NextOptions options) {
+  final prefix = RegExp.escape(options.nestingPrefix ?? r'$t(');
+  final suffix = RegExp.escape(options.nestingSuffix ?? ')');
+  final separator = RegExp.escape(options.nestingSeparator ?? ',');
+  return RegExp(
+    '$prefix'
+    '(?<key>.*?)'
+    '($separator\\s*(?<variables>.*?)\\s*)?'
+    '$suffix',
+  );
+}

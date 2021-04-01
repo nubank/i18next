@@ -24,7 +24,8 @@ class Translator {
   ) {
     var namespace = contextNamespace;
     var keyPath = key;
-    final match = RegExp(options.namespaceSeparator).firstMatch(key);
+    final nsSeparator = options.namespaceSeparator ?? ':';
+    final match = RegExp(nsSeparator).firstMatch(key);
     if (match != null) {
       namespace = key.substring(0, match.start);
       keyPath = key.substring(match.end);

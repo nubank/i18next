@@ -61,10 +61,11 @@ class ResourceStore {
     String key,
     I18NextOptions options,
   ) {
+    final keySeparator = options.keySeparator ?? '.';
     final path = <Object>[
       locale,
       namespace,
-      ...key.split(options.keySeparator),
+      ...key.split(keySeparator),
     ];
     final value = evaluate(path, _data);
     return value is String ? value : null;

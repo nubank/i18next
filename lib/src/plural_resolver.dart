@@ -11,10 +11,13 @@ class PluralResolver {
   String pluralize(Locale locale, int count, I18NextOptions options) {
     final rule = _ruleForLocale(locale);
     final index = rule(count.abs());
+    final separator = options.pluralSeparator ?? '_';
+
     if (_ruleUsesSimpleSuffixes(rule)) {
-      return index == 0 ? '' : options.pluralSeparator + options.pluralSuffix;
+      final suffix = options.pluralSuffix ?? 'plural';
+      return index == 0 ? '' : '$separator$suffix';
     } else {
-      return '${options.pluralSeparator}$index';
+      return '$separator$index';
     }
   }
 
