@@ -1,5 +1,10 @@
 ## Next version
 
+## [0.4.0.nullsafety.0]
+
+* Migrates the codebase to flutter stable 2.0.3 + null-safety
+  Renames `I18NextOptions.apply -> merge`
+
 ## [0.3.1]
 
 * Renames `utils.dart -> definitions.dart`

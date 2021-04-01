@@ -5,38 +5,26 @@ import 'package:i18next/i18next.dart';
 import 'package:i18next/interpolator.dart';
 
 void main() {
-  final baseOptions = I18NextOptions.base;
+  const baseOptions = I18NextOptions.base;
+  const defaultFormatter = I18NextOptions.defaultFormatter;
+  const defaultLocale = Locale('en');
 
   group('interpolate', () {
     String interpol(
       String string, {
-      Map<String, Object> variables,
-      Locale locale,
-      ArgumentFormatter formatter,
+      Map<String, dynamic> variables = const {},
+      Locale locale = defaultLocale,
+      ArgumentFormatter? formatter,
     }) {
-      final options = baseOptions.apply(I18NextOptions(formatter: formatter));
+      final options = baseOptions.copyWith(formatter: formatter);
       return interpolate(locale, string, variables, options);
     }
-
-    test('given string null', () {
-      expect(
-        () => interpolate(null, null, null, baseOptions),
-        throwsAssertionError,
-      );
-    });
-
-    test('given options null', () {
-      expect(
-        () => interpolate(null, '', null, null),
-        throwsAssertionError,
-      );
-    });
 
     test('given a non matching string', () {
       expect(
         interpol(
           'This is a normal string',
-          formatter: expectAsync3(null, count: 0),
+          formatter: expectAsync3(defaultFormatter, count: 0),
         ),
         'This is a normal string',
       );
@@ -47,7 +35,7 @@ void main() {
         expect(
           interpol(
             'This is a {{}} string',
-            formatter: expectAsync3(null, count: 0),
+            formatter: expectAsync3(defaultFormatter, count: 0),
           ),
           'This is a {{}} string',
         );
@@ -58,7 +46,7 @@ void main() {
           expect(
             interpol(
               'This is a {{variable}} string',
-              formatter: expectAsync3(null, count: 0),
+              formatter: expectAsync3(defaultFormatter, count: 0),
             ),
             'This is a {{variable}} string',
           );
@@ -72,7 +60,7 @@ void main() {
               formatter: expectAsync3((variable, format, locale) {
                 expect(variable, 'my variable');
                 expect(format, isNull);
-                expect(locale, isNull);
+                expect(locale, defaultLocale);
                 return 'VALUE';
               }),
             ),
@@ -111,7 +99,7 @@ void main() {
             interpol(
               'This is a {{variable}} string',
               variables: {'another': 'value'},
-              formatter: expectAsync3(null, count: 0),
+              formatter: expectAsync3(defaultFormatter, count: 0),
             ),
             'This is a {{variable}} string',
           );
@@ -122,7 +110,7 @@ void main() {
         expect(
           interpol(
             'This is a {{, some format}} string',
-            formatter: expectAsync3(null, count: 0),
+            formatter: expectAsync3(defaultFormatter, count: 0),
           ),
           'This is a {{, some format}} string',
         );
@@ -136,7 +124,7 @@ void main() {
             formatter: expectAsync3((variable, format, locale) {
               expect(variable, 'my variable');
               expect(format, 'format');
-              expect(locale, isNull);
+              expect(locale, defaultLocale);
               return 'VALUE';
             }),
           ),
@@ -145,16 +133,16 @@ void main() {
       });
 
       test('given locale', () {
-        const locale = Locale('any');
+        const anotherLocale = Locale('any');
         expect(
           interpol(
             'This is a {{variable}} string',
-            locale: locale,
+            locale: anotherLocale,
             variables: {'variable': 'my variable'},
             formatter: expectAsync3((variable, format, locale) {
               expect(variable, 'my variable');
               expect(format, isNull);
-              expect(locale, locale);
+              expect(locale, anotherLocale);
               return 'VALUE';
             }),
           ),
@@ -167,53 +155,19 @@ void main() {
   group('nest', () {
     String nst(
       String string, {
-      Locale locale,
-      Map<String, Object> variables,
-      Translate translate,
-      I18NextOptions options,
+      Locale locale = defaultLocale,
+      Map<String, Object> variables = const {},
+      Translate translate = _defaultTranslate,
+      I18NextOptions options = baseOptions,
     }) {
-      translate ??= (a, b, c, d) => a;
-      return nest(locale, string, translate, variables, options ?? baseOptions);
+      return nest(locale, string, translate, variables, options);
     }
-
-    test('given string null', () {
-      expect(
-        () => nest(
-          null,
-          null,
-          expectAsync4(null, count: 0),
-          null,
-          baseOptions,
-        ),
-        throwsAssertionError,
-      );
-    });
-
-    test('given translate null', () {
-      expect(
-        () => nest(null, '', null, null, baseOptions),
-        throwsAssertionError,
-      );
-    });
-
-    test('given options null', () {
-      expect(
-        () => nest(
-          null,
-          '',
-          expectAsync4(null, count: 0),
-          null,
-          null,
-        ),
-        throwsAssertionError,
-      );
-    });
 
     test('given a non matching string', () {
       expect(
         nst(
           'This is my unmatching string',
-          translate: expectAsync4(null, count: 0),
+          translate: expectAsync4(_defaultTranslate, count: 0),
         ),
         'This is my unmatching string',
       );
@@ -224,7 +178,7 @@ void main() {
         expect(
           nst(
             r'This is my $t() string',
-            translate: expectAsync4(null, count: 0),
+            translate: expectAsync4(_defaultTranslate, count: 0),
           ),
           r'This is my $t() string',
         );
@@ -247,7 +201,7 @@ void main() {
         expect(
           nst(
             r'This is my $t(, {"x": "y"}) string',
-            translate: expectAsync4(null, count: 0),
+            translate: expectAsync4(_defaultTranslate, count: 0),
           ),
           r'This is my $t(, {"x": "y"}) string',
         );
@@ -343,7 +297,7 @@ void main() {
   group('interpolationPattern', () {
     final pattern = interpolationPattern(baseOptions);
 
-    Iterable<List<String>> allMatches(String text) =>
+    Iterable<List<String?>> allMatches(String text) =>
         pattern.allMatches(text).map((match) => [
               match.namedGroup('variable'),
               match.namedGroup('format'),
@@ -423,7 +377,7 @@ void main() {
   group('nestingPattern', () {
     final pattern = nestingPattern(baseOptions);
 
-    Iterable<List<String>> allMatches(String text) =>
+    Iterable<List<String?>> allMatches(String text) =>
         pattern.allMatches(text).map((match) => [
               match.namedGroup('key'),
               match.namedGroup('variables'),
@@ -500,3 +454,11 @@ void main() {
     });
   });
 }
+
+String? _defaultTranslate(
+  String key,
+  Locale locale,
+  Map<String, dynamic> variables,
+  I18NextOptions options,
+) =>
+    key;

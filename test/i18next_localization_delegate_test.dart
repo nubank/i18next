@@ -1,21 +1,20 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:i18next/i18next.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-class MockLocalizationDataSource extends Mock
-    implements LocalizationDataSource {}
+import 'i18next_localization_delegate_test.mocks.dart';
 
-class MockResourceStore extends Mock implements ResourceStore {}
-
+@GenerateMocks([LocalizationDataSource, ResourceStore])
 void main() {
   const en = Locale('en'), enUS = Locale('en', 'US');
   const pt = Locale('pt'), ptBR = Locale('pt', 'BR');
   const ar = Locale('ar');
 
-  MockLocalizationDataSource dataSource;
-  MockResourceStore resourceStore;
-  I18NextLocalizationDelegate localizationDelegate;
+  late MockLocalizationDataSource dataSource;
+  late MockResourceStore resourceStore;
+  late I18NextLocalizationDelegate localizationDelegate;
 
   setUp(() {
     dataSource = MockLocalizationDataSource();

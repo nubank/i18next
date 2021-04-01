@@ -11,9 +11,8 @@ import 'localization_data_source.dart';
 class AssetBundleLocalizationDataSource implements LocalizationDataSource {
   AssetBundleLocalizationDataSource({
     this.bundlePath = 'localizations',
-    AssetBundle bundle,
-  })  : assert(bundlePath != null),
-        bundle = bundle ?? rootBundle,
+    AssetBundle? bundle,
+  })  : bundle = bundle ?? rootBundle,
         super();
 
   /// The path prefixed to the asset when retrieving from the [bundle].
@@ -48,12 +47,11 @@ class AssetBundleLocalizationDataSource implements LocalizationDataSource {
   /// The end result is a [Map] that contains all the namespaces which are
   /// the file names themselves (case sensitive).
   @override
-  Future<Map<String, Object>> load(
+  Future<Map<String, dynamic>> load(
     Locale locale, {
     String manifest = 'AssetManifest.json',
   }) async {
-    assert(locale != null);
-    assert(manifest != null && manifest.isNotEmpty);
+    assert(manifest.isNotEmpty);
 
     final assetFiles = await bundle
         .loadString(manifest)
@@ -69,11 +67,11 @@ class AssetBundleLocalizationDataSource implements LocalizationDataSource {
     return await loadFromFiles(files);
   }
 
-  Future<Map<String, Object>> loadFromFiles(
+  Future<Map<String, dynamic>> loadFromFiles(
     Iterable<String> files,
   ) async {
     // TODO: make it case insensitive?
-    final namespaces = HashMap<String, Object>();
+    final namespaces = HashMap<String, dynamic>();
     for (final file in files) {
       // TODO: make this a lazy eval and let loading be handed concurrently?
       final namespace = path.basenameWithoutExtension(file);

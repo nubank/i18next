@@ -3,28 +3,23 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:i18next/i18next.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-class MockBundle extends Mock implements AssetBundle {}
+import 'asset_bundle_data_source_test.mocks.dart';
 
+@GenerateMocks([AssetBundle])
 void main() {
   const bundlePath = 'bundle/path';
   const defaultManifest = 'AssetManifest.json';
-  MockBundle bundle;
-  AssetBundleLocalizationDataSource dataSource;
+  late MockAssetBundle bundle;
+  late AssetBundleLocalizationDataSource dataSource;
 
   setUp(() {
-    bundle = MockBundle();
+    bundle = MockAssetBundle();
     dataSource = AssetBundleLocalizationDataSource(
       bundlePath: bundlePath,
       bundle: bundle,
-    );
-  });
-
-  test('given bundlePath null', () {
-    expect(
-      () => AssetBundleLocalizationDataSource(bundlePath: null),
-      throwsAssertionError,
     );
   });
 
@@ -37,10 +32,6 @@ void main() {
             "$bundlePath/pt/file1.json": [""],
             "$bundlePath/pt/file2.json": [""]
           }''');
-    });
-
-    test('given locale null', () {
-      expect(() => dataSource.load(null), throwsAssertionError);
     });
 
     test('given any locale', () async {
@@ -120,16 +111,6 @@ void main() {
       expect(
         dataSource.load(const Locale('any')),
         throwsA(error),
-      );
-    });
-
-    test('given manifest null', () {
-      expect(
-        () => dataSource.load(
-          const Locale('any'),
-          manifest: null,
-        ),
-        throwsAssertionError,
       );
     });
 
