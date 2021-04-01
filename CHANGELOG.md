@@ -1,5 +1,7 @@
 ## Next version
 
+## [0.3.1]
+
 * Renames `utils.dart -> definitions.dart`
 * Adds and moves `evaluate` to `lib/utils.dart` as a part of the package, but without explicitly exporting it.
 * Allows interpolations to access grouped variables like so:
