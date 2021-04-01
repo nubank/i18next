@@ -8,11 +8,11 @@ import 'options.dart';
 ///
 /// The access is done by [Locale], Namespace, and key in that order.
 class ResourceStore {
-  ResourceStore({Map<Locale, Map<String, Object>>? data})
+  ResourceStore({Map<Locale, Map<String, dynamic>>? data})
       : _data = data ?? {},
         super();
 
-  final Map<Locale, Map<String, Object>> _data;
+  final Map<Locale, Map<String, dynamic>> _data;
 
   /// Registers the [namespace] to the store for the given [locale].
   ///
@@ -20,7 +20,7 @@ class ResourceStore {
   void addNamespace(
     Locale locale,
     String namespace,
-    Map<String, Object> data,
+    Map<String, dynamic> data,
   ) {
     _data[locale] ??= {};
     _data[locale]?[namespace] = data;
