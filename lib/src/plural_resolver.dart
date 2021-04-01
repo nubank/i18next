@@ -5,7 +5,7 @@ import 'options.dart';
 typedef PluralizationRule = int Function(int);
 
 class PluralResolver {
-  PluralResolver() : super();
+  const PluralResolver() : super();
 
   /// Returns the plural suffix based on [count] and presented [options].
   String pluralize(Locale locale, int count, I18NextOptions options) {

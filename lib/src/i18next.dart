@@ -33,19 +33,18 @@ import 'translator.dart';
 /// I18Next.t('feature:title') // -> 'My feature title'
 /// ```
 class I18Next {
-  I18Next(this.locale, this.resourceStore, {I18NextOptions options})
-      : assert(resourceStore != null),
-        pluralResolver = PluralResolver(),
-        options = I18NextOptions.base.apply(options);
+  I18Next(this.locale, this.resourceStore, {I18NextOptions? options})
+      : pluralResolver = const PluralResolver(),
+        options = options ?? const I18NextOptions();
 
   /// The current and default [Locale] for this instance.
   final Locale locale;
 
   /// The resources store that contains all the necessary values mapped by
   /// [Locale], namespace, and keys.
-  ///
-  /// Cannot be null.
   final ResourceStore resourceStore;
+
+  /// The pluralization resolver.
   final PluralResolver pluralResolver;
 
   /// The options used to find and format matching interpolations.
@@ -75,21 +74,20 @@ class I18Next {
   /// in the order: `key_context_plural`
   String t(
     String key, {
-    Locale locale,
-    String context,
-    int count,
-    Map<String, Object> variables,
-    I18NextOptions options,
+    Locale? locale,
+    String? context,
+    int? count,
+    Map<String, dynamic>? variables,
+    I18NextOptions? options,
   }) {
-    assert(key != null);
-
     variables ??= {};
     if (context != null) variables['context'] = context;
     if (count != null) variables['count'] = count;
 
     locale ??= this.locale;
-    final newOptions = this.options.apply(options);
+    final newOptions = options ?? this.options;
 
+    // TODO: when translator fails, allow a fallback behavior (null or throw)
     return Translator(pluralResolver, resourceStore)
             .call(key, locale, variables, newOptions) ??
         key;
@@ -102,5 +100,6 @@ class I18Next {
   ///
   /// An instance is usually registered and created by the
   /// [I18NextLocalizationDelegate].
-  static I18Next of(BuildContext context) => Localizations.of(context, I18Next);
+  static I18Next? of(BuildContext context) =>
+      Localizations.of(context, I18Next);
 }
