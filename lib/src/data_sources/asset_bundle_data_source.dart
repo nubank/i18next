@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as path;
+import 'package:universal_io/io.dart';
 
 import 'localization_data_source.dart';
 
@@ -61,11 +62,22 @@ class AssetBundleLocalizationDataSource implements LocalizationDataSource {
         .then((map) => map.keys);
 
     final bundleLocalePath = path.join(bundlePath, locale.toLanguageTag());
-    final files = assetFiles
-        // trailing slash is to guarantee the whole dir matches, otherwise
-        // it might allow undesired files
-        .where((key) => key.contains('$bundleLocalePath${path.separator}'))
-        .where((key) => path.extension(key) == '.json');
+
+    Iterable<String> files;
+    if (!Platform.isWindows) {
+      files = assetFiles
+          // trailing slash is to guarantee the whole dir matches, otherwise
+          // it might allow undesired files
+          .where((key) => key.contains('$bundleLocalePath${path.separator}'))
+          .where((key) => path.extension(key) == '.json');
+    } else {
+      files = assetFiles
+          // trailing slash is to guarantee the whole dir matches, otherwise
+          // it might allow undesired files
+          .where((key) => key.contains('$bundleLocalePath/'))
+          .where((key) => path.extension(key) == '.json');
+    }
+
     return await loadFromFiles(files);
   }
 

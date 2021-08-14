@@ -1,5 +1,6 @@
 name: i18next
-description: A localization formatter based on the i18next standard. It is not yet a fully i18n tool only the formatting itself.
+description: A localization formatter based on the i18next standard. It is not
+  yet a fully i18n tool only the formatting itself.
 version: 0.3.0
 repository: https://github.com/nubank/i18next
 homepage: https://github.com/nubank/i18next
@@ -11,10 +12,14 @@ dependencies:
   flutter:
     sdk: flutter
   path: ^1.6.0
+  universal_io: ^2.0.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   mockito: ^4.0.0
 
-flutter:
+dependency_overrides: 
+  test_api: ^0.2.1
+
+flutter: null
