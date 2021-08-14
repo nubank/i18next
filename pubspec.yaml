@@ -12,7 +12,6 @@ dependencies:
   flutter:
     sdk: flutter
   path: ^1.6.0
-  universal_io: ^2.0.4
 
 dev_dependencies:
   flutter_test:
