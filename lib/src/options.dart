@@ -2,11 +2,15 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
-import 'definitions.dart';
+typedef ArgumentFormatter = String Function(
+  Object value,
+  String? format,
+  Locale locale,
+);
 
 /// Contains all options for [I18Next] to work properly.
 class I18NextOptions with Diagnosticable {
-  I18NextOptions({
+  const I18NextOptions({
     this.fallbackNamespace,
     this.namespaceSeparator,
     this.contextSeparator,
@@ -22,19 +26,18 @@ class I18NextOptions with Diagnosticable {
     this.formatter,
   }) : super();
 
-  /// Creates the base options
-  static final I18NextOptions base = I18NextOptions(
+  static const I18NextOptions base = I18NextOptions(
     fallbackNamespace: null,
     namespaceSeparator: ':',
     contextSeparator: '_',
     pluralSeparator: '_',
     keySeparator: '.',
-    interpolationPrefix: RegExp.escape('{{'),
-    interpolationSuffix: RegExp.escape('}}'),
-    interpolationSeparator: RegExp.escape(','),
-    nestingPrefix: RegExp.escape(r'$t('),
-    nestingSuffix: RegExp.escape(')'),
-    nestingSeparator: RegExp.escape(','),
+    interpolationPrefix: '{{',
+    interpolationSuffix: '}}',
+    interpolationSeparator: ',',
+    nestingPrefix: r'$t(',
+    nestingSuffix: ')',
+    nestingSeparator: ',',
     pluralSuffix: 'plural',
     formatter: defaultFormatter,
   );
@@ -43,31 +46,31 @@ class I18NextOptions with Diagnosticable {
   /// current namespace.
   ///
   /// Defaults to null.
-  final String fallbackNamespace;
+  final String? fallbackNamespace;
 
   /// The separator used when splitting the key.
   ///
   /// Defaults to ':'.
-  final String namespaceSeparator;
+  final String? namespaceSeparator;
 
   /// The separator for contexts, it is inserted between the key and the
   /// context value.
   ///
   /// Defaults to '_'.
-  final String contextSeparator;
+  final String? contextSeparator;
 
   /// The separator for plural suffixes, it is inserted between the key and the
   /// plural value ("plural" for simple rules, or a numeric index for complex
   /// rules with multiple plurals).
   ///
   /// Defaults to '_'.
-  final String pluralSeparator;
+  final String? pluralSeparator;
 
   /// The separator for nested keys. It is used to denote multiple object
   /// levels of access when retrieving a key from a namespace.
   ///
   /// Defaults to '.'.
-  final String keySeparator;
+  final String? keySeparator;
 
   /// [pluralSuffix] is used for the pluralization mechanism.
   ///
@@ -79,7 +82,7 @@ class I18NextOptions with Diagnosticable {
   /// "friend": "A friend"
   /// "friend_plural": "{{count}} friends"
   /// ```
-  final String pluralSuffix;
+  final String? pluralSuffix;
 
   /// [interpolationPrefix] and [interpolationSuffix] are the deliminators
   /// for the variable interpolation and formatting mechanism.
@@ -94,7 +97,9 @@ class I18NextOptions with Diagnosticable {
   /// - '{{title}}' name = 'title, format = null
   /// - '{{title, uppercase}}' name = 'title', format = 'uppercase'
   /// ```
-  final String interpolationPrefix, interpolationSuffix, interpolationSeparator;
+  final String? interpolationPrefix,
+      interpolationSuffix,
+      interpolationSeparator;
 
   /// [nestingPrefix] and [nestingSuffix] are the deliminators for nesting
   /// mechanism. By default they are '$t(' and ')' respectively and can't be
@@ -111,27 +116,28 @@ class I18NextOptions with Diagnosticable {
   /// }
   /// i18Next.t('key1') // "Hello World!"
   /// ```
-  final String nestingPrefix, nestingSuffix, nestingSeparator;
+  final String? nestingPrefix, nestingSuffix, nestingSeparator;
 
   /// [formatter] is called when an interpolation has been found and is ready
   /// for substitution.
   ///
   /// Defaults to [defaultFormatter], which simply returns the value itself in
   /// String form ([Object.toString]).
-  final ArgumentFormatter formatter;
+  final ArgumentFormatter? formatter;
 
-  /// Creates a new instance of [I18NextOptions] which overrides this
-  /// instance's values for [other]'s values when they aren't null.
+  /// Creates a new instance of [I18NextOptions] overriding any properties
+  /// where [other] isn't null.
   ///
-  /// If [other] is null, returns this instance itself.
-  I18NextOptions apply(I18NextOptions other) {
+  /// If [other] is null, returns this.
+  I18NextOptions merge(I18NextOptions? other) {
     if (other == null) return this;
-    return I18NextOptions(
+    return copyWith(
       fallbackNamespace: other.fallbackNamespace ?? fallbackNamespace,
       namespaceSeparator: other.namespaceSeparator ?? namespaceSeparator,
       contextSeparator: other.contextSeparator ?? contextSeparator,
       pluralSeparator: other.pluralSeparator ?? pluralSeparator,
       keySeparator: other.keySeparator ?? keySeparator,
+      pluralSuffix: other.pluralSuffix ?? pluralSuffix,
       interpolationPrefix: other.interpolationPrefix ?? interpolationPrefix,
       interpolationSuffix: other.interpolationSuffix ?? interpolationSuffix,
       interpolationSeparator:
@@ -139,8 +145,42 @@ class I18NextOptions with Diagnosticable {
       nestingPrefix: other.nestingPrefix ?? nestingPrefix,
       nestingSuffix: other.nestingSuffix ?? nestingSuffix,
       nestingSeparator: other.nestingSeparator ?? nestingSeparator,
-      pluralSuffix: other.pluralSuffix ?? pluralSuffix,
       formatter: other.formatter ?? formatter,
+    );
+  }
+
+  /// Creates a new instance of [I18NextOptions] overriding any of the
+  /// properties that aren't null.
+  I18NextOptions copyWith({
+    String? fallbackNamespace,
+    String? namespaceSeparator,
+    String? contextSeparator,
+    String? pluralSeparator,
+    String? keySeparator,
+    String? pluralSuffix,
+    String? interpolationPrefix,
+    String? interpolationSuffix,
+    String? interpolationSeparator,
+    String? nestingPrefix,
+    String? nestingSuffix,
+    String? nestingSeparator,
+    ArgumentFormatter? formatter,
+  }) {
+    return I18NextOptions(
+      fallbackNamespace: fallbackNamespace ?? this.fallbackNamespace,
+      namespaceSeparator: namespaceSeparator ?? this.namespaceSeparator,
+      contextSeparator: contextSeparator ?? this.contextSeparator,
+      pluralSeparator: pluralSeparator ?? this.pluralSeparator,
+      keySeparator: keySeparator ?? this.keySeparator,
+      pluralSuffix: pluralSuffix ?? this.pluralSuffix,
+      interpolationPrefix: interpolationPrefix ?? this.interpolationPrefix,
+      interpolationSuffix: interpolationSuffix ?? this.interpolationSuffix,
+      interpolationSeparator:
+          interpolationSeparator ?? this.interpolationSeparator,
+      nestingPrefix: nestingPrefix ?? this.nestingPrefix,
+      nestingSuffix: nestingSuffix ?? this.nestingSuffix,
+      nestingSeparator: nestingSeparator ?? this.nestingSeparator,
+      formatter: formatter ?? this.formatter,
     );
   }
 
@@ -164,6 +204,7 @@ class I18NextOptions with Diagnosticable {
   bool operator ==(Object other) =>
       other.runtimeType == runtimeType &&
       other is I18NextOptions &&
+      other.fallbackNamespace == fallbackNamespace &&
       other.namespaceSeparator == namespaceSeparator &&
       other.contextSeparator == contextSeparator &&
       other.pluralSeparator == pluralSeparator &&
@@ -181,6 +222,7 @@ class I18NextOptions with Diagnosticable {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
+      ..add(StringProperty('fallbackNamespace', fallbackNamespace))
       ..add(StringProperty('namespaceSeparator', namespaceSeparator))
       ..add(StringProperty('contextSeparator', contextSeparator))
       ..add(StringProperty('pluralSeparator', pluralSeparator))
@@ -196,6 +238,6 @@ class I18NextOptions with Diagnosticable {
   }
 
   /// Simply returns [value] in string form. Ignores [format] and [locale].
-  static String defaultFormatter(Object value, String format, Locale locale) =>
+  static String defaultFormatter(Object value, String? format, Locale locale) =>
       value.toString();
 }

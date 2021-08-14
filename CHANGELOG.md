@@ -1,5 +1,16 @@
 ## Next version
 
+## [0.4.1]
+
+* Officializes the null-safety migration
+
+## [0.4.0-nullsafety.0]
+
+* Migrates the codebase to flutter stable 2.0.3 + null-safety
+  Renames `I18NextOptions.apply -> merge`
+
+## [0.3.1]
+
 * Renames `utils.dart -> definitions.dart`
 * Adds and moves `evaluate` to `lib/utils.dart` as a part of the package, but without explicitly exporting it.
 * Allows interpolations to access grouped variables like so:

@@ -10,32 +10,33 @@ class Translator {
     this.pluralResolver,
     this.resourceStore, [
     this.contextNamespace,
-  ])  : assert(pluralResolver != null),
-        assert(resourceStore != null);
+  ]) : super();
 
   final PluralResolver pluralResolver;
   final ResourceStore resourceStore;
-  final String contextNamespace;
+  final String? contextNamespace;
 
-  String call(
+  String? call(
     String key,
     Locale locale,
-    Map<String, Object> variables,
+    Map<String, dynamic> variables,
     I18NextOptions options,
   ) {
-    assert(key != null);
-
-    var namespace = contextNamespace ?? '';
+    var namespace = contextNamespace;
     var keyPath = key;
-    final match = RegExp(options.namespaceSeparator).firstMatch(key);
+    final nsSeparator = options.namespaceSeparator ?? ':';
+    final match = RegExp(nsSeparator).firstMatch(key);
     if (match != null) {
       namespace = key.substring(0, match.start);
       keyPath = key.substring(match.end);
     }
-    return translateKey(locale, namespace, keyPath, variables, options);
+    return translateKey(locale, namespace ?? '', keyPath, variables, options);
   }
 
   /// Order of key resolution:
+  ///
+  /// Expects `variables['context']` to be a `String?` and
+  /// `variables['count']` to be an `int?`. Otherwise throws cast error.
   ///
   /// - context + pluralization:
   ///   ['key_ctx_plr', 'key_ctx', 'key_plr', 'key']
@@ -45,21 +46,21 @@ class Translator {
   ///   ['key_plr', 'key']
   /// - Otherwise:
   ///   ['key']
-  String translateKey(
+  String? translateKey(
     Locale locale,
     String namespace,
     String key,
-    Map<String, Object> variables,
+    Map<String, dynamic> variables,
     I18NextOptions options,
   ) {
-    final String context = variables['context'];
-    final int count = variables['count'];
+    final context = variables['context'] as String?;
+    final count = variables['count'] as int?;
     final needsContext = context != null && context.isNotEmpty;
     final needsPlural = count != null;
 
-    String pluralSuffix;
+    var pluralSuffix = '';
     if (needsPlural) {
-      pluralSuffix = pluralResolver.pluralize(locale, count, options);
+      pluralSuffix = pluralResolver.pluralize(locale, count!, options);
     }
 
     var tempKey = key;
@@ -74,10 +75,9 @@ class Translator {
       keys.add(tempKey += pluralSuffix);
     }
 
-    String result;
-    final namespaces = [
+    final namespaces = <String>[
       namespace,
-      if (options.fallbackNamespace != null) options.fallbackNamespace
+      if (options.fallbackNamespace != null) options.fallbackNamespace!,
     ];
     for (final currentNamespace in namespaces) {
       for (final currentKey in keys.reversed) {
@@ -91,23 +91,22 @@ class Translator {
         if (found != null) return found;
       }
     }
-
-    return result;
+    return null;
   }
 
   /// Attempts to find the value given a [namespace] and [key].
   ///
   /// If one is not found directly, then tries to fallback (if necessary). May
   /// still return null if none is found.
-  String find(
+  String? find(
     Locale locale,
     String namespace,
     String key,
-    Map<String, Object> variables,
+    Map<String, dynamic> variables,
     I18NextOptions options,
   ) {
     final value = resourceStore.retrieve(locale, namespace, key, options);
-    String result;
+    String? result;
     if (value != null) {
       result = interpolator.interpolate(locale, value, variables, options);
       result = interpolator.nest(

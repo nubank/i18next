@@ -1,26 +1,32 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:i18next/i18next.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-class MockResourceStore extends Mock implements ResourceStore {}
+import 'i18next_localization_delegate_test.mocks.dart';
 
-class MockLocalizationsDataSource extends Mock
-    implements LocalizationDataSource {}
-
+@GenerateMocks([ResourceStore, LocalizationDataSource])
 void main() {
   const namespace = 'local_namespace';
   const locale = Locale('en');
-  I18Next i18next;
-  MockResourceStore resourceStore;
+  const defaultFormatter = I18NextOptions.defaultFormatter;
+
+  late I18Next i18next;
+  late MockResourceStore resourceStore;
 
   setUp(() {
     resourceStore = MockResourceStore();
     i18next = I18Next(locale, resourceStore);
+    when(resourceStore.retrieve(any, any, any, any)).thenReturn(null);
   });
 
-  void mockKey(String key, String answer,
-      {String ns = namespace, Locale locale = const Locale('en')}) {
+  void mockKey(
+    String key,
+    String answer, {
+    String ns = namespace,
+    Locale locale = locale,
+  }) {
     when(resourceStore.retrieve(locale, ns, key, any)).thenReturn(answer);
   }
 
@@ -49,10 +55,6 @@ void main() {
     });
   });
 
-  test('given resource store null', () {
-    expect(() => I18Next(locale, null), throwsAssertionError);
-  });
-
   test('given resource store', () {
     mockKey('key', 'My value', ns: 'ns');
 
@@ -65,10 +67,6 @@ void main() {
 
     expect(i18next.t('someKey'), 'someKey');
     expect(i18next.t('some.key'), 'some.key');
-  });
-
-  test('given null key', () {
-    expect(() => i18next.t(null), throwsAssertionError);
   });
 
   test('given an existing string key', () {
@@ -100,7 +98,7 @@ void main() {
         locale,
         resourceStore,
         options: I18NextOptions(
-          formatter: expectAsync3((value, format, locale) => null, count: 0),
+          formatter: expectAsync3(defaultFormatter, count: 0),
         ),
       );
       mockKey('key', 'no interpolations here');
@@ -167,8 +165,8 @@ void main() {
     });
 
     test('with multiple matching interpolations', () {
-      final values = <String>[];
-      final formats = <String>[];
+      final values = <Object>[];
+      final formats = <Object?>[];
       i18next = I18Next(
         locale,
         resourceStore,
@@ -496,7 +494,7 @@ void main() {
       i18next = I18Next(
         locale,
         resourceStore,
-        options: I18NextOptions(fallbackNamespace: fallbackNamespace),
+        options: const I18NextOptions(fallbackNamespace: fallbackNamespace),
       );
 
       mockKey('keyZ', 'Z', ns: fallbackNamespace);
@@ -512,7 +510,7 @@ void main() {
       i18next = I18Next(
         locale,
         resourceStore,
-        options: I18NextOptions(fallbackNamespace: fallbackNamespace),
+        options: const I18NextOptions(fallbackNamespace: fallbackNamespace),
       );
 
       mockKey('keyX', 'Global X', ns: fallbackNamespace);
@@ -563,7 +561,7 @@ void main() {
   });
 
   group('.of', () {
-    BuildContext capturedContext;
+    BuildContext? capturedContext;
 
     final builder = Builder(builder: (context) {
       capturedContext = context;
@@ -576,11 +574,11 @@ void main() {
 
     testWidgets('when not registered in the widget tree', (tester) async {
       await tester.pumpWidget(builder);
-      expect(I18Next.of(capturedContext), isNull);
+      expect(I18Next.of(capturedContext!), isNull);
     });
 
     testWidgets('when is registered in the widget tree', (tester) async {
-      final dataSource = MockLocalizationsDataSource();
+      final dataSource = MockLocalizationDataSource();
       when(dataSource.load(any)).thenAnswer((_) async => {});
 
       await tester.pumpWidget(Localizations(
@@ -595,7 +593,7 @@ void main() {
         child: builder,
       ));
       await tester.pump();
-      expect(I18Next.of(capturedContext), isNotNull);
+      expect(I18Next.of(capturedContext!), isNotNull);
     });
   });
 }

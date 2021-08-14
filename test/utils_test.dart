@@ -19,17 +19,20 @@ void main() {
       locale: level1,
     };
 
-    test('given null path', () {
-      expect(() => evaluate(null, data), throwsNoSuchMethodError);
-    });
-
     test('given empty path', () {
       expect(evaluate([], data), data);
     });
 
+    test('given null data', () {
+      expect(evaluate([], null), isNull);
+      expect(evaluate(['key'], null), isNull);
+      expect(evaluate(['key', 'nested'], null), isNull);
+    });
+
     test('given a non matching path', () {
-      expect(evaluate(['somewhere'], data), isNull);
-      expect(evaluate([null], data), isNull);
+      expect(evaluate(['invalid'], data), isNull);
+      expect(evaluate(['key', 'invalid'], data), isNull);
+      expect(evaluate(['key', 'invalid', 'another'], data), isNull);
     });
 
     test('given leaf matching path', () {
