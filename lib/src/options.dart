@@ -11,7 +11,7 @@ typedef ArgumentFormatter = String Function(
 /// Contains all options for [I18Next] to work properly.
 class I18NextOptions with Diagnosticable {
   const I18NextOptions({
-    this.fallbackNamespace,
+    this.fallbackNamespaces,
     this.namespaceSeparator,
     this.contextSeparator,
     this.pluralSeparator,
@@ -27,7 +27,7 @@ class I18NextOptions with Diagnosticable {
   }) : super();
 
   static const I18NextOptions base = I18NextOptions(
-    fallbackNamespace: null,
+    fallbackNamespaces: null,
     namespaceSeparator: ':',
     contextSeparator: '_',
     pluralSeparator: '_',
@@ -46,7 +46,7 @@ class I18NextOptions with Diagnosticable {
   /// current namespace.
   ///
   /// Defaults to null.
-  final String? fallbackNamespace;
+  final List<String>? fallbackNamespaces;
 
   /// The separator used when splitting the key.
   ///
@@ -132,7 +132,7 @@ class I18NextOptions with Diagnosticable {
   I18NextOptions merge(I18NextOptions? other) {
     if (other == null) return this;
     return copyWith(
-      fallbackNamespace: other.fallbackNamespace ?? fallbackNamespace,
+      fallbackNamespaces: other.fallbackNamespaces ?? fallbackNamespaces,
       namespaceSeparator: other.namespaceSeparator ?? namespaceSeparator,
       contextSeparator: other.contextSeparator ?? contextSeparator,
       pluralSeparator: other.pluralSeparator ?? pluralSeparator,
@@ -152,7 +152,7 @@ class I18NextOptions with Diagnosticable {
   /// Creates a new instance of [I18NextOptions] overriding any of the
   /// properties that aren't null.
   I18NextOptions copyWith({
-    String? fallbackNamespace,
+    List<String>? fallbackNamespaces,
     String? namespaceSeparator,
     String? contextSeparator,
     String? pluralSeparator,
@@ -167,7 +167,7 @@ class I18NextOptions with Diagnosticable {
     ArgumentFormatter? formatter,
   }) {
     return I18NextOptions(
-      fallbackNamespace: fallbackNamespace ?? this.fallbackNamespace,
+      fallbackNamespaces: fallbackNamespaces ?? this.fallbackNamespaces,
       namespaceSeparator: namespaceSeparator ?? this.namespaceSeparator,
       contextSeparator: contextSeparator ?? this.contextSeparator,
       pluralSeparator: pluralSeparator ?? this.pluralSeparator,
@@ -204,7 +204,7 @@ class I18NextOptions with Diagnosticable {
   bool operator ==(Object other) =>
       other.runtimeType == runtimeType &&
       other is I18NextOptions &&
-      other.fallbackNamespace == fallbackNamespace &&
+      other.fallbackNamespaces == fallbackNamespaces &&
       other.namespaceSeparator == namespaceSeparator &&
       other.contextSeparator == contextSeparator &&
       other.pluralSeparator == pluralSeparator &&
@@ -222,7 +222,7 @@ class I18NextOptions with Diagnosticable {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties
-      ..add(StringProperty('fallbackNamespace', fallbackNamespace))
+      ..add(IterableProperty('fallbackNamespaces', fallbackNamespaces))
       ..add(StringProperty('namespaceSeparator', namespaceSeparator))
       ..add(StringProperty('contextSeparator', contextSeparator))
       ..add(StringProperty('pluralSeparator', pluralSeparator))

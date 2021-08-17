@@ -494,7 +494,7 @@ void main() {
       i18next = I18Next(
         locale,
         resourceStore,
-        options: const I18NextOptions(fallbackNamespace: fallbackNamespace),
+        options: const I18NextOptions(fallbackNamespaces: [fallbackNamespace]),
       );
 
       mockKey('keyZ', 'Z', ns: fallbackNamespace);
@@ -510,7 +510,7 @@ void main() {
       i18next = I18Next(
         locale,
         resourceStore,
-        options: const I18NextOptions(fallbackNamespace: fallbackNamespace),
+        options: const I18NextOptions(fallbackNamespaces: [fallbackNamespace]),
       );
 
       mockKey('keyX', 'Global X', ns: fallbackNamespace);
