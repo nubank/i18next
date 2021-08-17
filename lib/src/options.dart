@@ -42,8 +42,9 @@ class I18NextOptions with Diagnosticable {
     formatter: defaultFormatter,
   );
 
-  /// The namespace used to fallback when no key matches were found on the
+  /// The namespaces used to fallback to when no key matches were found on the
   /// current namespace.
+  /// These namespaces are evaluated in the order they are put in the list.
   ///
   /// Defaults to null.
   final List<String>? fallbackNamespaces;
