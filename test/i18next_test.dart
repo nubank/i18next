@@ -79,18 +79,6 @@ void main() {
     expect(i18next.t('some.key'), 'some.key');
   });
 
-  group('given fallback namespaces', (){
-
-    setUp(() {
-      mockKey('key', 'My first value', ns: 'ns1');
-      mockKey('key', 'My second value', ns: 'ns2');
-      mockKey('key', 'My fallback value', ns: 'fbns');
-    });
-
-    test('given an existing key without namespace',(){});
-
-  });
-
   test('given overriding locale', () {
     const anotherLocale = Locale('another');
     mockKey('key', 'my value', locale: anotherLocale);
@@ -210,7 +198,7 @@ void main() {
     });
   });
 
-  group('fallback', (){
+  group('fallback', () {
     test('given a global fallback key substitution', () {
       const fallbackNamespace1 = 'fallback_namespace_1';
       i18next = I18Next(
@@ -228,7 +216,7 @@ void main() {
       expect(i18next.t('$namespace:key'), 'value');
     });
 
-    group('given 2 global fallback keys subsitution',(){
+    group('given 2 global fallback keys subsitution', () {
       const fallbackNamespace1 = 'fallback_namespace_1';
       const fallbackNamespace2 = 'fallback_namespace_2';
 
@@ -242,7 +230,7 @@ void main() {
         );
       });
 
-      test('key only exists in second fallbackNamespace', (){
+      test('key only exists in second fallbackNamespace', () {
         mockKey('key2', 'fallbackValue2', ns: fallbackNamespace2);
         mockKey('key2', 'value2', ns: namespace);
 
@@ -250,15 +238,14 @@ void main() {
         expect(i18next.t('$namespace:key2'), 'value2');
       });
 
-      test('key exists in both first and second fallbackNamespace', (){
-        mockKey('key', 'fallbackValue', ns: fallbackNamespace1);
-        mockKey('key', 'fallbackValue', ns: fallbackNamespace2);
+      test('key exists in both first and second fallbackNamespace', () {
+        mockKey('key', 'fallbackValue1', ns: fallbackNamespace1);
+        mockKey('key', 'fallbackValue2', ns: fallbackNamespace2);
         mockKey('key', 'value', ns: namespace);
 
-        expect(i18next.t('key'), 'fallbackValue');
+        expect(i18next.t('key'), 'fallbackValue1');
         expect(i18next.t('$namespace:key'), 'value');
       });
-
     });
   });
 
