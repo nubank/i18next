@@ -79,6 +79,18 @@ void main() {
     expect(i18next.t('some.key'), 'some.key');
   });
 
+  group('given fallback namespaces', (){
+
+    setUp(() {
+      mockKey('key', 'My first value', ns: 'ns1');
+      mockKey('key', 'My second value', ns: 'ns2');
+      mockKey('key', 'My fallback value', ns: 'fbns');
+    });
+
+    test('given an existing key without namespace',(){});
+
+  });
+
   test('given overriding locale', () {
     const anotherLocale = Locale('another');
     mockKey('key', 'my value', locale: anotherLocale);
@@ -195,6 +207,58 @@ void main() {
       );
       expect(values, orderedEquals(<String>['1eulav', '2eulav']));
       expect(formats, orderedEquals(<String>['format1', 'format2']));
+    });
+  });
+
+  group('fallback', (){
+    test('given a global fallback key substitution', () {
+      const fallbackNamespace1 = 'fallback_namespace_1';
+      i18next = I18Next(
+        locale,
+        resourceStore,
+        options: const I18NextOptions(
+          fallbackNamespaces: [fallbackNamespace1],
+        ),
+      );
+
+      mockKey('key', 'fallbackValue', ns: fallbackNamespace1);
+      mockKey('key', 'value', ns: namespace);
+
+      expect(i18next.t('key'), 'fallbackValue');
+      expect(i18next.t('$namespace:key'), 'value');
+    });
+
+    group('given 2 global fallback keys subsitution',(){
+      const fallbackNamespace1 = 'fallback_namespace_1';
+      const fallbackNamespace2 = 'fallback_namespace_2';
+
+      setUp(() {
+        i18next = I18Next(
+          locale,
+          resourceStore,
+          options: const I18NextOptions(
+            fallbackNamespaces: [fallbackNamespace1, fallbackNamespace2],
+          ),
+        );
+      });
+
+      test('key only exists in second fallbackNamespace', (){
+        mockKey('key2', 'fallbackValue2', ns: fallbackNamespace2);
+        mockKey('key2', 'value2', ns: namespace);
+
+        expect(i18next.t('key2'), 'fallbackValue2');
+        expect(i18next.t('$namespace:key2'), 'value2');
+      });
+
+      test('key exists in both first and second fallbackNamespace', (){
+        mockKey('key', 'fallbackValue', ns: fallbackNamespace1);
+        mockKey('key', 'fallbackValue', ns: fallbackNamespace2);
+        mockKey('key', 'value', ns: namespace);
+
+        expect(i18next.t('key'), 'fallbackValue');
+        expect(i18next.t('$namespace:key'), 'value');
+      });
+
     });
   });
 
