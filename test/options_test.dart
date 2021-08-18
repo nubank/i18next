@@ -55,7 +55,7 @@ void main() {
   group('#merge', () {
     const empty = I18NextOptions();
     final another = I18NextOptions(
-      fallbackNamespace: 'Some fallbackNamespace',
+      fallbackNamespaces: ['Some fallbackNamespace'],
       namespaceSeparator: 'Some namespaceSeparator',
       contextSeparator: 'Some contextSeparator',
       pluralSeparator: 'Some pluralSeparator',
@@ -104,7 +104,7 @@ void main() {
 
   group('#copyWith', () {
     final another = I18NextOptions(
-      fallbackNamespace: 'Some fallbackNamespace',
+      fallbackNamespaces: ['Some fallbackNamespace'],
       namespaceSeparator: 'Some namespaceSeparator',
       contextSeparator: 'Some contextSeparator',
       pluralSeparator: 'Some pluralSeparator',
@@ -131,7 +131,7 @@ void main() {
     });
 
     for (final permutation in _generatePermutations([
-      another.fallbackNamespace!,
+      another.fallbackNamespaces!,
       another.namespaceSeparator!,
       another.contextSeparator!,
       another.pluralSeparator!,
@@ -146,7 +146,7 @@ void main() {
     ])) {
       test('given individual values=$permutation', () {
         final result = base.copyWith(
-          fallbackNamespace: permutation[0] as String?,
+          fallbackNamespaces: permutation[0] as List<String>?,
           namespaceSeparator: permutation[1] as String?,
           contextSeparator: permutation[2] as String?,
           pluralSeparator: permutation[3] as String?,
@@ -162,8 +162,8 @@ void main() {
         // at least one should be different
         expect(result, isNot(base));
         expect(
-          result.fallbackNamespace,
-          permutation[0] ?? base.fallbackNamespace,
+          result.fallbackNamespaces,
+          permutation[0] ?? base.fallbackNamespaces,
         );
         expect(
           result.namespaceSeparator,
@@ -214,7 +214,7 @@ void main() {
 
     test('given all values', () {
       final result = base.copyWith(
-        fallbackNamespace: another.fallbackNamespace,
+        fallbackNamespaces: another.fallbackNamespaces,
         namespaceSeparator: another.namespaceSeparator,
         contextSeparator: another.contextSeparator,
         pluralSeparator: another.pluralSeparator,

@@ -77,8 +77,9 @@ class Translator {
 
     final namespaces = <String>[
       namespace,
-      if (options.fallbackNamespace != null) options.fallbackNamespace!,
+      if (options.fallbackNamespaces != null) ...options.fallbackNamespaces!,
     ];
+
     for (final currentNamespace in namespaces) {
       for (final currentKey in keys.reversed) {
         final found = find(

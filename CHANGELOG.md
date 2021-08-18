@@ -1,4 +1,6 @@
-## Next version
+## [0.5.0]
+
+* Adds support for multiple fallback namespaces
 
 ## [0.4.1]
 
