@@ -137,5 +137,14 @@ void main() {
       );
       verify(bundle.loadString(manifest)).called(1);
     });
+
+    test('given incorrect source-path to any bundle asset', () async {
+      await expectLater(
+        dataSource.load(const Locale('en', 'US')),
+        completion(isNotEmpty),
+      );
+
+      verifyNever(bundle.loadString(argThat(contains('$bundlePath\en-US'))));
+    });
   });
 }
