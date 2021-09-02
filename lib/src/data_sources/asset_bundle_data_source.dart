@@ -58,12 +58,17 @@ class AssetBundleLocalizationDataSource implements LocalizationDataSource {
         .then<Map<String, dynamic>>((string) => json.decode(string))
         .then((map) => map.keys);
 
-    final bundleLocalePath = path.join(bundlePath, locale.toLanguageTag());
+    /// On every platform you never should try to get the `path.separator`,
+    /// because Flutter is fetching all assets in `/` style.
+    /// `path.separator` should only be used to handle OS files.
+    final bundleLocalePath = '$bundlePath/${locale.toLanguageTag()}';
+
     final files = assetFiles
         // trailing slash is to guarantee the whole dir matches, otherwise
         // it might allow undesired files
-        .where((key) => key.contains('$bundleLocalePath${path.separator}'))
+        .where((key) => key.contains('$bundleLocalePath'))
         .where((key) => path.extension(key) == '.json');
+
     return await loadFromFiles(files);
   }
 
