@@ -1,3 +1,7 @@
+## [0.5.1]
+
+* Fix: Asset path (rely on Flutter asset specifications)
+
 ## [0.5.0]
 
 * Adds support for multiple fallback namespaces
