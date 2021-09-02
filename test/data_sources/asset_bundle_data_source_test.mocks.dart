@@ -11,7 +11,7 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: comment_references
 // ignore_for_file: unnecessary_parenthesis
 
-class _FakeByteData extends _i1.Fake implements _i2.ByteData {}
+class _FakeByteData extends _i1.Fake {}
 
 /// A class which mocks [AssetBundle].
 ///
