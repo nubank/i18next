@@ -85,4 +85,15 @@ class AssetBundleLocalizationDataSource implements LocalizationDataSource {
     }
     return namespaces;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AssetBundleLocalizationDataSource &&
+          runtimeType == other.runtimeType &&
+          bundlePath == other.bundlePath &&
+          bundle == other.bundle;
+
+  @override
+  int get hashCode => bundlePath.hashCode ^ bundle.hashCode;
 }
