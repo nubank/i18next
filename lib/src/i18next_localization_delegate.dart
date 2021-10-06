@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 
 import 'data_sources/localization_data_source.dart';
 import 'i18next.dart';
@@ -49,7 +50,15 @@ class I18NextLocalizationDelegate extends LocalizationsDelegate<I18Next> {
       locales.any((l) => l.languageCode == locale.languageCode);
 
   @override
-  bool shouldReload(I18NextLocalizationDelegate old) => true;
+  bool shouldReload(I18NextLocalizationDelegate old) {
+    if (!listEquals(locales, old.locales) ||
+        resourceStore != old.resourceStore ||
+        dataSource != old.dataSource ||
+        options != old.options) {
+      return true;
+    }
+    return false;
+  }
 
   /// Normalizes [locale] in case it is not fully supported, but a shorter
   /// or specific one might be.
