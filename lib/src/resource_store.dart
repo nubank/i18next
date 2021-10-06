@@ -76,8 +76,8 @@ class ResourceStore {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ResourceStore &&
-      runtimeType == other.runtimeType &&
-      mapEquals(_data, other._data);
+          runtimeType == other.runtimeType &&
+          mapEquals(_data, other._data);
 
   @override
   int get hashCode => _data.hashCode;
