@@ -95,5 +95,8 @@ class AssetBundleLocalizationDataSource implements LocalizationDataSource {
           bundle == other.bundle;
 
   @override
-  int get hashCode => bundlePath.hashCode ^ bundle.hashCode;
+  int get hashCode => hashValues(
+        bundlePath,
+        bundle,
+      );
 }

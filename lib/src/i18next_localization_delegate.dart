@@ -51,13 +51,10 @@ class I18NextLocalizationDelegate extends LocalizationsDelegate<I18Next> {
 
   @override
   bool shouldReload(I18NextLocalizationDelegate old) {
-    if (!listEquals(locales, old.locales) ||
+    return !listEquals(locales, old.locales) ||
         resourceStore != old.resourceStore ||
         dataSource != old.dataSource ||
-        options != old.options) {
-      return true;
-    }
-    return false;
+        options != old.options;
   }
 
   /// Normalizes [locale] in case it is not fully supported, but a shorter
