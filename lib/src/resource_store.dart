@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import '../utils.dart';
@@ -70,4 +71,14 @@ class ResourceStore {
     final value = evaluate(path, _data);
     return value is String ? value : null;
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ResourceStore &&
+          runtimeType == other.runtimeType &&
+          mapEquals(_data, other._data);
+
+  @override
+  int get hashCode => _data.hashCode;
 }
