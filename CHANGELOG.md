@@ -1,3 +1,7 @@
+## [0.5.2]
+
+* Fix: Unnecessary reloads of the localizationDataSource
+
 ## [0.5.1]
 
 * Fix: Asset path (rely on Flutter asset specifications)
