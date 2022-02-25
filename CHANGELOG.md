@@ -1,3 +1,8 @@
+## [New version]
+
+* Fix: When nesting fails, returns null rather than fallbacking to the matched group 
+  Resulting in a "value not found" kind of scenario (i.e. returning the key itself)
+
 ## [0.5.2]
 
 * Fix: Unnecessary reloads of the localizationDataSource

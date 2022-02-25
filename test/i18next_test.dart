@@ -66,7 +66,10 @@ void main() {
     when(resourceStore.retrieve(any, any, any, any)).thenReturn(null);
 
     expect(i18next.t('someKey'), 'someKey');
+    verify(resourceStore.retrieve(locale, '', 'someKey', any)).called(1);
+
     expect(i18next.t('some.key'), 'some.key');
+    verify(resourceStore.retrieve(locale, '', 'some.key', any)).called(1);
   });
 
   test('given an existing string key', () {
@@ -521,7 +524,7 @@ void main() {
     test('when nested key is not found', () {
       mockKey('key', r'This is my $t(anotherKey)');
 
-      expect(i18next.t('$namespace:key'), r'This is my $t(anotherKey)');
+      expect(i18next.t('$namespace:key'), '$namespace:key');
     });
 
     test('given multiple simple key substitutions', () {

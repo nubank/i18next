@@ -59,6 +59,8 @@ String interpolate(
 /// Replaces occurrences of nested key-values in [string] for other
 /// key-values. Essentially calls [I18Next.translate] with the nested value.
 ///
+/// If nesting fails, returns null. (e.g. missing key, or variables malformed)
+///
 /// E.g.:
 /// ```json
 /// {
@@ -67,7 +69,7 @@ String interpolate(
 /// }
 /// i18Next.t('key1') // "Hello World!"
 /// ```
-String nest(
+String? nest(
   Locale locale,
   String string,
   Translate translate,
@@ -75,28 +77,28 @@ String nest(
   I18NextOptions options,
 ) {
   final pattern = nestingPattern(options);
-  return string.splitMapJoin(pattern, onMatch: (match) {
-    final regExpMatch = match as RegExpMatch;
-    final key = regExpMatch.namedGroup('key');
+  for (final match in pattern.allMatches(string)) {
+    final key = match.namedGroup('key');
+    if (key == null || key.isEmpty) return null;
 
-    String? result;
-    if (key != null && key.isNotEmpty) {
-      final newVariables = Map<String, dynamic>.of(variables);
-      final varsString = regExpMatch.namedGroup('variables');
-      if (varsString != null && varsString.isNotEmpty) {
-        try {
-          final Map<String, dynamic> decoded = jsonDecode(varsString);
-          newVariables.addAll(decoded);
-        } catch (error) {
-          // TODO: throw/fallback nesting failure(s)?
-          assert(true, error);
-        }
+    final newVariables = Map<String, dynamic>.of(variables);
+    final varsString = match.namedGroup('variables');
+    if (varsString != null && varsString.isNotEmpty) {
+      try {
+        final Map<String, dynamic> decoded = jsonDecode(varsString);
+        newVariables.addAll(decoded);
+      } catch (error) {
+        // TODO: throw/fallback nesting failure(s)?
+        assert(true, error);
       }
-
-      result = translate(key, locale, newVariables, options);
     }
-    return result ?? regExpMatch.group(0)!;
-  });
+
+    final value = translate(key, locale, newVariables, options);
+    // failed to nest
+    if (value == null) return null;
+    string = string.replaceFirst(match[0]!, value);
+  }
+  return string;
 }
 
 RegExp interpolationPattern(I18NextOptions options) {

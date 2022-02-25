@@ -111,11 +111,12 @@ class Translator {
     if (value != null) {
       result = interpolator.interpolate(locale, value, variables, options);
       result = interpolator.nest(
-          locale,
-          result,
-          Translator(pluralResolver, resourceStore, namespace),
-          variables,
-          options);
+        locale,
+        result,
+        Translator(pluralResolver, resourceStore, namespace),
+        variables,
+        options,
+      );
     }
     return result;
   }

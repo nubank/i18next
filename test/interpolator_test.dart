@@ -153,7 +153,7 @@ void main() {
   });
 
   group('nest', () {
-    String nst(
+    String? nst(
       String string, {
       Locale locale = defaultLocale,
       Map<String, Object> variables = const {},
@@ -180,7 +180,7 @@ void main() {
             r'This is my $t() string',
             translate: expectAsync4(_defaultTranslate, count: 0),
           ),
-          r'This is my $t() string',
+          isNull,
         );
       });
 
@@ -203,7 +203,7 @@ void main() {
             r'This is my $t(, {"x": "y"}) string',
             translate: expectAsync4(_defaultTranslate, count: 0),
           ),
-          r'This is my $t(, {"x": "y"}) string',
+          isNull,
         );
       });
 
@@ -289,6 +289,33 @@ void main() {
             }),
           ),
           r'This is my VALUE string',
+        );
+      });
+    });
+
+    group('with multiple nestings', () {
+      test('and both succeed', () {
+        final returnValues = {
+          'key': 'VALUE',
+          'anotherKey': 'ANOTHER VALUE',
+        };
+
+        expect(
+          nst(
+            r'This is my $t(key) and $t(anotherKey, {"a":"A"}) string',
+            translate: (key, b, c, d) => returnValues[key],
+          ),
+          r'This is my VALUE and ANOTHER VALUE string',
+        );
+      });
+
+      test('and one fails', () {
+        expect(
+          nst(
+            r'This is my $t(key) and $t(unknown) string',
+            translate: (key, b, c, d) => key == 'key' ? 'VALUE' : null,
+          ),
+          isNull,
         );
       });
     });
