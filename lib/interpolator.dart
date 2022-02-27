@@ -5,10 +5,10 @@ import 'src/options.dart';
 import 'utils.dart';
 
 typedef Translate = String? Function(
-  String,
-  Locale,
-  Map<String, dynamic>,
-  I18NextOptions,
+  String key,
+  Locale locale,
+  Map<String, dynamic> variables,
+  I18NextOptions options,
 );
 
 /// Replaces occurrences of matches in [string] for the named values

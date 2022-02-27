@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'options.dart';
 
-typedef PluralizationRule = int Function(int);
+typedef PluralizationRule = int Function(int count);
 
 class PluralResolver {
   const PluralResolver() : super();
