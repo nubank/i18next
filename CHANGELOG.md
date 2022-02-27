@@ -3,6 +3,7 @@
 * Fix: When nesting fails, returns null rather than fallbacking to the matched group 
   Resulting in a "value not found" kind of scenario (i.e. returning the key itself)
 * Adds name arguments to the typedefs
+* Fixes immediate key recursion after nesting
 
 ## [0.5.2]
 

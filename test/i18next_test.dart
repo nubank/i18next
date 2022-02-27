@@ -612,6 +612,21 @@ void main() {
         '3 girls and 2 boys',
       );
     });
+
+    test('when the nested key is the same as the referenced one', () {
+      mockKey('key', r'My key is $t(key)!');
+
+      expect(i18next.t('$namespace:key'), '$namespace:key');
+    });
+
+    test(
+      'when the nested key is referenced with a context that doesnt exist',
+      () {
+        mockKey('key', r'My key is $t(key, {"context": "ctx"})!');
+
+        expect(i18next.t('$namespace:key'), '$namespace:key');
+      },
+    );
   });
 
   group('.of', () {

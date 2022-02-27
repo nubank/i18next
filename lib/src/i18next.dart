@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/widgets.dart';
 
 import 'options.dart';
@@ -72,6 +70,8 @@ class I18Next {
   ///
   /// Keys that allow both contextualization and pluralization must be declared
   /// in the order: `key_context_plural`
+  ///
+  /// If a value for [key] is not found, returns the [key] itself.
   String t(
     String key, {
     Locale? locale,
