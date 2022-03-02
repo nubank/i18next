@@ -10,7 +10,6 @@ import 'i18next_localization_delegate_test.mocks.dart';
 void main() {
   const namespace = 'local_namespace';
   const locale = Locale('en');
-  const defaultFormatter = I18NextOptions.defaultFormatter;
 
   late I18Next i18next;
   late MockResourceStore resourceStore;
@@ -100,9 +99,7 @@ void main() {
       i18next = I18Next(
         locale,
         resourceStore,
-        options: I18NextOptions(
-          formatter: expectAsync3(defaultFormatter, count: 0),
-        ),
+        options: const I18NextOptions(formats: {}),
       );
       mockKey('key', 'no interpolations here');
 
@@ -114,10 +111,12 @@ void main() {
         locale,
         resourceStore,
         options: I18NextOptions(
-          formatter: expectAsync3(
-            (value, format, locale) => value.toString(),
-            count: 0,
-          ),
+          formats: {
+            'fmt': expectAsync4(
+              (value, valueArguments, locale, options) => value.toString(),
+              count: 0,
+            ),
+          },
         ),
       );
       mockKey('key', 'leading {{value, format}} trailing');
@@ -133,7 +132,16 @@ void main() {
         locale,
         resourceStore,
         options: I18NextOptions(
-          formatter: expectAsync3((value, format, locale) => value.toString()),
+          formats: {
+            'format': expectAsync4(
+              (value, valueArguments, locale, options) {
+                expect(value, 'eulav');
+                expect(valueArguments, isEmpty);
+                return value.toString();
+              },
+              count: 1,
+            ),
+          },
         ),
       );
       mockKey('key', 'leading {{value, format}} trailing');
@@ -149,14 +157,14 @@ void main() {
         locale,
         resourceStore,
         options: I18NextOptions(
-          formatter: expectAsync3(
-            (value, format, locale) {
+          formats: {
+            'format': expectAsync4((value, valueArguments, locale, options) {
               expect(value, 'eulav');
-              expect(format, 'format');
+              expect(valueArguments, isEmpty);
               expect(locale, locale);
               return value.toString();
-            },
-          ),
+            }),
+          },
         ),
       );
       mockKey('key', 'leading {{value, format}} trailing');
@@ -168,26 +176,27 @@ void main() {
     });
 
     test('with multiple matching interpolations', () {
-      final values = <Object>[];
-      final formats = <Object?>[];
       i18next = I18Next(
         locale,
         resourceStore,
         options: I18NextOptions(
-          formatter: expectAsync3(
-            (value, format, locale) {
-              values.add(value);
-              formats.add(format);
+          formats: {
+            'format1': expectAsync4((value, valueArguments, locale, options) {
+              expect(value, '1eulav');
               return value.toString();
-            },
-            count: 2,
-          ),
+            }),
+            'format2': expectAsync4((value, valueArguments, locale, options) {
+              expect(value, '2eulav');
+              return value.toString();
+            }),
+          },
         ),
       );
       mockKey(
-          'key',
-          'leading {{value1, format1}} middle '
-              '{{value2, format2}} trailing');
+        'key',
+        'leading {{value1, format1}} middle '
+            '{{value2, format2}} trailing',
+      );
 
       expect(
         i18next.t('$namespace:key', variables: {
@@ -196,8 +205,6 @@ void main() {
         }),
         'leading 1eulav middle 2eulav trailing',
       );
-      expect(values, orderedEquals(<String>['1eulav', '2eulav']));
-      expect(formats, orderedEquals(<String>['format1', 'format2']));
     });
   });
 

@@ -1,11 +1,17 @@
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
-typedef ArgumentFormatter = String Function(
-  Object value,
-  String? format,
+/// The formatter signature for [I18NextOptions.formats].
+///
+/// The [value] can be null if the variable wasn't evaluated properly, giving a
+/// chance for the formatter to do something
+typedef ValueFormatter = Object? Function(
+  Object? value,
+  Map<String, Object> formatOptions,
   Locale locale,
+  I18NextOptions options,
 );
 
 /// Contains all options for [I18Next] to work properly.
@@ -23,7 +29,7 @@ class I18NextOptions with Diagnosticable {
     this.nestingSuffix,
     this.nestingOptionsSeparator,
     this.pluralSuffix,
-    this.formatter,
+    this.formats = const {},
   }) : super();
 
   static const I18NextOptions base = I18NextOptions(
@@ -39,7 +45,7 @@ class I18NextOptions with Diagnosticable {
     nestingSuffix: ')',
     nestingOptionsSeparator: ',',
     pluralSuffix: 'plural',
-    formatter: defaultFormatter,
+    formats: {},
   );
 
   /// The namespaces used to fallback to when no key matches were found on the
@@ -117,12 +123,12 @@ class I18NextOptions with Diagnosticable {
   /// ```
   final String? nestingPrefix, nestingSuffix, nestingOptionsSeparator;
 
-  /// [formatter] is called when an interpolation has been found and is ready
-  /// for substitution.
+  /// [formats] are called when interpolations find the right patterns and try
+  /// to find the right substitutions.
   ///
-  /// Defaults to [defaultFormatter], which simply returns the value itself in
-  /// String form ([Object.toString]).
-  final ArgumentFormatter? formatter;
+  /// If the format doesn't exist then it either moves to the next format or
+  /// the value is returned as is (in string form: [Object.toString]).
+  final Map<String, ValueFormatter> formats;
 
   /// Creates a new instance of [I18NextOptions] overriding any properties
   /// where [other] isn't null.
@@ -144,7 +150,7 @@ class I18NextOptions with Diagnosticable {
       nestingSuffix: other.nestingSuffix ?? nestingSuffix,
       nestingOptionsSeparator:
           other.nestingOptionsSeparator ?? nestingOptionsSeparator,
-      formatter: other.formatter ?? formatter,
+      formats: {...formats, ...other.formats},
     );
   }
 
@@ -163,7 +169,7 @@ class I18NextOptions with Diagnosticable {
     String? nestingPrefix,
     String? nestingSuffix,
     String? nestingOptionsSeparator,
-    ArgumentFormatter? formatter,
+    Map<String, ValueFormatter>? formats,
   }) {
     return I18NextOptions(
       fallbackNamespaces: fallbackNamespaces ?? this.fallbackNamespaces,
@@ -179,12 +185,13 @@ class I18NextOptions with Diagnosticable {
       nestingSuffix: nestingSuffix ?? this.nestingSuffix,
       nestingOptionsSeparator:
           nestingOptionsSeparator ?? this.nestingOptionsSeparator,
-      formatter: formatter ?? this.formatter,
+      formats: formats ?? this.formats,
     );
   }
 
   @override
   int get hashCode => hashValues(
+        fallbackNamespaces,
         namespaceSeparator,
         contextSeparator,
         pluralSeparator,
@@ -196,7 +203,7 @@ class I18NextOptions with Diagnosticable {
         nestingSuffix,
         nestingOptionsSeparator,
         pluralSuffix,
-        formatter,
+        formats,
       );
 
   @override
@@ -215,7 +222,7 @@ class I18NextOptions with Diagnosticable {
       other.nestingSuffix == nestingSuffix &&
       other.nestingOptionsSeparator == nestingOptionsSeparator &&
       other.pluralSuffix == pluralSuffix &&
-      other.formatter == formatter;
+      const MapEquality().equals(other.formats, formats);
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -233,10 +240,6 @@ class I18NextOptions with Diagnosticable {
       ..add(StringProperty('nestingSuffix', nestingSuffix))
       ..add(StringProperty('nestingOptionsSeparator', nestingOptionsSeparator))
       ..add(StringProperty('pluralSuffix', pluralSuffix))
-      ..add(StringProperty('formatter', formatter?.toString()));
+      ..add(StringProperty('formats', formats.toString()));
   }
-
-  /// Simply returns [value] in string form. Ignores [format] and [locale].
-  static String defaultFormatter(Object value, String? format, Locale locale) =>
-      value.toString();
 }

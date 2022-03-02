@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'src/formatter.dart' as formatter;
 import 'src/options.dart';
 import 'utils.dart';
 
@@ -59,22 +60,21 @@ String interpolate(
 
   return string.splitMapJoin(pattern, onMatch: (match) {
     var variable = match[1]!.trim();
-    String? format;
+    Iterable<String> formats = [];
     if (variable.contains(formatSeparator)) {
       final variableParts = variable.split(formatSeparator);
       variable = variableParts.first.trim();
-      format = variableParts.skip(1).join(formatSeparator).trim();
+      formats = variableParts.skip(1).map((e) => e.trim());
     }
-
     if (variable.isEmpty) {
       throw InterpolationException('Missing variable', match);
     }
+
     final path = variable.split(keySeparator);
     final value = evaluate(path, variables);
-    if (value == null) {
-      throw InterpolationException('Could not evaluate variable', match);
-    }
-    return options.formatter?.call(value, format, locale) ?? value.toString();
+    return formatter.format(value, formats, locale, options) ??
+        (throw InterpolationException(
+            'Could not evaluate or format variable', match));
   });
 }
 

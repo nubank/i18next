@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:i18next/src/options.dart';
 
@@ -19,7 +17,7 @@ void main() {
     expect(options.nestingSuffix, isNull);
     expect(options.nestingOptionsSeparator, isNull);
     expect(options.pluralSuffix, isNull);
-    expect(options.formatter, isNull);
+    expect(options.formats, isEmpty);
   });
 
   test('default base values', () {
@@ -34,22 +32,7 @@ void main() {
     expect(base.nestingSuffix, ')');
     expect(base.nestingOptionsSeparator, ',');
     expect(base.pluralSuffix, 'plural');
-    expect(base.formatter, I18NextOptions.defaultFormatter);
-  });
-
-  test('.defaultFormatter', () {
-    const format = 'format';
-    const locale = Locale('en');
-    const formatter = I18NextOptions.defaultFormatter;
-
-    expect(formatter('My value', format, locale), 'My value');
-    expect(formatter(9876.1234, format, locale), '9876.1234');
-
-    const object = {'my': 'value'};
-    expect(formatter(object, format, locale), object.toString());
-
-    final date = DateTime.now();
-    expect(formatter(date, format, locale), date.toString());
+    expect(base.formats, isEmpty);
   });
 
   group('#merge', () {
@@ -67,14 +50,12 @@ void main() {
       nestingSuffix: 'Some nestingSuffix',
       nestingOptionsSeparator: 'Some nestingSeparator',
       pluralSuffix: 'Some pluralSuffix',
-      formatter: (value, format, locale) => value.toString(),
+      formats: {'format': (value, formatOptions, locale, options) => value},
     );
 
     test('given no values', () {
-      expect(base.merge(base), base);
-      expect(base.copyWith(), base);
       expect(empty.merge(empty), empty);
-      expect(another.copyWith(), another);
+      expect(base.merge(base), base);
       expect(another.merge(another), another);
     });
 
@@ -91,14 +72,23 @@ void main() {
     test('from full given full', () {
       expect(base.merge(another), another);
       expect(another.merge(another), another);
+
+      final withFormats = I18NextOptions(
+        formats: {'custom': (value, formatOptions, locale, options) => value},
+      );
+      expect(
+        another.merge(withFormats).formats,
+        {
+          ...another.formats,
+          ...withFormats.formats,
+        },
+      );
     });
 
     test('given null', () {
-      expect(base.merge(null), equals(base));
-      expect(empty.merge(null), empty);
-      expect(another.merge(null), another);
-
-      expect(identical(base.merge(null), base), isTrue);
+      expect(base.merge(null), same(base));
+      expect(empty.merge(null), same(empty));
+      expect(another.merge(null), same(another));
     });
   });
 
@@ -116,7 +106,7 @@ void main() {
       nestingSuffix: 'Some nestingSuffix',
       nestingOptionsSeparator: 'Some nestingSeparator',
       pluralSuffix: 'Some pluralSuffix',
-      formatter: (value, format, locale) => value.toString(),
+      formats: {'format': (value, valueOptions, locale, options) => value},
     );
 
     test('equality', () {
@@ -226,7 +216,7 @@ void main() {
         nestingPrefix: another.nestingPrefix,
         nestingSuffix: another.nestingSuffix,
         nestingOptionsSeparator: another.nestingOptionsSeparator,
-        formatter: another.formatter,
+        formats: another.formats,
       );
       expect(result, another);
     });

@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
             bundlePath: 'localizations',
           ),
           // extra formatting options can be added here
-          options: const I18NextOptions(formatter: formatter),
+          options: I18NextOptions(formats: formatters()),
         ),
       ],
       home: MyHomePage(
@@ -67,18 +67,20 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  static String formatter(Object value, String? format, Locale? locale) {
-    switch (format) {
-      case 'uppercase':
-        return value.toString().toUpperCase();
-      case 'lowercase':
-        return value.toString().toLowerCase();
-      default:
-        if (value is DateTime) {
-          return DateFormat(format, locale?.toString()).format(value);
-        }
-    }
-    return value.toString();
+  static Map<String, ValueFormatter> formatters() {
+    return <String, ValueFormatter>{
+      'uppercase': (value, valueOption, locale, options) =>
+          value.toString().toUpperCase(),
+      'lowercase': (value, valueOption, locale, options) =>
+          value.toString().toLowerCase(),
+      'datetime': (value, valueOption, locale, options) {
+        if (value is! DateTime) return value;
+
+        var format = valueOption['format'];
+        format = format is String ? format : 'dd/MM/yyyy';
+        return DateFormat(format, locale.toString()).format(value);
+      },
+    };
   }
 }
 

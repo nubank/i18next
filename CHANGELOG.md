@@ -13,6 +13,31 @@
     themselves.
   * Renamed `I18NextOptions.interpolationSeparator->formatSeparator`
   * Renamed `I18NextOptions.nestingSeparator->nestingOptionSeparator`
+* Refactors: Formatting update:
+  * Now the formatters are registered by name rather than just by a single function:
+    ```dart
+    I18NextOptions(formats: {
+      'uppercase': (variable, variableOptions, locale, options) => variable?.toUpperCase(),
+      'lowercase': (variable, variableOptions, locale, options) => variable?.toUpperCase(),
+      // (...)
+    });
+    ```
+    The callback of the formatter may receive and return a null value so other formats may have a chance of handling it
+    before returning to the interpolation call. Which if it is null, it is considered a translation error, resulting 
+    in the original key being returned.
+    ```
+    "key": "Hello {{name, uppercase}}!" // "Hello WORLD!"
+    
+    // multiple formatters in sequence
+    "key": "Hello {{name, fmt1, fmt2, fmt3}}!" 
+    ```
+    And they also accept options if the format needs them:
+    ```json
+    {
+      "key": "Some format {{value, formatName}}",
+      "keyWithOptions": "Some format {{value, formatName(option1Name: option1Value; option2Name: option2Value)}}"
+    }
+    ```
 
 ## [0.5.2]
 
