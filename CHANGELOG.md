@@ -1,5 +1,6 @@
-## [New version]
+## [0.6.0]
 
+* BREAKING CHANGES!
 * Fix: When nesting fails, returns null rather than fallbacking to the matched group 
   Resulting in a "value not found" kind of scenario (i.e. returning the key itself)
 * Adds name arguments to the typedefs
