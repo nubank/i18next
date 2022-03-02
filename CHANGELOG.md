@@ -4,6 +4,10 @@
   Resulting in a "value not found" kind of scenario (i.e. returning the key itself)
 * Adds name arguments to the typedefs
 * Fixes immediate key recursion after nesting
+* Refactors: `interpolation` and `nesting` methods with dedicated `Exceptions` while running `splitMapJoin`
+  * The final result is still the same, if either interpolation or nesting fails, the translator will fallback to null,
+    which in turn is converted back into the original key.
+  * Also, json deserialization issues `nesting` now fail, rather than silently recovering
 
 ## [0.5.2]
 

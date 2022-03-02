@@ -20,11 +20,17 @@ void main() {
       return interpolate(locale, string, variables, options);
     }
 
+    final throwsInterpolationException = throwsA(isA<InterpolationException>());
+
+    ArgumentFormatter noFormatterCalls() =>
+        expectAsync3((key, a, b) => fail('Should not have been called'),
+            count: 0);
+
     test('given a non matching string', () {
       expect(
         interpol(
           'This is a normal string',
-          formatter: expectAsync3(defaultFormatter, count: 0),
+          formatter: noFormatterCalls(),
         ),
         'This is a normal string',
       );
@@ -33,22 +39,23 @@ void main() {
     group('given a matching string', () {
       test('without variable or format', () {
         expect(
-          interpol(
+          () => interpol(
             'This is a {{}} string',
-            formatter: expectAsync3(defaultFormatter, count: 0),
+            formatter: noFormatterCalls(),
           ),
-          'This is a {{}} string',
+          throwsInterpolationException,
         );
       });
 
       group('with variable only', () {
         test('without variables', () {
+          const string = 'This is a {{variable}} string';
           expect(
-            interpol(
-              'This is a {{variable}} string',
-              formatter: expectAsync3(defaultFormatter, count: 0),
+            () => interpol(
+              string,
+              formatter: noFormatterCalls(),
             ),
-            'This is a {{variable}} string',
+            throwsInterpolationException,
           );
         });
 
@@ -84,35 +91,35 @@ void main() {
 
         test('with partially matching replaceable grouped variables', () {
           expect(
-            interpol(
+            () => interpol(
               'This is a {{grouped.key.variable}} string',
               variables: {
                 'grouped': {'key': 'grouped variable'}
               },
             ),
-            'This is a {{grouped.key.variable}} string',
+            throwsInterpolationException,
           );
         });
 
         test('without replaceable variables', () {
           expect(
-            interpol(
+            () => interpol(
               'This is a {{variable}} string',
               variables: {'another': 'value'},
-              formatter: expectAsync3(defaultFormatter, count: 0),
+              formatter: noFormatterCalls(),
             ),
-            'This is a {{variable}} string',
+            throwsInterpolationException,
           );
         });
       });
 
       test('with format only', () {
         expect(
-          interpol(
+          () => interpol(
             'This is a {{, some format}} string',
-            formatter: expectAsync3(defaultFormatter, count: 0),
+            formatter: noFormatterCalls(),
           ),
-          'This is a {{, some format}} string',
+          throwsInterpolationException,
         );
       });
 
@@ -163,11 +170,17 @@ void main() {
       return nest(locale, string, translate, variables, options);
     }
 
+    final throwsNestingException = throwsA(isA<NestingException>());
+
+    Translate noTranslateCalls() =>
+        expectAsync4((key, a, b, c) => fail('Should not have been called'),
+            count: 0);
+
     test('given a non matching string', () {
       expect(
         nst(
           'This is my unmatching string',
-          translate: expectAsync4(_defaultTranslate, count: 0),
+          translate: noTranslateCalls(),
         ),
         'This is my unmatching string',
       );
@@ -176,11 +189,11 @@ void main() {
     group('given a nesting string', () {
       test('without key or variables', () {
         expect(
-          nst(
+          () => nst(
             r'This is my $t() string',
-            translate: expectAsync4(_defaultTranslate, count: 0),
+            translate: noTranslateCalls(),
           ),
-          isNull,
+          throwsNestingException,
         );
       });
 
@@ -199,11 +212,11 @@ void main() {
 
       test('with variables only', () {
         expect(
-          nst(
+          () => nst(
             r'This is my $t(, {"x": "y"}) string',
-            translate: expectAsync4(_defaultTranslate, count: 0),
+            translate: noTranslateCalls(),
           ),
-          isNull,
+          throwsNestingException,
         );
       });
 
@@ -247,30 +260,22 @@ void main() {
 
         test('when variables are a malformed json', () {
           expect(
-            nst(
+            () => nst(
               r'This is my $t(key, "x") string',
-              translate: expectAsync4((key, b, variables, d) {
-                expect(key, 'key');
-                expect(variables, isEmpty);
-                return 'VALUE';
-              }),
+              translate: noTranslateCalls(),
             ),
-            r'This is my VALUE string',
+            throwsA(isA<TypeError>()),
           );
         });
       });
 
       test('with multiple split points', () {
         expect(
-          nst(
+          () => nst(
             r'This is my $t(key, {"a":"a"}, {"b":"b"}) string',
-            translate: expectAsync4((key, b, variables, d) {
-              expect(key, 'key');
-              expect(variables, isEmpty);
-              return 'VALUE';
-            }),
+            translate: noTranslateCalls(),
           ),
-          r'This is my VALUE string',
+          throwsFormatException,
         );
       });
 
@@ -311,11 +316,11 @@ void main() {
 
       test('and one fails', () {
         expect(
-          nst(
+          () => nst(
             r'This is my $t(key) and $t(unknown) string',
             translate: (key, b, c, d) => key == 'key' ? 'VALUE' : null,
           ),
-          isNull,
+          throwsNestingException,
         );
       });
     });

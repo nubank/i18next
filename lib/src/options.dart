@@ -235,7 +235,7 @@ class I18NextOptions with Diagnosticable {
       ..add(StringProperty('nestingSuffix', nestingSuffix))
       ..add(StringProperty('nestingSeparator', nestingSeparator))
       ..add(StringProperty('pluralSuffix', pluralSuffix))
-      ..add(StringProperty('formatter', '$formatter'));
+      ..add(StringProperty('formatter', formatter?.toString()));
   }
 
   /// Simply returns [value] in string form. Ignores [format] and [locale].
