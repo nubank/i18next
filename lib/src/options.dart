@@ -18,10 +18,10 @@ class I18NextOptions with Diagnosticable {
     this.keySeparator,
     this.interpolationPrefix,
     this.interpolationSuffix,
-    this.interpolationSeparator,
+    this.formatSeparator,
     this.nestingPrefix,
     this.nestingSuffix,
-    this.nestingSeparator,
+    this.nestingOptionsSeparator,
     this.pluralSuffix,
     this.formatter,
   }) : super();
@@ -34,10 +34,10 @@ class I18NextOptions with Diagnosticable {
     keySeparator: '.',
     interpolationPrefix: '{{',
     interpolationSuffix: '}}',
-    interpolationSeparator: ',',
+    formatSeparator: ',',
     nestingPrefix: r'$t(',
     nestingSuffix: ')',
-    nestingSeparator: ',',
+    nestingOptionsSeparator: ',',
     pluralSuffix: 'plural',
     formatter: defaultFormatter,
   );
@@ -90,7 +90,7 @@ class I18NextOptions with Diagnosticable {
   /// By default they are '{{' and '}}' respectively and can't be null but
   /// can be empty.
   ///
-  /// [interpolationSeparator] is used to separate the variable's
+  /// [formatSeparator] is used to separate the variable's
   /// name from the format (if any). Defaults to ',' and cannot be null nor
   /// empty (otherwise it'll match every char in the interpolation).
   ///
@@ -98,17 +98,15 @@ class I18NextOptions with Diagnosticable {
   /// - '{{title}}' name = 'title, format = null
   /// - '{{title, uppercase}}' name = 'title', format = 'uppercase'
   /// ```
-  final String? interpolationPrefix,
-      interpolationSuffix,
-      interpolationSeparator;
+  final String? interpolationPrefix, interpolationSuffix, formatSeparator;
 
   /// [nestingPrefix] and [nestingSuffix] are the deliminators for nesting
   /// mechanism. By default they are '$t(' and ')' respectively and can't be
   /// null but can be empty.
   ///
-  /// [nestingSeparator] is used to separate the key's name from the variables
-  /// (if any) which must be JSON. Defaults to ',' and cannot be null nor empty
-  /// (otherwise it'll match every char in the nesting).
+  /// [nestingOptionsSeparator] is used to separate the key's name from the
+  /// variables (if any) which must be JSON. Defaults to ',' and cannot be null
+  /// nor empty (otherwise it'll match every char in the nesting).
   ///
   /// ```json
   /// {
@@ -117,7 +115,7 @@ class I18NextOptions with Diagnosticable {
   /// }
   /// i18Next.t('key1') // "Hello World!"
   /// ```
-  final String? nestingPrefix, nestingSuffix, nestingSeparator;
+  final String? nestingPrefix, nestingSuffix, nestingOptionsSeparator;
 
   /// [formatter] is called when an interpolation has been found and is ready
   /// for substitution.
@@ -141,11 +139,11 @@ class I18NextOptions with Diagnosticable {
       pluralSuffix: other.pluralSuffix ?? pluralSuffix,
       interpolationPrefix: other.interpolationPrefix ?? interpolationPrefix,
       interpolationSuffix: other.interpolationSuffix ?? interpolationSuffix,
-      interpolationSeparator:
-          other.interpolationSeparator ?? interpolationSeparator,
+      formatSeparator: other.formatSeparator ?? formatSeparator,
       nestingPrefix: other.nestingPrefix ?? nestingPrefix,
       nestingSuffix: other.nestingSuffix ?? nestingSuffix,
-      nestingSeparator: other.nestingSeparator ?? nestingSeparator,
+      nestingOptionsSeparator:
+          other.nestingOptionsSeparator ?? nestingOptionsSeparator,
       formatter: other.formatter ?? formatter,
     );
   }
@@ -161,10 +159,10 @@ class I18NextOptions with Diagnosticable {
     String? pluralSuffix,
     String? interpolationPrefix,
     String? interpolationSuffix,
-    String? interpolationSeparator,
+    String? formatSeparator,
     String? nestingPrefix,
     String? nestingSuffix,
-    String? nestingSeparator,
+    String? nestingOptionsSeparator,
     ArgumentFormatter? formatter,
   }) {
     return I18NextOptions(
@@ -176,11 +174,11 @@ class I18NextOptions with Diagnosticable {
       pluralSuffix: pluralSuffix ?? this.pluralSuffix,
       interpolationPrefix: interpolationPrefix ?? this.interpolationPrefix,
       interpolationSuffix: interpolationSuffix ?? this.interpolationSuffix,
-      interpolationSeparator:
-          interpolationSeparator ?? this.interpolationSeparator,
+      formatSeparator: formatSeparator ?? this.formatSeparator,
       nestingPrefix: nestingPrefix ?? this.nestingPrefix,
       nestingSuffix: nestingSuffix ?? this.nestingSuffix,
-      nestingSeparator: nestingSeparator ?? this.nestingSeparator,
+      nestingOptionsSeparator:
+          nestingOptionsSeparator ?? this.nestingOptionsSeparator,
       formatter: formatter ?? this.formatter,
     );
   }
@@ -193,10 +191,10 @@ class I18NextOptions with Diagnosticable {
         keySeparator,
         interpolationPrefix,
         interpolationSuffix,
-        interpolationSeparator,
+        formatSeparator,
         nestingPrefix,
         nestingSuffix,
-        nestingSeparator,
+        nestingOptionsSeparator,
         pluralSuffix,
         formatter,
       );
@@ -212,10 +210,10 @@ class I18NextOptions with Diagnosticable {
       other.keySeparator == keySeparator &&
       other.interpolationPrefix == interpolationPrefix &&
       other.interpolationSuffix == interpolationSuffix &&
-      other.interpolationSeparator == interpolationSeparator &&
+      other.formatSeparator == formatSeparator &&
       other.nestingPrefix == nestingPrefix &&
       other.nestingSuffix == nestingSuffix &&
-      other.nestingSeparator == nestingSeparator &&
+      other.nestingOptionsSeparator == nestingOptionsSeparator &&
       other.pluralSuffix == pluralSuffix &&
       other.formatter == formatter;
 
@@ -230,10 +228,10 @@ class I18NextOptions with Diagnosticable {
       ..add(StringProperty('keySeparator', keySeparator))
       ..add(StringProperty('interpolationPrefix', interpolationPrefix))
       ..add(StringProperty('interpolationSuffix', interpolationSuffix))
-      ..add(StringProperty('interpolationSeparator', interpolationSeparator))
+      ..add(StringProperty('formatSeparator', formatSeparator))
       ..add(StringProperty('nestingPrefix', nestingPrefix))
       ..add(StringProperty('nestingSuffix', nestingSuffix))
-      ..add(StringProperty('nestingSeparator', nestingSeparator))
+      ..add(StringProperty('nestingOptionsSeparator', nestingOptionsSeparator))
       ..add(StringProperty('pluralSuffix', pluralSuffix))
       ..add(StringProperty('formatter', formatter?.toString()));
   }

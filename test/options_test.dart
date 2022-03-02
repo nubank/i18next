@@ -14,10 +14,10 @@ void main() {
     expect(options.keySeparator, isNull);
     expect(options.interpolationPrefix, isNull);
     expect(options.interpolationSuffix, isNull);
-    expect(options.interpolationSeparator, isNull);
+    expect(options.formatSeparator, isNull);
     expect(options.nestingPrefix, isNull);
     expect(options.nestingSuffix, isNull);
-    expect(options.nestingSeparator, isNull);
+    expect(options.nestingOptionsSeparator, isNull);
     expect(options.pluralSuffix, isNull);
     expect(options.formatter, isNull);
   });
@@ -29,10 +29,10 @@ void main() {
     expect(base.keySeparator, '.');
     expect(base.interpolationPrefix, '{{');
     expect(base.interpolationSuffix, '}}');
-    expect(base.interpolationSeparator, ',');
+    expect(base.formatSeparator, ',');
     expect(base.nestingPrefix, r'$t(');
     expect(base.nestingSuffix, ')');
-    expect(base.nestingSeparator, ',');
+    expect(base.nestingOptionsSeparator, ',');
     expect(base.pluralSuffix, 'plural');
     expect(base.formatter, I18NextOptions.defaultFormatter);
   });
@@ -62,10 +62,10 @@ void main() {
       keySeparator: 'Some keySeparator',
       interpolationPrefix: 'Some interpolationPrefix',
       interpolationSuffix: 'Some interpolationSuffix',
-      interpolationSeparator: 'Some interpolationSeparator',
+      formatSeparator: 'Some interpolationSeparator',
       nestingPrefix: 'Some nestingPrefix',
       nestingSuffix: 'Some nestingSuffix',
-      nestingSeparator: 'Some nestingSeparator',
+      nestingOptionsSeparator: 'Some nestingSeparator',
       pluralSuffix: 'Some pluralSuffix',
       formatter: (value, format, locale) => value.toString(),
     );
@@ -111,10 +111,10 @@ void main() {
       keySeparator: 'Some keySeparator',
       interpolationPrefix: 'Some interpolationPrefix',
       interpolationSuffix: 'Some interpolationSuffix',
-      interpolationSeparator: 'Some interpolationSeparator',
+      formatSeparator: 'Some interpolationSeparator',
       nestingPrefix: 'Some nestingPrefix',
       nestingSuffix: 'Some nestingSuffix',
-      nestingSeparator: 'Some nestingSeparator',
+      nestingOptionsSeparator: 'Some nestingSeparator',
       pluralSuffix: 'Some pluralSuffix',
       formatter: (value, format, locale) => value.toString(),
     );
@@ -138,10 +138,10 @@ void main() {
       another.keySeparator!,
       another.interpolationPrefix!,
       another.interpolationSuffix!,
-      another.interpolationSeparator!,
+      another.formatSeparator!,
       another.nestingPrefix!,
       another.nestingSuffix!,
-      another.nestingSeparator!,
+      another.nestingOptionsSeparator!,
       another.pluralSuffix!,
     ])) {
       test('given individual values=$permutation', () {
@@ -153,10 +153,10 @@ void main() {
           keySeparator: permutation[4] as String?,
           interpolationPrefix: permutation[5] as String?,
           interpolationSuffix: permutation[6] as String?,
-          interpolationSeparator: permutation[7] as String?,
+          formatSeparator: permutation[7] as String?,
           nestingPrefix: permutation[8] as String?,
           nestingSuffix: permutation[9] as String?,
-          nestingSeparator: permutation[10] as String?,
+          nestingOptionsSeparator: permutation[10] as String?,
           pluralSuffix: permutation[11] as String?,
         );
         // at least one should be different
@@ -190,8 +190,8 @@ void main() {
           permutation[6] ?? base.interpolationSuffix,
         );
         expect(
-          result.interpolationSeparator,
-          permutation[7] ?? base.interpolationSeparator,
+          result.formatSeparator,
+          permutation[7] ?? base.formatSeparator,
         );
         expect(
           result.nestingPrefix,
@@ -202,8 +202,8 @@ void main() {
           permutation[9] ?? base.nestingSuffix,
         );
         expect(
-          result.nestingSeparator,
-          permutation[10] ?? base.nestingSeparator,
+          result.nestingOptionsSeparator,
+          permutation[10] ?? base.nestingOptionsSeparator,
         );
         expect(
           result.pluralSuffix,
@@ -222,10 +222,10 @@ void main() {
         pluralSuffix: another.pluralSuffix,
         interpolationPrefix: another.interpolationPrefix,
         interpolationSuffix: another.interpolationSuffix,
-        interpolationSeparator: another.interpolationSeparator,
+        formatSeparator: another.formatSeparator,
         nestingPrefix: another.nestingPrefix,
         nestingSuffix: another.nestingSuffix,
-        nestingSeparator: another.nestingSeparator,
+        nestingOptionsSeparator: another.nestingOptionsSeparator,
         formatter: another.formatter,
       );
       expect(result, another);

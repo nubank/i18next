@@ -8,6 +8,11 @@
   * The final result is still the same, if either interpolation or nesting fails, the translator will fallback to null,
     which in turn is converted back into the original key.
   * Also, json deserialization issues `nesting` now fail, rather than silently recovering
+* Refactors: `interpolation` and `nesting` regex patterns
+  * Simplifies them from named matches to `<prefix>(.*?)<suffix>`, while checking for separators on the methods 
+    themselves.
+  * Renamed `I18NextOptions.interpolationSeparator->formatSeparator`
+  * Renamed `I18NextOptions.nestingSeparator->nestingOptionSeparator`
 
 ## [0.5.2]
 

@@ -6,7 +6,6 @@ import 'package:i18next/interpolator.dart';
 
 void main() {
   const baseOptions = I18NextOptions.base;
-  const defaultFormatter = I18NextOptions.defaultFormatter;
   const defaultLocale = Locale('en');
 
   group('interpolate', () {
@@ -48,11 +47,10 @@ void main() {
       });
 
       group('with variable only', () {
-        test('without variables', () {
-          const string = 'This is a {{variable}} string';
+        test('without replaceable variables', () {
           expect(
             () => interpol(
-              string,
+              'This is a {{variable}} string',
               formatter: noFormatterCalls(),
             ),
             throwsInterpolationException,
@@ -236,6 +234,18 @@ void main() {
               ),
               'This is my VALUE string',
             );
+
+            expect(
+              nst(
+                r'This is my $t(key, {"x":"\t\ny\n\t"}) string',
+                translate: expectAsync4((key, b, variables, d) {
+                  expect(key, 'key');
+                  expect(variables, {'x': '\t\ny\n\t'});
+                  return 'VALUE';
+                }),
+              ),
+              'This is my VALUE string',
+            );
           });
 
           test('the new variables are merged with the previous variables', () {
@@ -329,52 +339,61 @@ void main() {
   group('interpolationPattern', () {
     final pattern = interpolationPattern(baseOptions);
 
-    Iterable<List<String?>> allMatches(String text) =>
-        pattern.allMatches(text).map((match) => [
-              match.namedGroup('variable'),
-              match.namedGroup('format'),
-            ]);
+    List<List<String?>> allMatches(String text) =>
+        pattern.allMatches(text).map((match) => [match[1]]).toList();
 
     test('default pattern', () {
       expect(
         pattern.pattern,
-        r'\{\{(?<variable>.*?)(,\s*(?<format>.*?)\s*)?\}\}',
+        r'\{\{(.*?)\}\}',
       );
     });
 
     test('when has only one match without format', () {
       expect(allMatches('My text has {{one}} match'), [
-        ['one', null]
+        ['one']
+      ]);
+      expect(allMatches('My text has {{   one}} match'), [
+        ['   one']
+      ]);
+      expect(allMatches('My text has {{one   }} match'), [
+        ['one   ']
+      ]);
+      expect(allMatches('My text has {{  one  }} match'), [
+        ['  one  ']
+      ]);
+      expect(allMatches('My text has {{\n\tone\n\t}} match'), [
+        ['\n\tone\n\t']
       ]);
     });
 
     test('when has only one match with format', () {
       expect(allMatches('My text has {{one, Xyz}} match'), [
-        ['one', 'Xyz']
+        ['one, Xyz']
       ]);
     });
 
     test('when has only one match with format with whitespaces', () {
       expect(allMatches('My text has {{one,   Xyz}} match'), [
-        ['one', 'Xyz']
+        ['one,   Xyz']
       ]);
       expect(allMatches('My text has {{one, Xyz   }} match'), [
-        ['one', 'Xyz']
+        ['one, Xyz   ']
       ]);
       expect(allMatches('My text has {{one,    Xyz   }} match'), [
-        ['one', 'Xyz']
+        ['one,    Xyz   ']
       ]);
-      expect(allMatches('My text has {{one, \nXyz\n}} match'), [
-        ['one', 'Xyz']
+      expect(allMatches('My text has {{one, \n\tXyz\n\t}} match'), [
+        ['one, \n\tXyz\n\t']
       ]);
     });
 
     test('when has multiple matches without formats', () {
       expect(allMatches('My {{text}} {{has}} {{four}} {{matches}}'), [
-        ['text', null],
-        ['has', null],
-        ['four', null],
-        ['matches', null]
+        ['text'],
+        ['has'],
+        ['four'],
+        ['matches']
       ]);
     });
 
@@ -384,10 +403,10 @@ void main() {
           'My {{text, Aaa}} {{has, Bbb}} {{four, Ccc}} {{matches, Ddd}}',
         ),
         [
-          ['text', 'Aaa'],
-          ['has', 'Bbb'],
-          ['four', 'Ccc'],
-          ['matches', 'Ddd']
+          ['text, Aaa'],
+          ['has, Bbb'],
+          ['four, Ccc'],
+          ['matches, Ddd']
         ],
       );
     });
@@ -398,10 +417,10 @@ void main() {
       );
 
       expect(matches, [
-        ['text', null],
-        ['has', 'Bbb'],
-        ['four', 'Ccc'],
-        ['matches', null]
+        ['text'],
+        ['has, Bbb'],
+        ['four, Ccc'],
+        ['matches']
       ]);
     });
   });
@@ -409,52 +428,55 @@ void main() {
   group('nestingPattern', () {
     final pattern = nestingPattern(baseOptions);
 
-    Iterable<List<String?>> allMatches(String text) =>
-        pattern.allMatches(text).map((match) => [
-              match.namedGroup('key'),
-              match.namedGroup('variables'),
-            ]);
+    List<List<String?>> allMatches(String text) {
+      return pattern.allMatches(text).map((match) => [match[1]]).toList();
+    }
 
     test('default pattern', () {
       expect(
         pattern.pattern,
-        r'\$t\((?<key>.*?)(,\s*(?<variables>.*?)\s*)?\)',
+        r'\$t\((.*?)\)',
       );
     });
 
     test('when has only one match without variables', () {
       expect(allMatches(r'My text has $t(one) match'), [
-        ['one', null]
+        ['one']
       ]);
     });
 
     test('when has only one match with variables', () {
       expect(allMatches(r'My text has $t(one, {"my": "values"}) match'), [
-        ['one', '{"my": "values"}']
+        ['one, {"my": "values"}']
       ]);
+      expect(
+          allMatches('My text has \$t(one, {"my": "Asd\t\nvalues\t\n"}) match'),
+          [
+            ['one, {"my": "Asd\t\nvalues\t\n"}']
+          ]);
     });
 
     test('when has only one match with variables and whitespaces', () {
       expect(allMatches(r'My text has $t(one,   Xyz) match'), [
-        ['one', 'Xyz']
+        ['one,   Xyz']
       ]);
       expect(allMatches(r'My text has $t(one, Xyz   ) match'), [
-        ['one', 'Xyz']
+        ['one, Xyz   ']
       ]);
       expect(allMatches(r'My text has $t(one,    Xyz   ) match'), [
-        ['one', 'Xyz']
+        ['one,    Xyz   ']
       ]);
-      expect(allMatches('My text has \$t(one, \nXyz\n) match'), [
-        ['one', 'Xyz']
+      expect(allMatches('My text has \$t(one, \t\nXyz\t\n) match'), [
+        ['one, \t\nXyz\t\n']
       ]);
     });
 
     test('when has multiple matches without formats', () {
       expect(allMatches(r'My $t(text) $t(has) $t(four) $t(matches)'), [
-        ['text', null],
-        ['has', null],
-        ['four', null],
-        ['matches', null]
+        ['text'],
+        ['has'],
+        ['four'],
+        ['matches']
       ]);
     });
 
@@ -464,10 +486,10 @@ void main() {
           r'My $t(text, Aaa) $t(has, Bbb) $t(four, Ccc) $t(matches, Ddd)',
         ),
         [
-          ['text', 'Aaa'],
-          ['has', 'Bbb'],
-          ['four', 'Ccc'],
-          ['matches', 'Ddd']
+          ['text, Aaa'],
+          ['has, Bbb'],
+          ['four, Ccc'],
+          ['matches, Ddd']
         ],
       );
     });
@@ -478,10 +500,10 @@ void main() {
       );
 
       expect(matches, [
-        ['text', null],
-        ['has', 'Bbb'],
-        ['four', 'Ccc'],
-        ['matches', null]
+        ['text'],
+        ['has, Bbb'],
+        ['four, Ccc'],
+        ['matches']
       ]);
     });
   });

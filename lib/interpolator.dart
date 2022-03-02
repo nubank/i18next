@@ -54,27 +54,27 @@ String interpolate(
   I18NextOptions options,
 ) {
   final pattern = interpolationPattern(options);
+  final formatSeparator = options.formatSeparator ?? ',';
   final keySeparator = options.keySeparator ?? '.';
 
   return string.splitMapJoin(pattern, onMatch: (match) {
-    match = match as RegExpMatch;
-    final variable = match.namedGroup('variable')?.trim();
-    if (variable == null || variable.isEmpty) {
-      throw InterpolationException('Missing variable', match);
+    var variable = match[1]!.trim();
+    String? format;
+    if (variable.contains(formatSeparator)) {
+      final variableParts = variable.split(formatSeparator);
+      variable = variableParts.first.trim();
+      format = variableParts.skip(1).join(formatSeparator).trim();
     }
 
+    if (variable.isEmpty) {
+      throw InterpolationException('Missing variable', match);
+    }
     final path = variable.split(keySeparator);
     final value = evaluate(path, variables);
     if (value == null) {
       throw InterpolationException('Could not evaluate variable', match);
     }
-
-    final formatter = options.formatter;
-    if (formatter != null) {
-      final format = match.namedGroup('format');
-      return formatter(value, format, locale);
-    }
-    return value.toString();
+    return options.formatter?.call(value, format, locale) ?? value.toString();
   });
 }
 
@@ -99,49 +99,37 @@ String nest(
   I18NextOptions options,
 ) {
   final pattern = nestingPattern(options);
+  final optionsSeparator = options.nestingOptionsSeparator ?? ',';
 
   return string.splitMapJoin(pattern, onMatch: (match) {
-    match = match as RegExpMatch;
-    final key = match.namedGroup('key');
-    if (key == null || key.isEmpty) {
+    var key = match[1]!.trim();
+
+    final newVariables = {...variables};
+    if (key.contains(optionsSeparator)) {
+      final index = key.indexOf(optionsSeparator);
+      final nestedOptionsString =
+          key.substring(index + optionsSeparator.length).trim();
+      newVariables.addAll(jsonDecode(nestedOptionsString));
+      key = key.substring(0, index).trim(); // after options
+    }
+
+    if (key.isEmpty) {
       throw NestingException('Key not found', match);
     }
 
-    final newVariables = Map<String, dynamic>.of(variables);
-    final varsString = match.namedGroup('variables');
-    if (varsString != null && varsString.isNotEmpty) {
-      final Map<String, dynamic> decoded = jsonDecode(varsString);
-      newVariables.addAll(decoded);
-    }
-
-    final value = translate(key, locale, newVariables, options);
-    if (value == null) {
-      throw NestingException('Translation not found', match);
-    }
-    return value;
+    return translate(key, locale, newVariables, options) ??
+        (throw NestingException('Translation not found', match));
   });
 }
 
 RegExp interpolationPattern(I18NextOptions options) {
   final prefix = RegExp.escape(options.interpolationPrefix ?? '{{');
   final suffix = RegExp.escape(options.interpolationSuffix ?? '}}');
-  final separator = RegExp.escape(options.interpolationSeparator ?? ',');
-  return RegExp(
-    '$prefix'
-    '(?<variable>.*?)'
-    '($separator\\s*(?<format>.*?)\\s*)?'
-    '$suffix',
-  );
+  return RegExp('$prefix(.*?)$suffix', dotAll: true);
 }
 
 RegExp nestingPattern(I18NextOptions options) {
   final prefix = RegExp.escape(options.nestingPrefix ?? r'$t(');
   final suffix = RegExp.escape(options.nestingSuffix ?? ')');
-  final separator = RegExp.escape(options.nestingSeparator ?? ',');
-  return RegExp(
-    '$prefix'
-    '(?<key>.*?)'
-    '($separator\\s*(?<variables>.*?)\\s*)?'
-    '$suffix',
-  );
+  return RegExp('$prefix(.*?)$suffix', dotAll: true);
 }
