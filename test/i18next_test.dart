@@ -620,20 +620,33 @@ void main() {
       );
     });
 
-    test('when the nested key is the same as the referenced one', () {
-      mockKey('key', r'My key is $t(key)!');
-
-      expect(i18next.t('$namespace:key'), '$namespace:key');
-    });
-
-    test(
-      'when the nested key is referenced with a context that doesnt exist',
-      () {
-        mockKey('key', r'My key is $t(key, {"context": "ctx"})!');
+    group('when the nested key is the same as the referenced one', () {
+      test('without contexts', () {
+        mockKey('key', r'My key is $t(key)!');
 
         expect(i18next.t('$namespace:key'), '$namespace:key');
-      },
-    );
+      });
+
+      test(
+        'when the nested key is referenced with a context that doesnt exist',
+        () {
+          mockKey('key', r'My key is $t(key, {"context": "ctx"})!');
+
+          expect(i18next.t('$namespace:key'), '$namespace:key');
+          expect(i18next.t('$namespace:key', context: 'xtc'), '$namespace:key');
+        },
+      );
+
+      test('with a valid different context', () {
+        mockKey('key', r'My key is $t(key, {"context":"ctx"})!');
+        mockKey('key_ctx', r'Contexted value');
+
+        expect(
+          i18next.t('$namespace:key', context: 'nonexistent'),
+          'My key is Contexted value!',
+        );
+      });
+    });
   });
 
   group('.of', () {

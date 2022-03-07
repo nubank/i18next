@@ -113,12 +113,13 @@ class Translator {
         result = interpolator.nest(
           locale,
           result,
-          (currentKey, locale, variables, options) {
+          (currentKey, locale, newVariables, options) {
             // nesting a potentially recursive key
-            if (currentKey == key) return null;
+            if (currentKey == key &&
+                newVariables['context'] == variables['context']) return null;
 
             return Translator(pluralResolver, resourceStore, namespace)
-                .call(currentKey, locale, variables, options);
+                .call(currentKey, locale, newVariables, options);
           },
           variables,
           options,
