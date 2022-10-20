@@ -81,6 +81,30 @@ class I18Next {
     I18NextOptions? options,
     String Function(String)? orElse,
   }) {
+    return tOrNull(
+          key,
+          locale: locale,
+          context: context,
+          count: count,
+          variables: variables,
+          options: options,
+        ) ??
+        orElse?.call(key) ??
+        key;
+  }
+
+  /// Attempts to retrieve a translation at [key].
+  /// Returns `null` if the translation cannot be found.
+  ///
+  /// **See also:** [t]
+  String? tOrNull(
+    String key, {
+    Locale? locale,
+    String? context,
+    int? count,
+    Map<String, dynamic>? variables,
+    I18NextOptions? options,
+  }) {
     variables ??= {};
     if (context != null) variables['context'] = context;
     if (count != null) variables['count'] = count;
@@ -89,9 +113,7 @@ class I18Next {
     final newOptions = this.options.merge(options);
 
     return Translator(pluralResolver, resourceStore)
-            .call(key, locale, variables, newOptions) ??
-        orElse?.call(key) ??
-        key;
+        .call(key, locale, variables, newOptions);
   }
 
   /// Returns the localized [I18Next] in the widget tree that corresponds to
