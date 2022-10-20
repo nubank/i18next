@@ -79,6 +79,7 @@ class I18Next {
     int? count,
     Map<String, dynamic>? variables,
     I18NextOptions? options,
+    String Function(String)? orElse,
   }) {
     variables ??= {};
     if (context != null) variables['context'] = context;
@@ -87,9 +88,9 @@ class I18Next {
     locale ??= this.locale;
     final newOptions = this.options.merge(options);
 
-    // TODO: when translator fails, allow a fallback behavior (null or throw)
     return Translator(pluralResolver, resourceStore)
             .call(key, locale, variables, newOptions) ??
+        orElse?.call(key) ??
         key;
   }
 

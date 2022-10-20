@@ -647,4 +647,84 @@ void main() {
       expect(I18Next.of(capturedContext!), isNotNull);
     });
   });
+
+  group('orElse', () {
+    group('fallback value', () {
+      const fallback = 'Fallback';
+      test('when key is not found', () {
+        expect(
+          i18next.t('$namespace:key', orElse: (key) => fallback),
+          fallback,
+        );
+      });
+      test('when namespace is wrong', () {
+        mockKey('key', 'Translation', ns: namespace);
+        expect(
+          i18next.t('ns2:key', orElse: (key) => fallback),
+          fallback,
+        );
+      });
+      test('ignored when key is found', () {
+        mockKey('key', 'Translation', ns: namespace);
+        expect(
+          i18next.t('$namespace:key', orElse: (key) => fallback),
+          'Translation',
+        );
+      });
+      test('ignored when key is found in fallback namespace', () {
+        const fallbackNamespace = 'fallback_namespace';
+        i18next = I18Next(
+          locale,
+          resourceStore,
+          options: const I18NextOptions(
+            fallbackNamespaces: [fallbackNamespace],
+          ),
+        );
+        mockKey('key', 'Translation', ns: fallbackNamespace);
+        expect(
+          i18next.t('$namespace:key', orElse: (key) => fallback),
+          'Translation',
+        );
+      });
+    });
+
+    final exc = Exception('Not found');
+    group('throw', () {
+      test('when key is not found', () {
+        expect(
+          () => i18next.t('$namespace:key', orElse: (key) => throw exc),
+          throwsA(exc),
+        );
+      });
+      test('when namespace is wrong', () {
+        mockKey('key', 'Translation', ns: namespace);
+        expect(
+          () => i18next.t('ns2:key', orElse: (key) => throw exc),
+          throwsA(exc),
+        );
+      });
+      test('ignored when key is found', () {
+        mockKey('key', 'Translation', ns: namespace);
+        expect(
+          i18next.t('$namespace:key', orElse: (key) => throw exc),
+          'Translation',
+        );
+      });
+      test('ignored when key is found in fallback namespace', () {
+        const fallbackNamespace = 'fallback_namespace';
+        i18next = I18Next(
+          locale,
+          resourceStore,
+          options: const I18NextOptions(
+            fallbackNamespaces: [fallbackNamespace],
+          ),
+        );
+        mockKey('key', 'Translation', ns: fallbackNamespace);
+        expect(
+          i18next.t('$namespace:key', orElse: (key) => throw exc),
+          'Translation',
+        );
+      });
+    });
+  });
 }
