@@ -15,6 +15,10 @@ class ResourceStore {
 
   final Map<Locale, Map<String, dynamic>> _data;
 
+  /// get all data from [locale] and [namespace]
+  Map<String, dynamic>? getNamespace(Locale locale, String namespace) =>
+      _data[locale]?[namespace];
+
   /// Registers the [namespace] to the store for the given [locale].
   ///
   /// [locale], [namespace], and [data] cannot be null.
